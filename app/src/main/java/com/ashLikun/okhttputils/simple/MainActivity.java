@@ -7,12 +7,14 @@ import android.util.Log;
 import com.ashLikun.okhttputils.http.Callback;
 import com.ashLikun.okhttputils.http.OkHttpUtils;
 import com.ashLikun.okhttputils.http.request.RequestParam;
+import com.ashLikun.okhttputils.liteorm.LiteOrmUtil;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LiteOrmUtil.init(getApplication(), 1, true);
         setContentView(R.layout.activity_main);
         RequestParam p = new RequestParam("http://jielehua.vcash.cn/api/jlh/apply/getApplyProgress/");
         p.get();
