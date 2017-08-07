@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.simple;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,7 +15,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LiteOrmUtil.init(getApplication(), 1, true);
+        LiteOrmUtil.init(new LiteOrmUtil.OnNeedListener() {
+            @Override
+            public Application getApplication() {
+                return getApplication();
+            }
+
+            @Override
+            public boolean isDebug() {
+                return true;
+            }
+
+            @Override
+            public int getVersionCode() {
+                return 1;
+            }
+        });
         setContentView(R.layout.activity_main);
         RequestParam p = new RequestParam("http://jielehua.vcash.cn/api/jlh/apply/getApplyProgress/");
         p.get();
