@@ -312,7 +312,7 @@ public class RequestParam implements Comparator<String> {
      * 作者　　: 李坤
      * 创建时间: 2017/8/8 9:45
      * 邮箱　　：496546144@qq.com
-     * 方法功能：添加签名，在全部参数添加完毕后,请不要调用toJson方法
+     * 方法功能：添加签名，在全部参数添加完毕后,如果调用toJson方法那么params没有值，content有值
      * 实现者可以继承从写
      */
     public void addSign() {
