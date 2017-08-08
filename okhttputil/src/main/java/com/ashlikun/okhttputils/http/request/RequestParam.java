@@ -12,9 +12,11 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -32,7 +34,7 @@ import okhttp3.RequestBody;
  * 注意：一定要调用请求方法指定请求的方法，默认时get
  */
 
-public class RequestParam {
+public class RequestParam implements Comparator<String> {
     protected Uri url;//请求地址
     private String method;//请求方法
     protected Map<String, String> headers;//请求头
@@ -85,14 +87,14 @@ public class RequestParam {
 
     public void addParam(String key, String valuse) {
         if (!isEmpty(key) && !isEmpty(valuse)) {
-            if (params == null) params = new HashMap<>();
+            if (params == null) newParamMap();
             params.put(key, valuse);
         }
     }
 
     public void addHeader(String key, String valuse) {
         if (!isEmpty(key) && !isEmpty(valuse)) {
-            if (headers == null) headers = new HashMap<>();
+            if (headers == null) newHeaderMap();
             headers.put(key, valuse);
         }
     }
@@ -185,7 +187,7 @@ public class RequestParam {
 
     public RequestBody buildRequestBody(Callback callback) {
         RequestBody body = null;
-
+        addSign();
         if (method.equals("GET")) {
             //get请求把参数放在url里面, 没有请求实体
             url = appendQueryParams(url, params);
@@ -304,5 +306,30 @@ public class RequestParam {
             e.printStackTrace();
         }
         return "application/octet-stream";
+    }
+
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/8/8 9:45
+     * 邮箱　　：496546144@qq.com
+     * 方法功能：添加签名，在全部参数添加完毕后,请不要调用toJson方法
+     * 实现者可以继承从写
+     */
+    public void addSign() {
+
+    }
+
+    public void newParamMap() {
+        params = new TreeMap<>(this);
+    }
+
+    public void newHeaderMap() {
+        headers = new HashMap<>();
+    }
+
+    //遍历参数的时候顺序,默认递增，结合 newParamMap 方法
+    @Override
+    public int compare(String o1, String o2) {
+        return o1.compareTo(o2);
     }
 }
