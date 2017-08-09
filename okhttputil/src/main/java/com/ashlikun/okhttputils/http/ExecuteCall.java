@@ -15,7 +15,7 @@ public class ExecuteCall {
     private boolean isCompleted = false;//是否完成
 
     public void cancel() {
-        if (call != null) {
+        if (call != null && !call.isCanceled()) {
             call.cancel();
         }
     }

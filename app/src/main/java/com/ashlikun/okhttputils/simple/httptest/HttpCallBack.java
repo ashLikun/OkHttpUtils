@@ -26,7 +26,7 @@ public abstract class HttpCallBack<T> implements Callback<T> {
     }
 
     @Override
-    public void onError(Throwable e) {
+    public void onError(Exception e) {
 
     }
 

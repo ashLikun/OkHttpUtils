@@ -2,6 +2,7 @@ package com.ashlikun.okhttputils.http.request;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ashlikun.okhttputils.http.Callback;
 import com.ashlikun.okhttputils.json.GsonHelper;
@@ -49,6 +50,11 @@ public class RequestParam implements Comparator<String> {
         url(url);
     }
 
+    /* valid HTTP methods */
+    private static final String[] methods = {
+            "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"
+    };
+
     public void appendPath(String path) {
         if (url == null) new Exception("先调用url方法");
         Uri.Builder builder = url.buildUpon();
@@ -58,15 +64,22 @@ public class RequestParam implements Comparator<String> {
     }
 
     public void setMethod(String method) {
-        this.method = method;
+        for (int i = 0; i < methods.length; i++) {
+            if (methods[i].equals(method)) {
+                this.method = method;
+                return;
+            }
+        }
+        Log.e("setMethod", "请求方法错误" + method);
+        this.method = methods[0];
     }
 
     public void post() {
-        method = "POST";
+        setMethod("POST");
     }
 
     public void get() {
-        method = "GET";
+        setMethod("GET");
     }
 
     public void url(String url) {
@@ -159,7 +172,7 @@ public class RequestParam implements Comparator<String> {
     public Request bulidRequest(Callback callback) {
         Request.Builder builder = new Request.Builder();
         if (isEmpty(method))
-            method = "GET";
+            method = methods[0];
         RequestBody requestBody = buildRequestBody(callback);
         Headers.Builder header = new Headers.Builder();
         if (isHavaHeader()) {

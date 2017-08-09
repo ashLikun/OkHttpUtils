@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(Exception e) {
 
             }
 
