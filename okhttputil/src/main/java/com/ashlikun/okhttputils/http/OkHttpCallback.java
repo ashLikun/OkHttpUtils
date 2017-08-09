@@ -10,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.concurrent.TimeoutException;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -40,25 +39,27 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
 
     @Override
     public void onFailure(Call call, final IOException e) {
-        Exception res = e;
+        HttpException res;
         if (e instanceof ConnectException) {
             res = new HttpException(HttpErrorCode.HTTP_NO_CONNECT, HttpErrorCode.MSG_NO_CONNECT);
-        } else if (res instanceof SocketException) {
+        } else if (e instanceof SocketException) {
             //java.net.SocketException: sendto failed: ECONNRESET (Connection reset by peer)
             //服务器的并发连接数超过了其承载量，服务器会将其中一些连接关闭；
             //如果知道实际连接服务器的并发客户数没有超过服务器的承载量，则有可能是中了病毒或者木马，引起网
             res = new HttpException(HttpErrorCode.HTTP_SOCKET_ERROR, HttpErrorCode.MSG_SOCKET_ERROR);
-        } else if (res instanceof SocketTimeoutException || res instanceof TimeoutException) {
+        } else if (e instanceof SocketTimeoutException) {
             res = new HttpException(HttpErrorCode.HTTP_TIME_OUT, HttpErrorCode.MSG_TIME_OUT);
-        } else if (res instanceof UnknownHostException) {
+        } else if (e instanceof UnknownHostException) {
             res = new HttpException(HttpErrorCode.HTTP_UNKNOWN_HOST, HttpErrorCode.MSG_UNKNOWN_HOST);
         } else {
+            e.printStackTrace();
             res = new HttpException(HttpErrorCode.HTTP_UNKNOWN, HttpErrorCode.MSG_UNKNOWN);
         }
+        res.setOriginalException(e);
         postFailure(res);
     }
 
-    private void postFailure(final Exception throwable) {
+    private void postFailure(final HttpException throwable) {
         switchThread(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
@@ -96,7 +97,9 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
                 postResponse(response, resultType);
             } catch (IOException e) {
                 e.printStackTrace();
-                postFailure(new HttpException(HttpErrorCode.HTTP_DATA_ERROR, HttpErrorCode.MSG_DATA_ERROR));
+                HttpException res = new HttpException(HttpErrorCode.HTTP_DATA_ERROR, HttpErrorCode.MSG_DATA_ERROR);
+                res.setOriginalException(e);
+                postFailure(res);
                 response.close();
             }
         } else {

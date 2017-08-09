@@ -11,13 +11,13 @@ package com.ashlikun.okhttputils.http;
 public final class HttpException extends Exception {
     private int code;
     private String message;
+    private Exception originalException;//原始错误
 
     public HttpException(int code, String message) {
         super(message);
         this.code = code;
         this.message = message;
     }
-
 
 
     /**
@@ -34,4 +34,11 @@ public final class HttpException extends Exception {
         return message;
     }
 
+    public Exception getOriginalException() {
+        return originalException;
+    }
+
+    public void setOriginalException(Exception originalException) {
+        this.originalException = originalException;
+    }
 }

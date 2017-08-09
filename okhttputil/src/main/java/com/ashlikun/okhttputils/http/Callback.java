@@ -20,7 +20,7 @@ public interface Callback<ResultType> {
 
     void onCompleted();
 
-    void onError(Exception e);
+    void onError(HttpException e);
 
     void onSuccess(ResultType responseBody);
 }

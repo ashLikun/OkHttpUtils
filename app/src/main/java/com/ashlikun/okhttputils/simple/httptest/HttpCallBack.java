@@ -2,6 +2,7 @@ package com.ashlikun.okhttputils.simple.httptest;
 
 
 import com.ashlikun.okhttputils.http.Callback;
+import com.ashlikun.okhttputils.http.HttpException;
 
 /**
  * 作者　　: 李坤
@@ -26,7 +27,7 @@ public abstract class HttpCallBack<T> implements Callback<T> {
     }
 
     @Override
-    public void onError(Exception e) {
+    public void onError(HttpException e) {
 
     }
 

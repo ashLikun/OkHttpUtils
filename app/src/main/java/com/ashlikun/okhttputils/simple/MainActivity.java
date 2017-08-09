@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.ashlikun.okhttputils.http.Callback;
+import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.liteorm.LiteOrmUtil;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(Exception e) {
+            public void onError(HttpException e) {
 
             }
 
