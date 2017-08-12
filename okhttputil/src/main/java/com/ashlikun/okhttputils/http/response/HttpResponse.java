@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import okhttp3.Response;
 
 /**
@@ -44,7 +47,7 @@ public class HttpResponse {
     }
 
     public String getMessage() {
-        return message;
+        return unicode2String(message);
     }
 
     public JSONObject getJSONObject() throws JSONException {
@@ -66,7 +69,6 @@ public class HttpResponse {
     public boolean isSucceed() {
         return code == HttpCode.SUCCEED;
     }
-
 
 
     /**
@@ -124,5 +126,23 @@ public class HttpResponse {
         return cache;
     }
 
+    static final Pattern reUnicode = Pattern.compile("\\\\u([0-9a-zA-Z]{2,4})");
 
+    /**
+     * unicode 转字符串
+     */
+    public String unicode2String(String unicode) {
+
+        if (TextUtils.isEmpty(unicode)) {
+            return null;
+        }
+        Matcher m = reUnicode.matcher(unicode);
+        StringBuffer sb = new StringBuffer(unicode.length());
+        while (m.find()) {
+            m.appendReplacement(sb,
+                    Character.toString((char) Integer.parseInt(m.group(1), 16)));
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
 }
