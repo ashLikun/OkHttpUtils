@@ -30,9 +30,6 @@ public class HttpResult<T> extends HttpResponse {
                 ", httpcode=" + httpcode +
                 ", code=" + code +
                 ", message='" + message + '\'' +
-                ", timestamp='" + timestamp + '\'' +
-                ", success=" + success +
-                ", error=" + error +
                 '}';
     }
 }

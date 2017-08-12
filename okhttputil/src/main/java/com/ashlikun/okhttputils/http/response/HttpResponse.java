@@ -60,23 +60,6 @@ public class HttpResponse {
 
     /**
      * 作者　　: 李坤
-     * 创建时间: 2017/5/25 11:07
-     * <p>
-     * 方法功能：设置当前类的解析json
-     */
-
-    public void setJson(String json) {
-        GsonHelper.getGson().fromJson(json, HttpResponse.class);
-    }
-
-    public void setResponse(Response response) throws IOException {
-        setJson(response.body().string());
-        this.response = response;
-        httpcode = response.code();
-    }
-
-    /**
-     * 作者　　: 李坤
      * 创建时间: 2016/9/2 11:05
      * <p>
      * 方法功能：返回成功  success
