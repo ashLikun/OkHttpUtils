@@ -16,7 +16,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 
 public class HttpCode {
-    public static final int SUCCEED = 200;//正常请求
+    public static final int SUCCEED = 0;//正常请求
+    public static final int SIGN_ERROR = 2;//签名错误
+    public static final int ERROR = 1;//请求出错
 
     @IntDef(value = {SUCCEED})
     @Retention(value = RUNTIME)

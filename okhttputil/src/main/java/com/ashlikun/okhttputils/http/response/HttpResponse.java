@@ -31,14 +31,9 @@ public class HttpResponse {
     @HttpCode.IHttpCode
     @SerializedName("code")
     public int code;
-    @SerializedName("message")
+    @SerializedName("msg")
     public String message;
-    @SerializedName("timestamp")
-    public String timestamp;
-    @SerializedName("success")
-    public boolean success;
-    @SerializedName("error")
-    public boolean error;
+
 
     @HttpCode.IHttpCode
     public int getCode() {
@@ -88,20 +83,9 @@ public class HttpResponse {
      */
 
     public boolean isSucceed() {
-        return success;
+        return code == HttpCode.SUCCEED;
     }
 
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2016/9/2 11:06
-     * <p>
-     * 方法功能：接口失败  success
-     */
-
-
-    public boolean isError() {
-        return error;
-    }
 
 
     /**
