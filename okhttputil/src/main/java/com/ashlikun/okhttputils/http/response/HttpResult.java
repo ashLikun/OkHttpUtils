@@ -14,7 +14,6 @@ public class HttpResult<T> extends HttpResponse {
     public T data;
 
     public T getData() {
-        json = null;
         return data;
     }
 

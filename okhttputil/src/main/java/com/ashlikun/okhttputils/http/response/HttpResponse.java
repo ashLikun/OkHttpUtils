@@ -74,10 +74,10 @@ public class HttpResponse {
     /**
      * 作者　　: 李坤
      * 创建时间: 2017/5/19 17:04
-     * 方法功能：根据key获取对象
+     * 方法功能：根据key获取对象,多个key代表多个等级
      */
 
-    public <T> T getTypeToObject(Class<T> type, String... key) throws JSONException {
+    public <T> T getValue(Class<T> type, String... key) throws JSONException {
         Object resStr = getJSONObject();
         if (key != null) {
             for (int i = 0; i < key.length; i++) {
@@ -93,6 +93,51 @@ public class HttpResponse {
         }
         T t = GsonHelper.getGson().fromJson(resStr.toString(), type);
         return t;
+    }
+
+    public int getIntValue(String... key) {
+        try {
+            return getValue(Integer.class, key);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public String getStringValue(String... key) {
+        try {
+            return getValue(String.class, key);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public boolean getBooleanValue(String... key) {
+        try {
+            return getValue(Boolean.class, key);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public float getFloatValue(String... key) {
+        try {
+            return getValue(Float.class, key);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public double getDoubleValue(String... key) {
+        try {
+            return getValue(Double.class, key);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     /**
