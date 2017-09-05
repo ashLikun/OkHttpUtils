@@ -9,6 +9,7 @@ import com.ashlikun.okhttputils.http.Callback;
 import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.request.RequestParam;
+import com.ashlikun.okhttputils.http.response.HttpResponse;
 import com.ashlikun.okhttputils.liteorm.LiteOrmUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,5 +66,16 @@ public class MainActivity extends AppCompatActivity {
         });
         //https://jlhpredeploy.vcash.cn/api/jlh/apply/getCustomerApplyInfo/4690943?accessToken=DE3AB2FCF409231F0C7F9D5EE306264D
 
+        HttpResponse response = new HttpResponse();
+        response.json = "{\n" +
+                "\t\"code\": 0,\n" +
+                "\t\"msg\": \"\\u767b\\u9646\\u6210\\u529f\",\n" +
+                "\t\"data\": {\n" +
+                "\t\t\"type\": 2,\n" +
+                "\t\t\"id\": \"5\",\n" +
+                "\t\t\"token\": \"zn8UmgHJT\"\n" +
+                "\t}\n" +
+                "}";
+        Log.e("aaa", response.getIntValue("type") + "");
     }
 }

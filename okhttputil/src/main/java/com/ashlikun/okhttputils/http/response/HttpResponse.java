@@ -88,16 +88,15 @@ public class HttpResponse {
         if (resStr == null) {
             return null;
         }
-        if (type.isAssignableFrom(String.class)) {
 
-        }
         T t = GsonHelper.getGson().fromJson(resStr.toString(), type);
         return t;
     }
 
     public int getIntValue(String... key) {
         try {
-            return getValue(Integer.class, key);
+            Integer res = getValue(Integer.class, key);
+            return res == null ? 0 : res;
         } catch (JSONException e) {
             e.printStackTrace();
             return 0;
@@ -106,7 +105,8 @@ public class HttpResponse {
 
     public String getStringValue(String... key) {
         try {
-            return getValue(String.class, key);
+            String res = getValue(String.class, key);
+            return res == null ? "" : res;
         } catch (JSONException e) {
             e.printStackTrace();
             return "";
@@ -115,7 +115,8 @@ public class HttpResponse {
 
     public boolean getBooleanValue(String... key) {
         try {
-            return getValue(Boolean.class, key);
+            Boolean res = getValue(Boolean.class, key);
+            return res == null ? false : res;
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
@@ -124,7 +125,8 @@ public class HttpResponse {
 
     public float getFloatValue(String... key) {
         try {
-            return getValue(Float.class, key);
+            Float res = getValue(Float.class, key);
+            return res == null ? 0 : res;
         } catch (JSONException e) {
             e.printStackTrace();
             return 0;
@@ -133,7 +135,8 @@ public class HttpResponse {
 
     public double getDoubleValue(String... key) {
         try {
-            return getValue(Double.class, key);
+            Double res = getValue(Double.class, key);
+            return res == null ? 0 : res;
         } catch (JSONException e) {
             e.printStackTrace();
             return 0;
