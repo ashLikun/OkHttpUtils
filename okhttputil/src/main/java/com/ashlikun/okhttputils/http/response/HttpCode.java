@@ -17,10 +17,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public class HttpCode {
     public static final int SUCCEED = 0;//正常请求
-    public static final int SIGN_ERROR = 2;//签名错误
     public static final int ERROR = 1;//请求出错
+    public static final int SIGN_ERROR = 887;//签名错误
+    public static final int TOKEN_ERROR = 888;//token失效
 
-    @IntDef(value = {SUCCEED, ERROR, SIGN_ERROR})
+
+    @IntDef(value = {SUCCEED, ERROR, SIGN_ERROR, TOKEN_ERROR})
     @Retention(value = RUNTIME)
     public @interface IHttpCode {
 

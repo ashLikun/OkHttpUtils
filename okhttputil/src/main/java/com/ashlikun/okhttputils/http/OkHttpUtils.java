@@ -4,7 +4,9 @@ package com.ashlikun.okhttputils.http;
 import com.ashlikun.okhttputils.http.request.RequestCall;
 import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
+import com.ashlikun.okhttputils.http.response.HttpResult;
 import com.ashlikun.okhttputils.json.GsonHelper;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -70,7 +72,7 @@ public class OkHttpUtils implements SuperHttp {
         Call call = requestCall.buildCall(callback);
         ExecuteCall exc = new ExecuteCall();
         exc.setCall(call);
-        call.enqueue(new OkHttpCallback( exc, callback));
+        call.enqueue(new OkHttpCallback(exc, callback));
         return exc;
     }
 
@@ -136,7 +138,20 @@ public class OkHttpUtils implements SuperHttp {
                 if (type == String.class) {
                     return (T) json;
                 } else {
-                    T res = GsonHelper.getGson().fromJson(json, type);
+                    T res = null;
+                    try {
+                        res = GsonHelper.getGson().fromJson(json, type);
+                    } catch (JsonSyntaxException e) {//数据解析异常
+                        if (HttpResponse.class == type) {
+                            res = (T) new HttpResponse();
+                        }
+                        if (HttpResult.class == type) {
+                            res = (T) new HttpResult();
+                        }
+                        if (res != null) {
+                            ((HttpResponse) res).setOnGsonErrorData(json);
+                        }
+                    }
                     if (res instanceof HttpResponse) {
                         ((HttpResponse) res).json = json;
                         ((HttpResponse) res).httpcode = response.code();

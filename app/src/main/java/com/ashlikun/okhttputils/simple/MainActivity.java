@@ -10,7 +10,11 @@ import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
+import com.ashlikun.okhttputils.http.response.HttpResult;
+import com.ashlikun.okhttputils.json.GsonHelper;
 import com.ashlikun.okhttputils.liteorm.LiteOrmUtil;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,15 +71,19 @@ public class MainActivity extends AppCompatActivity {
         //https://jlhpredeploy.vcash.cn/api/jlh/apply/getCustomerApplyInfo/4690943?accessToken=DE3AB2FCF409231F0C7F9D5EE306264D
 
         HttpResponse response = new HttpResponse();
-        response.json = "{\n" +
-                "\t\"code\": 0,\n" +
-                "\t\"msg\": \"\\u767b\\u9646\\u6210\\u529f\",\n" +
-                "\t\"data\": {\n" +
-                "\t\t\"type\": 2,\n" +
-                "\t\t\"id\": \"5\",\n" +
-                "\t\t\"token\": \"zn8UmgHJT\"\n" +
-                "\t}\n" +
+        String json = "{\n" +
+                "\t\"code\": 888,\n" +
+                "\t\"msg\": \"\\u83b7\\u53d6\\u4fe1\\u606f\\u5931\\u8d25\",\n" +
+                "\t\"data\": \"\"\n" +
                 "}";
-        Log.e("aaa", response.getIntValue("type") + "");
+        HttpResult result;
+        try {
+            result = GsonHelper.getGson().fromJson(json, new TypeToken<HttpResult<UserData>>() {
+            }.getType());
+        } catch (JsonSyntaxException exception) {
+
+        }
+
+        Log.e("aaa", "" + "");
     }
 }

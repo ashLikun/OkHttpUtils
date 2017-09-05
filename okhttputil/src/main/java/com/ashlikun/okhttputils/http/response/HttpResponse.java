@@ -22,6 +22,8 @@ import okhttp3.Response;
  * 功能介绍：http的基本类
  */
 public class HttpResponse {
+    public final static String CODE_KEY = "code";
+    public final static String MES_KEY = "msg";
     //gson不解析
     public transient Response response;
     public transient String json;
@@ -29,12 +31,17 @@ public class HttpResponse {
     //缓存已经实例化的JSONObject,JSONArray对象
     private transient JSONObject cache;
 
-    @HttpCode.IHttpCode
-    @SerializedName("code")
+    @SerializedName(CODE_KEY)
     public int code;
-    @SerializedName("msg")
+    @SerializedName(MES_KEY)
     public String message;
 
+    //当Gson自动解析异常的时候会调用，由内部调用
+    public void setOnGsonErrorData(String json) {
+        this.json = json;
+        this.code = getIntValue(HttpResponse.CODE_KEY);
+        this.message = getStringValue(HttpResponse.MES_KEY);
+    }
 
     @HttpCode.IHttpCode
     public int getCode() {
@@ -58,6 +65,7 @@ public class HttpResponse {
         }
         return cache;
     }
+
 
     /**
      * 作者　　: 李坤
