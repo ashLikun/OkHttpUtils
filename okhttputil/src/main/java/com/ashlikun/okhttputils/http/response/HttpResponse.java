@@ -32,7 +32,7 @@ public class HttpResponse {
     private transient JSONObject cache;
 
     @SerializedName(CODE_KEY)
-    public int code;
+    public int code = HttpCode.ERROR;
     @SerializedName(MES_KEY)
     public String message;
 
