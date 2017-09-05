@@ -1,6 +1,8 @@
 package com.ashlikun.okhttputils.http;
 
 
+import android.text.TextUtils;
+
 import com.ashlikun.okhttputils.http.request.RequestCall;
 import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
@@ -140,6 +142,9 @@ public class OkHttpUtils implements SuperHttp {
                 } else {
                     T res = null;
                     try {
+                        if (TextUtils.isEmpty(json)) {
+                            throw new JsonSyntaxException("json length = 0");
+                        }
                         res = GsonHelper.getGson().fromJson(json, type);
                     } catch (JsonSyntaxException e) {//数据解析异常
                         if (HttpResponse.class == type) {
