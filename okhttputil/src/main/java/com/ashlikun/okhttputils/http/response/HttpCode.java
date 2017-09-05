@@ -20,7 +20,7 @@ public class HttpCode {
     public static final int SIGN_ERROR = 2;//签名错误
     public static final int ERROR = 1;//请求出错
 
-    @IntDef(value = {SUCCEED})
+    @IntDef(value = {SUCCEED, ERROR, SIGN_ERROR})
     @Retention(value = RUNTIME)
     public @interface IHttpCode {
 
