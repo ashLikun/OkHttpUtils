@@ -59,6 +59,7 @@ public class HttpResponse {
 
     public JSONObject getJSONObject() throws JSONException {
         if (cache == null) {
+            if (json == null) json = "";
             JSONObject jObj = new JSONObject(json);
             json = null;
             cache = jObj;

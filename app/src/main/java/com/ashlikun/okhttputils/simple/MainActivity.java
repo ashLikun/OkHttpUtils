@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (JsonSyntaxException exception) {
 
         }
+        HttpResponse response1 = new HttpResponse();
+        response1.json = null;
+        response1.getIntValue("");
 
         Log.e("aaa", "" + "");
     }
