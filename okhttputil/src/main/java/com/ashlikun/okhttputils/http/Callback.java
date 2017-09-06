@@ -23,4 +23,15 @@ public interface Callback<ResultType> {
     void onError(HttpException e);
 
     void onSuccess(ResultType responseBody);
+
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/9/6 14:17
+     * 邮箱　　：496546144@qq.com
+     * 方法功能：接口请求成功了，但是处理code
+     *
+     * @return true:没问题
+     * false:有问题
+     */
+    boolean onSuccessHandelCode(ResultType responseBody);
 }

@@ -76,7 +76,9 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
         switchThread(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
-                callback.onSuccess(resultType);
+                if (callback.onSuccessHandelCode(resultType)) {
+                    callback.onSuccess(resultType);
+                }
                 exc.setCompleted(true);
                 callback.onCompleted();
                 response.close();
