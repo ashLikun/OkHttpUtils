@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.ashlikun.okhttputils.http.Callback;
-import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
@@ -47,27 +46,20 @@ public class MainActivity extends AppCompatActivity {
         p.addParam("aasda", "22222");
         p.addParam("9966", "33333");
         p.addParam("aaaaa", "44444");
+        p.addParamFile("aa", "filePath");
         OkHttpUtils.getInstance().execute(p, new Callback<String>() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(HttpException e) {
-
-            }
-
             @Override
             public void onSuccess(String responseBody) {
                 Log.e("onSuccess", responseBody);
             }
+
         });
+
+//        try {
+//            String string = OkHttpUtils.getInstance().syncExecute(p,String.class);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         //https://jlhpredeploy.vcash.cn/api/jlh/apply/getCustomerApplyInfo/4690943?accessToken=DE3AB2FCF409231F0C7F9D5EE306264D
 
         HttpResponse response = new HttpResponse();

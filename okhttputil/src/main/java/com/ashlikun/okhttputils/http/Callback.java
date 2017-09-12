@@ -11,18 +11,25 @@ package com.ashlikun.okhttputils.http;
  * @Link {@link String}
  * @Link {@link okhttp3.Response}//对这个操作要在子线程
  * @Link {@link okhttp3.ResponseBody}
+ * @Link {@link com.ashlikun.okhttputils.http.response.HttpResponse} 只是序列化了code和msg，但是内部有json字符串可供解析其他数据
  * @Link {@link com.ashlikun.okhttputils.http.response.HttpResult} 直接序列化的javabean,也可以自定义HttpResult。注意json的键
  * @Link 其他实体类。注意json的键
  */
-public interface Callback<ResultType> {
+public abstract class Callback<ResultType> {
 
-    void onStart();
+    public void onStart() {
 
-    void onCompleted();
+    }
 
-    void onError(HttpException e);
+    public void onCompleted() {
 
-    void onSuccess(ResultType responseBody);
+    }
+
+    public void onError(HttpException e) {
+
+    }
+
+    public abstract void onSuccess(ResultType responseBody);
 
     /**
      * 作者　　: 李坤
@@ -33,5 +40,7 @@ public interface Callback<ResultType> {
      * @return true:没问题
      * false:有问题
      */
-    boolean onSuccessHandelCode(ResultType responseBody);
+    public boolean onSuccessHandelCode(ResultType responseBody) {
+        return true;
+    }
 }

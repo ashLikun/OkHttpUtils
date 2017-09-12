@@ -1,6 +1,9 @@
 package com.ashlikun.okhttputils.simple.httptest;
 
 
+import android.telecom.Call;
+
+import com.ashlikun.okhttputils.http.Callback;
 import com.ashlikun.okhttputils.http.request.ProgressCallBack;
 
 /**
@@ -11,7 +14,7 @@ import com.ashlikun.okhttputils.http.request.ProgressCallBack;
  * 功能介绍：
  */
 
-public abstract class HttpProgressCallBack<T> extends HttpCallBack<T> implements ProgressCallBack {
+public abstract class HttpProgressCallBack<T> extends Callback<T> implements ProgressCallBack {
 
 
     @Override
