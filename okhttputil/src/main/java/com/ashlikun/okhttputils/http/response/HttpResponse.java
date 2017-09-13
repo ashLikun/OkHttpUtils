@@ -88,6 +88,7 @@ public class HttpResponse {
                 resStr = getCacheJSON(currKey, resStr);
             }
         }
+        if (resStr == null) return null;
         return resStr.toString();
     }
 
