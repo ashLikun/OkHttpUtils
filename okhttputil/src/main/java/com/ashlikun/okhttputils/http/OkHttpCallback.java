@@ -73,6 +73,7 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
 
     private void postResponse(final Response response, final ResultType resultType) {
 
+        callback.onSuccessSubThread(resultType);
         switchThread(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {

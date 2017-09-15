@@ -35,4 +35,9 @@ public abstract class SimpleCallback<ResultType> implements Callback<ResultType>
     public boolean onSuccessHandelCode(ResultType responseBody) {
         return true;
     }
+
+    @Override
+    public void onSuccessSubThread(ResultType responseBody) {
+        
+    }
 }

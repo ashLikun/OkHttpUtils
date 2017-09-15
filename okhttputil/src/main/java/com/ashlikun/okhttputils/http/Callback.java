@@ -27,6 +27,15 @@ public interface Callback<ResultType> {
 
     /**
      * 作者　　: 李坤
+     * 创建时间: 2017/9/15 16:36
+     * 邮箱　　：496546144@qq.com
+     * <p>
+     * 方法功能：成功回掉在子线程(当前http执行得线程)
+     */
+    void onSuccessSubThread(ResultType responseBody);
+
+    /**
+     * 作者　　: 李坤
      * 创建时间: 2017/9/6 14:17
      * 邮箱　　：496546144@qq.com
      * 方法功能：接口请求成功了，但是处理code
