@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,14 +80,7 @@ public class HttpResponse {
         return code == HttpCode.SUCCEED;
     }
 
-
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/5/19 17:04
-     * 方法功能：根据key获取对象,多个key代表多个等级
-     */
-
-    public <T> T getValue(Class<T> type, String... key) throws JSONException {
+    public String getKeyToString(String... key) throws JSONException {
         Object resStr = getJSONObject();
         if (key != null) {
             for (int i = 0; i < key.length; i++) {
@@ -94,12 +88,17 @@ public class HttpResponse {
                 resStr = getCacheJSON(currKey, resStr);
             }
         }
-        if (resStr == null) {
-            return null;
-        }
+        if (resStr == null) return null;
+        return resStr.toString();
+    }
 
-        T t = GsonHelper.getGson().fromJson(resStr.toString(), type);
-        return t;
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/5/19 17:04
+     * 方法功能：根据key获取对象,多个key代表多个等级,不能获取数组
+     */
+    public <T> T getValue(Type type, String... key) throws JSONException {
+        return GsonHelper.getGson().fromJson(getKeyToString(key), type);
     }
 
     public int getIntValue(String... key) {
