@@ -200,7 +200,7 @@ public class RequestParam implements Comparator<String> {
 
     public RequestBody buildRequestBody(Callback callback) {
         RequestBody body = null;
-        addSign();
+        onBuildRequestBody();
         if (method.equals("GET")) {
             //get请求把参数放在url里面, 没有请求实体
             url = appendQueryParams(url, params);
@@ -211,8 +211,14 @@ public class RequestParam implements Comparator<String> {
             } else {
                 body = RequestBody.create(MediaType.parse("text/plain;charset=utf-8"), postContent);
             }
+            if (isHavafiles()) {//存在文件用MultipartBody
+                MultipartBody.Builder builder = new MultipartBody.Builder();
+                builder.setType(MultipartBody.FORM);
+                builder.addPart(body);
+                addFlieParams(builder);
+                body = builder.build();
+            }
         } else {
-
             if (isHavafiles()) {//存在文件用MultipartBody
                 MultipartBody.Builder builder = new MultipartBody.Builder();
                 builder.setType(MultipartBody.FORM);
@@ -325,10 +331,12 @@ public class RequestParam implements Comparator<String> {
      * 作者　　: 李坤
      * 创建时间: 2017/8/8 9:45
      * 邮箱　　：496546144@qq.com
-     * 方法功能：添加签名，在全部参数添加完毕后,如果调用toJson方法那么params没有值，content有值
+     * 方法功能：
+     * <p>
+     * 可以添加签名，在全部参数添加完毕后,如果调用toJson方法那么params没有值，content有值
      * 实现者可以继承从写
      */
-    public void addSign() {
+    public void onBuildRequestBody() {
 
     }
 
