@@ -24,6 +24,7 @@ public interface HttpErrorCode {
     public static String MSG_UNKNOWN_NETWORK = "未知网络错误";//域名错误
     public static String MSG_UNKNOWN_HOST = "请检查网络设置";//域名错误
     public static String MSG_DATA_ERROR = "数据解析错误";//数据解析错误
+    public static String MSG_DATA_ERROR2 = "数据解析错误_NULL";//数据解析错误
     public static String MSG_SOCKET_ERROR = "请求过于频繁,请稍后再试";//请求过于频繁,请稍后再试
     public static String MSG_CANCELED = "请求被取消";//请求被取消
 

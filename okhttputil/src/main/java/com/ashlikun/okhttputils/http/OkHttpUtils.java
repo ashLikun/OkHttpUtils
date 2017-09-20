@@ -5,8 +5,8 @@ import android.text.TextUtils;
 
 import com.ashlikun.okhttputils.http.request.RequestCall;
 import com.ashlikun.okhttputils.http.request.RequestParam;
+import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
-import com.ashlikun.okhttputils.http.response.HttpResult;
 import com.ashlikun.okhttputils.json.GsonHelper;
 import com.google.gson.JsonSyntaxException;
 
@@ -140,22 +140,14 @@ public class OkHttpUtils implements SuperHttp {
                 if (type == String.class) {
                     return (T) json;
                 } else {
-                    T res = null;
+                    T res;
                     try {
                         if (TextUtils.isEmpty(json)) {
                             throw new JsonSyntaxException("json length = 0");
                         }
                         res = GsonHelper.getGson().fromJson(json, type);
                     } catch (JsonSyntaxException e) {//数据解析异常
-                        if (HttpResponse.class == type) {
-                            res = (T) new HttpResponse();
-                        }
-                        if (HttpResult.class == type) {
-                            res = (T) new HttpResult();
-                        }
-                        if (res != null) {
-                            ((HttpResponse) res).setOnGsonErrorData(json);
-                        }
+                        throw new JsonSyntaxException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
                     }
                     if (res instanceof HttpResponse) {
                         ((HttpResponse) res).json = json;
