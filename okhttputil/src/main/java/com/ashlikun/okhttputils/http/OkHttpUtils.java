@@ -147,7 +147,7 @@ public class OkHttpUtils implements SuperHttp {
                         }
                         res = GsonHelper.getGson().fromJson(json, type);
                     } catch (JsonSyntaxException e) {//数据解析异常
-                        throw new JsonSyntaxException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
+                        throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
                     }
                     if (res instanceof HttpResponse) {
                         ((HttpResponse) res).json = json;

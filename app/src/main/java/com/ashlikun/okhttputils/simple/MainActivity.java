@@ -63,17 +63,13 @@ public class MainActivity extends AppCompatActivity {
         //https://jlhpredeploy.vcash.cn/api/jlh/apply/getCustomerApplyInfo/4690943?accessToken=DE3AB2FCF409231F0C7F9D5EE306264D
 
         HttpResponse response = new HttpResponse();
-        String json = "{\n" +
-                "\t\"code\": 888,\n" +
-                "\t\"msg\": \"\\u83b7\\u53d6\\u4fe1\\u606f\\u5931\\u8d25\",\n" +
-                "\t\"data\": \"\"\n" +
-                "}";
+        String json = "[]";
         HttpResult result;
         try {
             result = GsonHelper.getGson().fromJson(json, new TypeToken<HttpResult<UserData>>() {
             }.getType());
         } catch (JsonSyntaxException exception) {
-
+            exception.printStackTrace();
         }
         HttpResponse response1 = new HttpResponse();
         response1.json = null;
