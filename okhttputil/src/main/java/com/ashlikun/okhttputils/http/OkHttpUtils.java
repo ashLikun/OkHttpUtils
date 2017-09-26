@@ -127,7 +127,6 @@ public class OkHttpUtils implements SuperHttp {
             }
         };
     }
-
     //处理返回值
     public static <T> T handerResult(Type type, final Response response) throws IOException {
         if (type != null) {
