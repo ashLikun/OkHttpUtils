@@ -21,7 +21,6 @@ public class HttpCode {
     public static final int SIGN_ERROR = 688;//签名错误
     public static final int TOKEN_ERROR = 888;//token失效
 
-
     @IntDef(value = {SUCCEED, ERROR, SIGN_ERROR, TOKEN_ERROR})
     @Retention(value = RUNTIME)
     public @interface IHttpCode {
