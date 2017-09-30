@@ -21,7 +21,7 @@ public class JsonTypeAdapter {
             if (json.getAsJsonPrimitive().getAsString() == null
                     || json.getAsJsonPrimitive().getAsString() == ""
                     || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
-                return GsonHelper.DEFAULT;
+                return null;
             } else {
                 return json.getAsJsonPrimitive().getAsInt();
             }
@@ -50,7 +50,7 @@ public class JsonTypeAdapter {
             if (json.getAsJsonPrimitive().getAsString() == null
                     || json.getAsJsonPrimitive().getAsString() == ""
                     || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
-                return Long.valueOf(GsonHelper.DEFAULT);
+                return null;
             } else {
                 return json.getAsJsonPrimitive().getAsLong();
             }
@@ -66,7 +66,7 @@ public class JsonTypeAdapter {
             if (json.getAsJsonPrimitive().getAsString() == null
                     || json.getAsJsonPrimitive().getAsString() == ""
                     || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
-                return Double.valueOf(GsonHelper.DEFAULT);
+                return null;
             } else {
                 return json.getAsJsonPrimitive().getAsDouble();
             }
@@ -82,7 +82,7 @@ public class JsonTypeAdapter {
             if (json.getAsJsonPrimitive().getAsString() == null
                     || json.getAsJsonPrimitive().getAsString() == ""
                     || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
-                return Float.valueOf(GsonHelper.DEFAULT);
+                return null;
             } else {
                 return json.getAsJsonPrimitive().getAsFloat();
             }

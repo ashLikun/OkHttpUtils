@@ -13,8 +13,6 @@ import com.google.gson.GsonBuilder;
  */
 
 public class GsonHelper {
-    public static final int DEFAULT = -200;
-
 
     public static Gson getGson() {
         return new GsonBuilder()
