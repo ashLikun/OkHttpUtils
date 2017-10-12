@@ -153,10 +153,11 @@ public class RequestParam implements Comparator<String> {
      * <p>
      * 方法功能：把键值对转换成json放到content里面,最后调用
      * 注意：在这个方法调用以后添加的参数将无效
+     * 2：如果存在文件就不能用content提交
      */
 
     public void toJson() {
-        if (params != null && !params.isEmpty()) {
+        if (params != null && !params.isEmpty() && !isHavafiles()) {
             postContent = GsonHelper.getGson().toJson(params);
             params.clear();
             isJson = true;
@@ -211,13 +212,7 @@ public class RequestParam implements Comparator<String> {
             } else {
                 body = RequestBody.create(MediaType.parse("text/plain;charset=utf-8"), postContent);
             }
-            if (isHavafiles()) {//存在文件用MultipartBody
-                MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.setType(MultipartBody.FORM);
-                builder.addPart(body);
-                addFlieParams(builder);
-                body = builder.build();
-            }
+            //content方式是不能提交文件的
         } else {
             if (isHavafiles()) {//存在文件用MultipartBody
                 MultipartBody.Builder builder = new MultipartBody.Builder();
