@@ -27,7 +27,6 @@ import okhttp3.ResponseBody;
  * <p>
  * 功能介绍：http工具类
  */
-
 public class OkHttpUtils implements SuperHttp {
 
     private volatile static OkHttpUtils INSTANCE = null;
