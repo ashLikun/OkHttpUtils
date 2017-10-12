@@ -40,7 +40,7 @@ public class RequestParam implements Comparator<String> {
     private String method;//请求方法
     protected Map<String, String> headers;//请求头
 
-    protected Map<String, String> params;//普通键值对参数  get
+    protected Map<String, Object> params;//普通键值对参数  get
     private String postContent;//请求内容，如果设置这个参数  其他的参数将不会提交  post
     private List<FileInput> files;//上传文件
 
@@ -98,13 +98,35 @@ public class RequestParam implements Comparator<String> {
         return files != null && !files.isEmpty();
     }
 
-    public void addParam(String key, String valuse) {
-        if (!isEmpty(key) && !isEmpty(valuse)) {
+    //添加对象参数
+    private void addParamObject(String key, Object valuse) {
+        if (!isEmpty(key) && valuse != null) {
             if (params == null) newParamMap();
             params.put(key, valuse);
         }
     }
 
+    //添加参数
+    public void addParam(String key, Object valuse) {
+        addParamObject(key, valuse);
+    }
+
+    //添加参数
+    public void addParam(String key, String valuse) {
+        addParamObject(key, valuse);
+    }
+
+    //添加参数
+    public void addParam(String key, int valuse) {
+        addParamObject(key, valuse);
+    }
+
+    //添加参数
+    public void addParam(String key, double valuse) {
+        addParamObject(key, valuse);
+    }
+
+    //添加头部
     public void addHeader(String key, String valuse) {
         if (!isEmpty(key) && !isEmpty(valuse)) {
             if (headers == null) newHeaderMap();
@@ -112,14 +134,7 @@ public class RequestParam implements Comparator<String> {
         }
     }
 
-    public void addParam(String key, int valuse) {
-        addParam(key, String.valueOf(valuse));
-    }
-
-    public void addParam(String key, double valuse) {
-        addParam(key, String.valueOf(valuse));
-    }
-
+    //添加文件参数
     public void addParam(String key, File file) {
         FileInput param = new FileInput(key, file);
         if (param.exists()) {
@@ -128,11 +143,13 @@ public class RequestParam implements Comparator<String> {
         }
     }
 
-    public void addParamFile(String key, String filePath) {
+    //添加文件参数
+    public void addParamFilePath(String key, String filePath) {
         if (filePath == null) return;
         addParam(key, new File(filePath));
     }
 
+    //添加文件参数
     public void addParam(String key, List<File> files) {
         if (files == null || files.isEmpty()) return;
         for (File f : files) {
@@ -140,13 +157,17 @@ public class RequestParam implements Comparator<String> {
         }
     }
 
-    public void addParamFile(String key, List<String> filePaths) {
+    //添加文件参数
+    public void addParamFilePath(String key, List<String> filePaths) {
         if (filePaths == null || filePaths.isEmpty()) return;
         for (String f : filePaths) {
-            addParamFile(key, f);
+            addParamFilePath(key, f);
         }
     }
-
+    //设置直接提交得post
+    public void setContent(String content) {
+        postContent = content;
+    }
     /**
      * 作者　　: 李坤
      * 创建时间: 2017/4/12 0012 17:22
@@ -155,7 +176,6 @@ public class RequestParam implements Comparator<String> {
      * 注意：在这个方法调用以后添加的参数将无效
      * 2：如果存在文件就不能用content提交
      */
-
     public void toJson() {
         if (params != null && !params.isEmpty() && !isHavafiles()) {
             postContent = GsonHelper.getGson().toJson(params);
@@ -165,9 +185,6 @@ public class RequestParam implements Comparator<String> {
         }
     }
 
-    public void setContent(String content) {
-        postContent = content;
-    }
 
     //构建一个Request
     public Request bulidRequest(Callback callback) {
@@ -240,14 +257,14 @@ public class RequestParam implements Comparator<String> {
      * 方法功能：get请求构建url
      */
 
-    private Uri appendQueryParams(Uri url, Map<String, String> params) {
+    private Uri appendQueryParams(Uri url, Map<String, Object> params) {
         if (url == null || params == null || params.isEmpty()) {
             return url;
         }
         Uri.Builder builder = url.buildUpon();
         if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                builder.appendQueryParameter(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                builder.appendQueryParameter(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
             }
         }
         return builder.build();
@@ -271,8 +288,8 @@ public class RequestParam implements Comparator<String> {
      */
     private void addParams(MultipartBody.Builder builder) {
         if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                builder.addFormDataPart(entry.getKey(), entry.getValue());//Content-Disposition;form-data; name="aaa"
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                builder.addFormDataPart(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());//Content-Disposition;form-data; name="aaa"
             }
         }
     }
@@ -285,8 +302,8 @@ public class RequestParam implements Comparator<String> {
      */
     private void addParams(FormBody.Builder builder) {
         if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                builder.addEncoded(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                builder.addEncoded(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
             }
         }
     }

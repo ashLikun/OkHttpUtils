@@ -42,11 +42,12 @@ public class MainActivity extends AppCompatActivity {
         p.addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B");
         //4690943?accessToken=8079CE15-038E-4977-8443-E885730DE268
         p.appendPath("118915");
-        p.addParam("accessToken", "11111");
-        p.addParam("aasda", "22222");
+        p.addParam("accessToken", 111111);
+        p.addParam("aasda", 2222.333);
         p.addParam("9966", "33333");
         p.addParam("aaaaa", "44444");
-        p.addParamFile("aa", "filePath");
+        p.addParamFilePath("aa", "filePath");
+        p.toJson();
         OkHttpUtils.getInstance().execute(p, new SimpleCallback<String>() {
             @Override
             public void onSuccess(String responseBody) {
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 "    \"src\":\"../up/15024439532015-04-16_155656.png\",\n" +
                 "    \"companyname\":\"李坤\"\n" +
                 "}";
-       HuodongData data =  GsonHelper.getGson().fromJson(json2,HuodongData.class);
+        HuodongData data = GsonHelper.getGson().fromJson(json2, HuodongData.class);
         Log.e("aaa", "" + "");
     }
 }
