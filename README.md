@@ -33,6 +33,9 @@
         try {
             //同步请求
             String string = OkHttpUtils.getInstance().syncExecute(p,String.class);
+            syncExecute(p, HttpResult.class, new TypeToken<List<EmUserData>>() {
+                    }.getType());
+            syncExecute(p, HttpResult.class, List.class,EmUserData.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

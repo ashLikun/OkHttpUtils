@@ -4,7 +4,6 @@ import com.ashlikun.okhttputils.http.request.RequestCall;
 import com.ashlikun.okhttputils.http.request.RequestParam;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 /**
  * 作者　　: 李坤
@@ -28,9 +27,9 @@ public interface SuperHttp {
     <T> ExecuteCall execute(RequestParam requestParam, Callback<T> callback);
 
     //同步执行
-    public <ResultType> ResultType syncExecute(RequestCall requestCall, Class raw, final Type... args) throws IOException;
+    public <ResultType> ResultType syncExecute(RequestCall requestCall, Class raw, final Class... args) throws IOException;
 
     //同步执行
-    public <ResultType> ResultType syncExecute(RequestParam requestParam, Class raw, final Type... args) throws IOException;
+    public <ResultType> ResultType syncExecute(RequestParam requestParam, Class raw, final Class... args) throws IOException;
 
 }

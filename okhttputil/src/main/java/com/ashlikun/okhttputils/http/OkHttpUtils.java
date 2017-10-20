@@ -97,14 +97,20 @@ public class OkHttpUtils implements SuperHttp {
      */
 
     @Override
-    public <ResultType> ResultType syncExecute(RequestCall requestCall, Class raw, final Type... args) throws IOException {
+    public <ResultType> ResultType syncExecute(RequestCall requestCall, Class raw, final Class... args) throws IOException {
         Response response = requestCall.buildCall(null).execute();
-        return handerResult(type(raw, args), response);
+        Type type = null;
+        if (args != null && args.length >= 2) {
+            type = type(raw, type(args[0], args[1]));
+        } else {
+            type = type(raw, args);
+        }
+        return handerResult(type, response);
     }
 
     //同步请求
     @Override
-    public <ResultType> ResultType syncExecute(RequestParam requestParam, Class raw, final Type... args) throws IOException {
+    public <ResultType> ResultType syncExecute(RequestParam requestParam, Class raw, final Class... args) throws IOException {
         RequestCall requestCall = new RequestCall.Builder(requestParam)
                 .build();
         return syncExecute(requestCall, raw, args);
@@ -126,6 +132,7 @@ public class OkHttpUtils implements SuperHttp {
             }
         };
     }
+
     //处理返回值
     public static <T> T handerResult(Type type, final Response response) throws IOException {
         if (type != null) {
