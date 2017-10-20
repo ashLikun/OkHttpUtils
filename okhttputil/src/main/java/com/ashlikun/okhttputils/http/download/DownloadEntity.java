@@ -1,13 +1,14 @@
 package com.ashlikun.okhttputils.http.download;
 
 
-import com.ashlikun.okhttputils.liteorm.LiteOrmUtil;
-import com.litesuits.orm.db.annotation.Column;
-import com.litesuits.orm.db.annotation.PrimaryKey;
-import com.litesuits.orm.db.annotation.Table;
-import com.litesuits.orm.db.enums.AssignType;
+import com.ashlikun.orm.LiteOrmUtil;
+import com.ashlikun.orm.db.annotation.Column;
+import com.ashlikun.orm.db.annotation.PrimaryKey;
+import com.ashlikun.orm.db.annotation.Table;
+import com.ashlikun.orm.db.enums.AssignType;
 
 import java.util.List;
+
 
 /**
  * Entity mapped to table "download".
@@ -98,22 +99,22 @@ public class DownloadEntity {
     }
 
     public static DownloadEntity queryById(String id) {
-        return LiteOrmUtil.getLiteOrm().queryById(id, DownloadEntity.class);
+        return LiteOrmUtil.get().queryById(id, DownloadEntity.class);
     }
 
     public static List<DownloadEntity> queryAll() {
-        return LiteOrmUtil.getLiteOrm().query(DownloadEntity.class);
+        return LiteOrmUtil.get().query(DownloadEntity.class);
     }
 
     public void save() {
-        LiteOrmUtil.getLiteOrm().save(this);
+        LiteOrmUtil.get().save(this);
     }
 
     public static void update(DownloadEntity entity) {
-        LiteOrmUtil.getLiteOrm().update(entity);
+        LiteOrmUtil.get().update(entity);
     }
 
     public static void delete(DownloadEntity entity) {
-        LiteOrmUtil.getLiteOrm().delete(entity);
+        LiteOrmUtil.get().delete(entity);
     }
 }

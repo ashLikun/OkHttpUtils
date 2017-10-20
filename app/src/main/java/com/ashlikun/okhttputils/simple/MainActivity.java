@@ -11,7 +11,7 @@ import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
 import com.ashlikun.okhttputils.http.response.HttpResult;
 import com.ashlikun.okhttputils.json.GsonHelper;
-import com.ashlikun.okhttputils.liteorm.LiteOrmUtil;
+import com.ashlikun.orm.LiteOrmUtil;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
