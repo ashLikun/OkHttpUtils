@@ -25,7 +25,6 @@ android {
         }
     }
 }
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 //    compile 'io.reactivex:rxjava:x.y.z'

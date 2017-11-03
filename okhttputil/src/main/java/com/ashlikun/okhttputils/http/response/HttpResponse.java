@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http.response;
 import android.text.TextUtils;
 
 import com.ashlikun.okhttputils.json.GsonHelper;
+import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
@@ -60,7 +61,9 @@ public class HttpResponse {
 
     public JSONObject getJSONObject() throws JSONException {
         if (cache == null) {
-            if (json == null) json = "";
+            if (json == null) {
+                json = "";
+            }
             JSONObject jObj = new JSONObject(json);
             json = null;
             cache = jObj;
@@ -88,7 +91,9 @@ public class HttpResponse {
                 resStr = getCacheJSON(currKey, resStr);
             }
         }
-        if (resStr == null) return null;
+        if (resStr == null) {
+            return null;
+        }
         return resStr.toString();
     }
 
@@ -97,7 +102,7 @@ public class HttpResponse {
      * 创建时间: 2017/5/19 17:04
      * 方法功能：根据key获取对象,多个key代表多个等级,不能获取数组
      */
-    public <T> T getValue(Type type, String... key) throws JSONException {
+    public <T> T getValue(Type type, String... key) throws JsonParseException, JSONException {
         return GsonHelper.getGson().fromJson(getKeyToString(key), type);
     }
 
@@ -105,6 +110,9 @@ public class HttpResponse {
         try {
             Integer res = getValue(Integer.class, key);
             return res == null ? 0 : res;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            return 0;
         } catch (JSONException e) {
             e.printStackTrace();
             return 0;
@@ -115,6 +123,9 @@ public class HttpResponse {
         try {
             String res = getValue(String.class, key);
             return res == null ? "" : res;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            return "";
         } catch (JSONException e) {
             e.printStackTrace();
             return "";
@@ -125,6 +136,9 @@ public class HttpResponse {
         try {
             Boolean res = getValue(Boolean.class, key);
             return res == null ? false : res;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            return false;
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
@@ -135,6 +149,9 @@ public class HttpResponse {
         try {
             Float res = getValue(Float.class, key);
             return res == null ? 0 : res;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            return 0;
         } catch (JSONException e) {
             e.printStackTrace();
             return 0;
@@ -145,6 +162,9 @@ public class HttpResponse {
         try {
             Double res = getValue(Double.class, key);
             return res == null ? 0 : res;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            return 0;
         } catch (JSONException e) {
             e.printStackTrace();
             return 0;
@@ -159,9 +179,13 @@ public class HttpResponse {
      */
 
     private Object getCacheJSON(String key, Object content) {
-        if (TextUtils.isEmpty(key)) return null;
+        if (TextUtils.isEmpty(key)) {
+            return null;
+        }
 
-        if (content == null) return cache;
+        if (content == null) {
+            return cache;
+        }
 
         if (content == null) {
             try {

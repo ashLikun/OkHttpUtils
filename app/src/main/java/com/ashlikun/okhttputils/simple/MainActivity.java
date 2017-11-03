@@ -79,18 +79,28 @@ public class MainActivity extends AppCompatActivity {
         Log.e("aaa", "" + "");
 
         String json2 = "{\n" +
-                "    \"type\":1,\n" +
-                "    \"name\":\"测试\",\n" +
-                "    \"status\":2,\n" +
-                "    \"shijian\":\"9月17日-10月17日\",\n" +
-                "    \"yusuan\":null,\n" +
-                "    \"yufukuan\":\"\",\n" +
-                "    \"xid\":5,\n" +
-                "    \"beizhu\":\"测试\",\n" +
-                "    \"src\":\"../up/15024439532015-04-16_155656.png\",\n" +
-                "    \"companyname\":\"李坤\"\n" +
+                "\t\"data\": [{\n" +
+                "\t\t\"name\": \"sdfdsf\",\n" +
+                "\t\t\"jine\": \"-400\",\n" +
+                "\t\t\"time\": \"1509094041000\",\n" +
+                "\t\t\"yue\": 0\n" +
+                "\t}, {\n" +
+                "\t\t\"name\": \"sdfdsf\",\n" +
+                "\t\t\"jine\": \"-400\",\n" +
+                "\t\t\"time\": \"1509094041000\",\n" +
+                "\t\t\"yue\": 0\n" +
+                "\t}],\n" +
+                "\t\"code\": 0,\n" +
+                "\t\"msg\": \"\\u6d88\\u8d39\\u8be6\\u60c5\\u5217\\u8868\"\n" +
                 "}";
-        HuodongData data = GsonHelper.getGson().fromJson(json2, HuodongData.class);
+//        HuodongData data = GsonHelper.getGson().fromJson(json2, HuodongData.class);
+        response.json = json2;
+        try {
+            response.getStringValue("head", "money");
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        }
+
         Log.e("aaa", "" + "");
     }
 }
