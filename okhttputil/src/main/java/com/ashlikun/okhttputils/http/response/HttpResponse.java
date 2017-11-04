@@ -104,6 +104,14 @@ public class HttpResponse {
      */
     public <T> T getValue(Type type, String... key) throws JsonParseException, JSONException {
         if (key == null || key.length == 0) return null;
+        return GsonHelper.getGson().fromJson(getKeyToString(key), type);
+    }
+
+    /**
+     * 基本类型的获取
+     */
+    public <T> T getValueBase(Type type, String... key) throws JsonParseException, JSONException {
+        if (key == null || key.length == 0) return null;
         if (key.length == 1) {
             return (T) (getJSONObject().get(key[0]));
         }
@@ -112,7 +120,7 @@ public class HttpResponse {
 
     public int getIntValue(String... key) {
         try {
-            Integer res = getValue(Integer.class, key);
+            Integer res = getValueBase(Integer.class, key);
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -125,7 +133,7 @@ public class HttpResponse {
 
     public String getStringValue(String... key) {
         try {
-            String res = getValue(String.class, key);
+            String res = getValueBase(String.class, key);
             return res == null ? "" : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -138,7 +146,7 @@ public class HttpResponse {
 
     public boolean getBooleanValue(String... key) {
         try {
-            Boolean res = getValue(Boolean.class, key);
+            Boolean res = getValueBase(Boolean.class, key);
             return res == null ? false : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -151,7 +159,7 @@ public class HttpResponse {
 
     public float getFloatValue(String... key) {
         try {
-            Float res = getValue(Float.class, key);
+            Float res = getValueBase(Float.class, key);
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -164,7 +172,7 @@ public class HttpResponse {
 
     public double getDoubleValue(String... key) {
         try {
-            Double res = getValue(Double.class, key);
+            Double res = getValueBase(Double.class, key);
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
