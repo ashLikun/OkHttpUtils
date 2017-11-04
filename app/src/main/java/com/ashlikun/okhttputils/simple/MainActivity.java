@@ -72,25 +72,21 @@ public class MainActivity extends AppCompatActivity {
         } catch (JsonSyntaxException exception) {
             exception.printStackTrace();
         }
-        HttpResponse response1 = new HttpResponse();
-        response1.json = null;
-        response1.getIntValue("");
+
 
         Log.e("aaa", "" + "");
 
         String json2 = "{\n" +
-                "    \"type\":1,\n" +
-                "    \"name\":\"测试\",\n" +
-                "    \"status\":2,\n" +
-                "    \"shijian\":\"9月17日-10月17日\",\n" +
-                "    \"yusuan\":null,\n" +
-                "    \"yufukuan\":\"\",\n" +
-                "    \"xid\":5,\n" +
-                "    \"beizhu\":\"测试\",\n" +
-                "    \"src\":\"../up/15024439532015-04-16_155656.png\",\n" +
-                "    \"companyname\":\"李坤\"\n" +
+                "\t\"code\": 0,\n" +
+                "\t\"msg\": \"\\u6210\\u529f\",\n" +
+                "\t\"data\": {\n" +
+                "\t\t\"jid\": 5,\n" +
+                "\t\t\"isAttention\": 1\n" +
+                "\t}\n" +
                 "}";
-        HuodongData data = GsonHelper.getGson().fromJson(json2, HuodongData.class);
+        HttpResponse response1 = new HttpResponse();
+        response1.json = json2;
+        response1.getIntValue("data", "jid");
         Log.e("aaa", "" + "");
     }
 }
