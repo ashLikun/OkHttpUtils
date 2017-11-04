@@ -76,17 +76,18 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("aaa", "" + "");
 
-        String json2 = "{\n" +
+        String json2 ="{\n" +
                 "\t\"code\": 0,\n" +
-                "\t\"msg\": \"\\u6210\\u529f\",\n" +
-                "\t\"data\": {\n" +
-                "\t\t\"jid\": 5,\n" +
-                "\t\t\"isAttention\": 1\n" +
-                "\t}\n" +
+                "\t\"msg\": \"\\u4e0a\\u4f20\\u56fe\\u7247\\u6210\\u529f\",\n" +
+                "\t\"imagePath\": \"..\\/up\\/15097930441447110546.jpg\"\n" +
                 "}";
-        HttpResponse response1 = new HttpResponse();
-        response1.json = json2;
-        response1.getIntValue("data", "jid");
+//        HuodongData data = GsonHelper.getGson().fromJson(json2, HuodongData.class);
+        response.json = json2;
+        try {
+            response.getStringValue("imagePath");
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        }
         Log.e("aaa", "" + "");
     }
 }
