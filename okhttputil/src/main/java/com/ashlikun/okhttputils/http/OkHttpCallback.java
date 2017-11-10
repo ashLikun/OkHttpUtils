@@ -39,6 +39,9 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
 
     @Override
     public void onFailure(Call call, final IOException e) {
+        if (exc.getCall().isCanceled()) {
+            return;
+        }
         HttpException res;
         if (e instanceof ConnectException) {
             res = new HttpException(HttpErrorCode.HTTP_NO_CONNECT, HttpErrorCode.MSG_NO_CONNECT);
@@ -60,6 +63,9 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
     }
 
     private void postFailure(final HttpException throwable) {
+        if (exc.getCall().isCanceled()) {
+            return;
+        }
         switchThread(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
@@ -72,7 +78,10 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
 
 
     private void postResponse(final Response response, final ResultType resultType) {
-
+        if (exc.getCall().isCanceled()) {
+            response.close();
+            return;
+        }
         callback.onSuccessSubThread(resultType);
         switchThread(new Consumer<Integer>() {
             @Override
@@ -90,7 +99,6 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
     @Override
     public void onResponse(final Call call, final Response response) throws IOException {
         if (call.isCanceled()) {
-            postFailure(new HttpException(HttpErrorCode.HTTP_CANCELED, HttpErrorCode.MSG_CANCELED));
             response.close();
             return;
         }

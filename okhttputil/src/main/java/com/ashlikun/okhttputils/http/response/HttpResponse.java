@@ -103,7 +103,9 @@ public class HttpResponse {
      * 方法功能：根据key获取对象,多个key代表多个等级,不能获取数组
      */
     public <T> T getValue(Type type, String... key) throws JsonParseException, JSONException {
-        if (key == null || key.length == 0) return null;
+        if (key == null || key.length == 0) {
+            return null;
+        }
         return GsonHelper.getGson().fromJson(getKeyToString(key), type);
     }
 
@@ -111,7 +113,9 @@ public class HttpResponse {
      * 基本类型的获取
      */
     public <T> T getValueBase(Type type, String... key) throws JsonParseException, JSONException {
-        if (key == null || key.length == 0) return null;
+        if (key == null || key.length == 0) {
+            return null;
+        }
         if (key.length == 1) {
             return (T) (getJSONObject().get(key[0]));
         }

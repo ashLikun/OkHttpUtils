@@ -9,13 +9,13 @@ package com.ashlikun.okhttputils.http.response;
  */
 public interface HttpErrorCode {
     //200以上的用HttpURLConnection里面的变量
-    public static int HTTP_NO_CONNECT = 102;//网络未连接
-    public static int HTTP_TIME_OUT = 101;//网络超时
-    public static int HTTP_UNKNOWN = 100;//未知错误
-    public static int HTTP_UNKNOWN_HOST = 98;//域名错误
-    public static int HTTP_DATA_ERROR = 97;//数据解析错误
-    public static int HTTP_SOCKET_ERROR = 96;//请求过于频繁,请稍后再试
-    public static int HTTP_CANCELED = 95;//请求被取消
+    public static int HTTP_NO_CONNECT = 100102;//网络未连接
+    public static int HTTP_TIME_OUT = 100101;//网络超时
+    public static int HTTP_UNKNOWN = 100100;//未知错误
+    public static int HTTP_UNKNOWN_HOST = 10098;//域名错误
+    public static int HTTP_DATA_ERROR = 10097;//数据解析错误
+    public static int HTTP_SOCKET_ERROR = 10096;//请求过于频繁,请稍后再试
+    public static int HTTP_CANCELED = 10095;//请求被取消
 
 
     public static String MSG_NO_CONNECT = "请检查网络设置";//网络未连接
