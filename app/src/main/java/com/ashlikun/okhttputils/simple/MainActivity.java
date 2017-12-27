@@ -37,8 +37,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         setContentView(R.layout.activity_main);
-        RequestParam p = new RequestParam("http://jielehua.vcash.cn/api/jlh/apply/getApplyProgress/");
-        p.get();
+        RequestParam p =RequestParam.get("https://jielehua.vcash.cn/api/jlh/apply/getApplyProgress/");
         p.addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B");
         //4690943?accessToken=8079CE15-038E-4977-8443-E885730DE268
         p.appendPath("118915");

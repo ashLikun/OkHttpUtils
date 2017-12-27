@@ -1,14 +1,26 @@
+[![Release](https://jitpack.io/v/ashLikun/OkHttpUtils.svg)](https://jitpack.io/#ashLikun/OkHttpUtils)
+
+
 # **OkhttpUtils**
 基于okhttp的封装
+## 使用方法
 
+build.gradle文件中添加:
+```gradle
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
+}
+```
+并且:
 
-### 1.用法
-        使用前，对于Android Studio的用户，可以选择添加:
-        compile 'com.github.ashLikun:OkHttpUtils:1.1.9'//okhttp封装
-        
-
-        RequestParam p = new RequestParam("");
-        p.get();//get请求,可以是post--->p.post();
+```gradle
+dependencies {
+    compile 'com.github.ashLikun:OkHttpUtils:{latest version}'
+}
+```
+        RequestParam p =  RequestParam.get();//get请求,可以是post--->RequestParam.post();
         //添加头部
         p.addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B");
         //添加path

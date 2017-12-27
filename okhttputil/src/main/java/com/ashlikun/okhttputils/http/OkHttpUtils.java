@@ -119,14 +119,17 @@ public class OkHttpUtils implements SuperHttp {
     //同步请求的 构建Type   args是泛型数据
     private ParameterizedType type(final Class raw, final Type... args) {
         return new ParameterizedType() {
+            @Override
             public Type getRawType() {
                 return raw;
             }
 
+            @Override
             public Type[] getActualTypeArguments() {
                 return args;
             }
 
+            @Override
             public Type getOwnerType() {
                 return null;
             }

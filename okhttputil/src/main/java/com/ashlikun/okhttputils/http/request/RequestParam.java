@@ -36,54 +36,67 @@ import okhttp3.RequestBody;
  */
 
 public class RequestParam implements Comparator<String> {
+    /* valid HTTP methods */
+    private static final String[] methods = {
+            "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"
+    };
     protected Uri url;//请求地址
     private String method;//请求方法
     protected Map<String, String> headers;//请求头
-
     protected Map<String, Object> params;//普通键值对参数  get
     private String postContent;//请求内容，如果设置这个参数  其他的参数将不会提交  post
     private List<FileInput> files;//上传文件
 
     private boolean isJson = false;
 
-    public RequestParam(String url) {
+    public static RequestParam post(String url) {
+        RequestParam param = new RequestParam(url);
+        param.setMethod("POST");
+        return param;
+    }
+
+    public static RequestParam get(String url) {
+        RequestParam param = new RequestParam(url);
+        param.setMethod("GET");
+        return param;
+    }
+
+    public static RequestParam get() {
+        return get("GET");
+    }
+
+    private RequestParam(String url) {
         url(url);
     }
 
-    /* valid HTTP methods */
-    private static final String[] methods = {
-            "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"
-    };
 
-    public void appendPath(String path) {
-        if (url == null) new Exception("先调用url方法");
+    public RequestParam appendPath(String path) {
+        if (url == null) {
+            new Exception("先调用url方法");
+        }
         Uri.Builder builder = url.buildUpon();
         if (!TextUtils.isEmpty(path)) {
             url = builder.appendPath(path).build();
         }
+        return this;
     }
 
-    public void setMethod(String method) {
+    public RequestParam setMethod(String method) {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].equals(method)) {
                 this.method = method;
-                return;
+                return this;
             }
         }
         Log.e("setMethod", "请求方法错误" + method);
         this.method = methods[0];
+        return this;
     }
 
-    public void post() {
-        setMethod("POST");
-    }
 
-    public void get() {
-        setMethod("GET");
-    }
-
-    public void url(String url) {
+    public RequestParam url(String url) {
         this.url = Uri.parse(url);
+        return this;
     }
 
     public boolean isHavaHeader() {
@@ -99,75 +112,107 @@ public class RequestParam implements Comparator<String> {
     }
 
     //添加对象参数
-    private void addParamObject(String key, Object valuse) {
+    private RequestParam addParamObject(String key, Object valuse) {
         if (!isEmpty(key) && valuse != null) {
-            if (params == null) newParamMap();
+            if (params == null) {
+                newParamMap();
+            }
             params.put(key, valuse);
         }
+        return this;
     }
 
     //添加参数
-    public void addParam(String key, Object valuse) {
+    public RequestParam addParam(String key, Object valuse) {
         addParamObject(key, valuse);
+        return this;
     }
 
     //添加参数
-    public void addParam(String key, String valuse) {
+    public RequestParam addParam(String key, String valuse) {
         addParamObject(key, valuse);
+        return this;
     }
 
     //添加参数
-    public void addParam(String key, int valuse) {
+    public RequestParam addParam(String key, int valuse) {
         addParamObject(key, valuse);
+        return this;
     }
 
     //添加参数
-    public void addParam(String key, double valuse) {
+    public RequestParam addParam(String key, double valuse) {
         addParamObject(key, valuse);
+        return this;
     }
 
     //添加头部
-    public void addHeader(String key, String valuse) {
+    public RequestParam addHeader(String key, String valuse) {
         if (!isEmpty(key) && !isEmpty(valuse)) {
-            if (headers == null) newHeaderMap();
+            if (headers == null) {
+                newHeaderMap();
+            }
             headers.put(key, valuse);
         }
+        return this;
     }
 
     //添加文件参数
-    public void addParam(String key, File file) {
+    public RequestParam addParam(String key, File file) {
         FileInput param = new FileInput(key, file);
         if (param.exists()) {
-            if (files == null) files = new ArrayList<>();
+            if (files == null) {
+                files = new ArrayList<>();
+            }
             files.add(param);
         }
+        return this;
     }
 
     //添加文件参数
-    public void addParamFilePath(String key, String filePath) {
-        if (filePath == null) return;
+    public RequestParam addParamFilePath(String key, String filePath) {
+        if (filePath == null) {
+            return this;
+        }
         addParam(key, new File(filePath));
+        return this;
     }
 
     //添加文件参数
-    public void addParam(String key, List<File> files) {
-        if (files == null || files.isEmpty()) return;
+    public RequestParam addParam(String key, List<File> files) {
+        if (files == null || files.isEmpty()) {
+            return this;
+        }
         for (File f : files) {
             addParam(key, f);
         }
+        return this;
     }
 
     //添加文件参数
-    public void addParamFilePath(String key, List<String> filePaths) {
-        if (filePaths == null || filePaths.isEmpty()) return;
+    public RequestParam addParamFilePath(String key, List<String> filePaths) {
+        if (filePaths == null || filePaths.isEmpty()) {
+            return this;
+        }
         for (String f : filePaths) {
             addParamFilePath(key, f);
         }
+        return this;
     }
+
     //设置直接提交得post
-    public void setContent(String content) {
+    public RequestParam setContent(String content) {
         postContent = content;
+        return this;
     }
+
+    //设置直接提交得post 并且是json
+    public RequestParam setContentJson(String content) {
+        postContent = content;
+        isJson = true;
+        return this;
+    }
+
     /**
      * 作者　　: 李坤
      * 创建时间: 2017/4/12 0012 17:22
@@ -176,21 +221,23 @@ public class RequestParam implements Comparator<String> {
      * 注意：在这个方法调用以后添加的参数将无效
      * 2：如果存在文件就不能用content提交
      */
-    public void toJson() {
+    public RequestParam toJson() {
         if (params != null && !params.isEmpty() && !isHavafiles()) {
             postContent = GsonHelper.getGson().toJson(params);
             params.clear();
             isJson = true;
-            post();
+            setMethod("POST");
         }
+        return this;
     }
 
 
     //构建一个Request
     public Request bulidRequest(Callback callback) {
         Request.Builder builder = new Request.Builder();
-        if (isEmpty(method))
+        if (isEmpty(method)) {
             method = methods[0];
+        }
         RequestBody requestBody = buildRequestBody(callback);
         Headers.Builder header = new Headers.Builder();
         if (isHavaHeader()) {
@@ -223,7 +270,8 @@ public class RequestParam implements Comparator<String> {
             //get请求把参数放在url里面, 没有请求实体
             url = appendQueryParams(url, params);
             body = null;
-        } else if (!isEmpty(postContent)) {//只提交content
+        } else if (!isEmpty(postContent)) {
+            //只提交content
             if (isJson) {
                 body = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), postContent);
             } else {
@@ -231,7 +279,8 @@ public class RequestParam implements Comparator<String> {
             }
             //content方式是不能提交文件的
         } else {
-            if (isHavafiles()) {//存在文件用MultipartBody
+            //存在文件用MultipartBody
+            if (isHavafiles()) {
                 MultipartBody.Builder builder = new MultipartBody.Builder();
                 builder.setType(MultipartBody.FORM);
                 addParams(builder);
