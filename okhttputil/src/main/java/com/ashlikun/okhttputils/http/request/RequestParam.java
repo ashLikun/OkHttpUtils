@@ -65,7 +65,7 @@ public class RequestParam implements Comparator<String> {
         return get("GET");
     }
 
-    private RequestParam(String url) {
+    public RequestParam(String url) {
         url(url);
     }
 
