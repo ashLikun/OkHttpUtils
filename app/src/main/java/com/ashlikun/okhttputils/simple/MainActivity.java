@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 //        LiteOrmUtil.init(new LiteOrmUtil.OnNeedListener() {
 //            @Override
 //            public Application getApplication() {
@@ -87,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onTestGsonClick(View view) {
+        HuodongData data = new HuodongData();
+        HuodongData data2 = new HuodongData();
+        data.hashCode();
         Map<String, String> map = new HashMap<>();
         map.put("aaa", "111");
         map.put("bbb", null);

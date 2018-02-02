@@ -11,6 +11,8 @@ import okhttp3.Call;
  */
 
 public class ExecuteCall {
+    //标识
+    private int flag;
     private Call call;
     private boolean isCompleted = false;//是否完成
 
@@ -44,4 +46,11 @@ public class ExecuteCall {
         return call;
     }
 
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
 }

@@ -9,18 +9,22 @@ package com.ashlikun.okhttputils.http;
  */
 
 public abstract class SimpleCallback<ResultType> implements Callback<ResultType> {
+    @Override
     public void onStart() {
 
     }
 
+    @Override
     public void onCompleted() {
 
     }
 
+    @Override
     public void onError(HttpException e) {
 
     }
 
+    @Override
     public abstract void onSuccess(ResultType responseBody);
 
     /**
@@ -32,12 +36,13 @@ public abstract class SimpleCallback<ResultType> implements Callback<ResultType>
      * @return true:没问题
      * false:有问题
      */
+    @Override
     public boolean onSuccessHandelCode(ResultType responseBody) {
         return true;
     }
 
     @Override
     public void onSuccessSubThread(ResultType responseBody) {
-        
+
     }
 }

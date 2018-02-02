@@ -72,8 +72,10 @@ public class OkHttpUtils implements SuperHttp {
     public <T> ExecuteCall execute(RequestCall requestCall, Callback<T> callback) {
         Call call = requestCall.buildCall(callback);
         ExecuteCall exc = new ExecuteCall();
+        exc.setFlag(callback.hashCode());
         exc.setCall(call);
         call.enqueue(new OkHttpCallback(exc, callback));
+
         return exc;
     }
 
