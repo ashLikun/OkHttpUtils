@@ -1,6 +1,7 @@
 package com.ashlikun.okhttputils.http;
 
 import com.ashlikun.okhttputils.http.response.HttpErrorCode;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -28,6 +29,7 @@ import okhttp3.Response;
 class OkHttpCallback<ResultType> implements okhttp3.Callback {
     ExecuteCall exc;
     Callback<ResultType> callback;
+    Gson gson;
 
     public OkHttpCallback(ExecuteCall exc, Callback<ResultType> callback) {
         this.exc = exc;
@@ -35,6 +37,10 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public void setParseGson(Gson gson) {
+        this.gson = gson;
     }
 
     @Override
@@ -104,7 +110,7 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
         }
         if (response.isSuccessful()) {
             try {
-                ResultType resultType = OkHttpUtils.handerResult(getType(), response);
+                ResultType resultType = OkHttpUtils.handerResult(getType(), response, gson);
                 postResponse(response, resultType);
             } catch (IOException e) {
                 e.printStackTrace();

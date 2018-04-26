@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http.response;
 import android.text.TextUtils;
 
 import com.ashlikun.okhttputils.json.GsonHelper;
+import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 
@@ -23,7 +24,7 @@ import okhttp3.Response;
  * <p>
  * 功能介绍：http的基本类
  */
-public class HttpResponse {
+public abstract class HttpResponse {
     public final static String CODE_KEY = "code";
     public final static String MES_KEY = "msg";
     //gson不解析
@@ -241,4 +242,6 @@ public class HttpResponse {
         m.appendTail(sb);
         return sb.toString();
     }
+
+    public abstract Gson parseGson();
 }

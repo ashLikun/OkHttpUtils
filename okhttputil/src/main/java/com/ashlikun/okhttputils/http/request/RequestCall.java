@@ -52,10 +52,12 @@ public class RequestCall {
                     .readTimeout(readTimeOut, TimeUnit.MILLISECONDS)
                     .writeTimeout(writeTimeOut, TimeUnit.MILLISECONDS)
                     .connectTimeout(connTimeOut, TimeUnit.MILLISECONDS);
-            if (interceptors != null && !interceptors.isEmpty())
+            if (interceptors != null && !interceptors.isEmpty()) {
                 clone.interceptors().addAll(interceptors);
-            if (networkInterceptors != null && !networkInterceptors.isEmpty())
+            }
+            if (networkInterceptors != null && !networkInterceptors.isEmpty()) {
                 clone.networkInterceptors().addAll(networkInterceptors);
+            }
             call = clone.build().newCall(request);
         } else {
             call = OkHttpUtils.getInstance().getOkHttpClient().newCall(request);
@@ -114,14 +116,19 @@ public class RequestCall {
             return this;
         }
 
+
         public Builder addNetworkInterceptor(Interceptor interceptor) {
-            if (networkInterceptors == null) networkInterceptors = new ArrayList<>();
+            if (networkInterceptors == null) {
+                networkInterceptors = new ArrayList<>();
+            }
             networkInterceptors.add(interceptor);
             return this;
         }
 
         public Builder addInterceptor(Interceptor interceptor) {
-            if (interceptors == null) interceptors = new ArrayList<>();
+            if (interceptors == null) {
+                interceptors = new ArrayList<>();
+            }
             interceptors.add(interceptor);
             return this;
         }

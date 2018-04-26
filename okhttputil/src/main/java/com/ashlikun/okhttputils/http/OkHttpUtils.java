@@ -8,6 +8,7 @@ import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
 import com.ashlikun.okhttputils.json.GsonHelper;
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
@@ -32,6 +33,8 @@ public class OkHttpUtils implements SuperHttp {
     private volatile static OkHttpUtils INSTANCE = null;
     //okhttp核心类
     private OkHttpClient mOkHttpClient;
+    //解析json
+    private Gson gson;
 
     //获取单例
     public static OkHttpUtils getInstance() {
@@ -55,6 +58,7 @@ public class OkHttpUtils implements SuperHttp {
         } else {
             mOkHttpClient = okHttpClient;
         }
+        gson = GsonHelper.getGson();
     }
 
     //初始化
@@ -67,6 +71,13 @@ public class OkHttpUtils implements SuperHttp {
         return mOkHttpClient;
     }
 
+    /**
+     * 全局设置gson解析
+     */
+    public void setParseGson(Gson gson) {
+        this.gson = gson;
+    }
+
     //异步请求
     @Override
     public <T> ExecuteCall execute(RequestCall requestCall, Callback<T> callback) {
@@ -74,7 +85,9 @@ public class OkHttpUtils implements SuperHttp {
         ExecuteCall exc = new ExecuteCall();
         exc.setFlag(callback.hashCode());
         exc.setCall(call);
-        call.enqueue(new OkHttpCallback(exc, callback));
+        OkHttpCallback okHttpCallback = new OkHttpCallback(exc, callback);
+        okHttpCallback.setParseGson(requestCall.getRequestParam().getParseGson());
+        call.enqueue(okHttpCallback);
 
         return exc;
     }
@@ -107,7 +120,7 @@ public class OkHttpUtils implements SuperHttp {
         } else {
             type = type(raw, args);
         }
-        return handerResult(type, response);
+        return handerResult(type, response, requestCall.getRequestParam().getParseGson());
     }
 
     //同步请求
@@ -139,7 +152,7 @@ public class OkHttpUtils implements SuperHttp {
     }
 
     //处理返回值
-    public static <T> T handerResult(Type type, final Response response) throws IOException {
+    public static <T> T handerResult(Type type, final Response response, Gson gson) throws IOException {
         if (type != null) {
             if (type == Response.class) {
                 return (T) response;
@@ -150,12 +163,39 @@ public class OkHttpUtils implements SuperHttp {
                 if (type == String.class) {
                     return (T) json;
                 } else {
-                    T res;
+                    T res = null;
                     try {
                         if (TextUtils.isEmpty(json)) {
                             throw new JsonSyntaxException("json length = 0");
                         }
-                        res = GsonHelper.getGson().fromJson(json, type);
+                        if (gson == null) {
+                            Class cls = null;
+                            try {
+                                if (type instanceof Class) {
+                                    cls = (Class) type;
+                                } else {
+                                    cls = (Class) ((ParameterizedType) type).getRawType();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            if (cls != null) {
+                                if (HttpResponse.class.isAssignableFrom(cls)) {
+                                    try {
+                                        HttpResponse da = (HttpResponse) cls.newInstance();
+                                        gson = da.parseGson();
+                                    } catch (InstantiationException e) {
+                                        e.printStackTrace();
+                                    } catch (IllegalAccessException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                        if (gson == null) {
+                            gson = OkHttpUtils.getInstance().gson;
+                        }
+                        res = gson.fromJson(json, type);
                     } catch (JsonSyntaxException e) {//数据解析异常
                         throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
                     }

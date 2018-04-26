@@ -5,6 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.ashlikun.okhttputils.http.OkHttpUtils;
+import com.ashlikun.okhttputils.http.SimpleCallback;
+import com.ashlikun.okhttputils.http.request.RequestParam;
 import com.ashlikun.okhttputils.json.GsonHelper;
 
 import java.util.HashMap;
@@ -34,23 +37,22 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 //
-//        RequestParam p =RequestParam.get("https://jielehua.vcash.cn/api/jlh/apply/getApplyProgress/");
-//        p.addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B");
-//        //4690943?accessToken=8079CE15-038E-4977-8443-E885730DE268
-//        p.appendPath("118915");
-//        p.addParam("accessToken", 111111);
-//        p.addParam("aasda", 2222.333);
-//        p.addParam("9966", "33333");
-//        p.addParam("aaaaa", "44444");
-//        p.addParamFilePath("aa", "filePath");
-//        p.toJson();
-//        OkHttpUtils.getInstance().execute(p, new SimpleCallback<String>() {
-//            @Override
-//            public void onSuccess(String responseBody) {
-//                Log.e("onSuccess", responseBody);
-//            }
-//
-//        });
+        RequestParam p = RequestParam.get("https://jielehua.vcash.cn/api/jlh/apply/getApplyProgress/");
+        p.addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B");
+        //4690943?accessToken=8079CE15-038E-4977-8443-E885730DE268
+        p.appendPath("118915");
+        p.addParam("accessToken", 111111);
+        p.addParam("aasda", 2222.333);
+        p.addParam("9966", "33333");
+        p.addParam("aaaaa", "44444");
+        p.addParamFilePath("aa", "filePath");
+        p.toJson();
+        OkHttpUtils.getInstance().execute(p, new SimpleCallback<HomeHttpResult<JlhData>>() {
+            @Override
+            public void onSuccess(HomeHttpResult<JlhData> responseBody) {
+            }
+
+        });
 
 //        try {
 //            String string = OkHttpUtils.getInstance().syncExecute(p,String.class);

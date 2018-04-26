@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.ashlikun.okhttputils.http.Callback;
 import com.ashlikun.okhttputils.json.GsonHelper;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -46,7 +47,7 @@ public class RequestParam implements Comparator<String> {
     protected Map<String, Object> params;//普通键值对参数  get
     private String postContent;//请求内容，如果设置这个参数  其他的参数将不会提交  post
     private List<FileInput> files;//上传文件
-
+    private Gson gson;
     private boolean isJson = false;
 
     public static RequestParam post(String url) {
@@ -231,6 +232,20 @@ public class RequestParam implements Comparator<String> {
         return this;
     }
 
+    /**
+     * 解析结果的gson
+     *
+     * @param gson
+     * @return
+     */
+    public RequestParam parseGson(Gson gson) {
+        this.gson = gson;
+        return this;
+    }
+
+    public Gson getParseGson() {
+        return gson;
+    }
 
     //构建一个Request
     public Request bulidRequest(Callback callback) {

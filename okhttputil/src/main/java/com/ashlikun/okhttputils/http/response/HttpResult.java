@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.http.response;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -30,5 +31,10 @@ public class HttpResult<T> extends HttpResponse {
                 ", code=" + code +
                 ", message='" + message + '\'' +
                 '}';
+    }
+
+    @Override
+    public Gson parseGson() {
+        return null;
     }
 }
