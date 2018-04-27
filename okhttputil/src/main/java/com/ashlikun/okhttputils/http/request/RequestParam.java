@@ -253,7 +253,7 @@ public class RequestParam implements Comparator<String> {
         return tag;
     }
 
-    public RequestParam tag() {
+    public RequestParam tag(Object tag) {
         this.tag = tag;
         return this;
     }
