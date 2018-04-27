@@ -84,7 +84,6 @@ public class OkHttpUtils implements SuperHttp {
         Call call = requestCall.buildCall(callback);
         ExecuteCall exc = new ExecuteCall();
         exc.setCall(call);
-        exc.setTag(requestCall.getRequestParam().getTag());
         OkHttpCallback okHttpCallback = new OkHttpCallback(exc, callback);
         okHttpCallback.setParseGson(requestCall.getRequestParam().getParseGson());
         call.enqueue(okHttpCallback);
@@ -129,6 +128,38 @@ public class OkHttpUtils implements SuperHttp {
         RequestCall requestCall = new RequestCall.Builder(requestParam)
                 .build();
         return syncExecute(requestCall, raw, args);
+    }
+
+
+    /**
+     * 根据Tag取消请求
+     */
+    public void cancelTag(Object tag) {
+        if (tag == null) {
+            return;
+        }
+        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
+            if (tag.equals(call.request().tag())) {
+                call.cancel();
+            }
+        }
+        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
+            if (tag.equals(call.request().tag())) {
+                call.cancel();
+            }
+        }
+    }
+
+    /**
+     * 取消所有请求请求
+     */
+    public void cancelAll() {
+        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
+            call.cancel();
+        }
+        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
+            call.cancel();
+        }
     }
 
     //同步请求的 构建Type   args是泛型数据

@@ -13,7 +13,6 @@ import okhttp3.Call;
 public class ExecuteCall {
     private Call call;
     private boolean isCompleted = false;//是否完成
-    private Object tag;
 
     public void cancel() {
         if (call != null && !call.isCanceled()) {
@@ -45,11 +44,5 @@ public class ExecuteCall {
         return call;
     }
 
-    public void setTag(Object tag) {
-        this.tag = tag;
-    }
 
-    public Object getTag() {
-        return tag;
-    }
 }
