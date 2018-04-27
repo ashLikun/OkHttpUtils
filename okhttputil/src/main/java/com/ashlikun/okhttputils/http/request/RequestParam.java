@@ -49,6 +49,8 @@ public class RequestParam implements Comparator<String> {
     private List<FileInput> files;//上传文件
     private Gson gson;
     private boolean isJson = false;
+    //标识这个请求，会传递到Request里面
+    private Object tag;
 
     public static RequestParam post(String url) {
         RequestParam param = new RequestParam(url);
@@ -247,6 +249,15 @@ public class RequestParam implements Comparator<String> {
         return gson;
     }
 
+    public Object getTag() {
+        return tag;
+    }
+
+    public RequestParam tag() {
+        this.tag = tag;
+        return this;
+    }
+
     //构建一个Request
     public Request bulidRequest(Callback callback) {
         Request.Builder builder = new Request.Builder();
@@ -265,6 +276,7 @@ public class RequestParam implements Comparator<String> {
                 .url(urlStr)
                 .headers(header.build())
                 .method(method, requestBody)
+                .tag(tag)
                 .build();
     }
 
