@@ -151,6 +151,27 @@ public class OkHttpUtils implements SuperHttp {
     }
 
     /**
+     * 根据Tag取消请求
+     */
+    public long count(Object tag) {
+        if (tag == null) {
+            return 0;
+        }
+        long count = 0;
+        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
+            if (tag.equals(call.request().tag())) {
+                count++;
+            }
+        }
+        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
+            if (tag.equals(call.request().tag())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
      * 取消所有请求请求
      */
     public void cancelAll() {
@@ -161,6 +182,7 @@ public class OkHttpUtils implements SuperHttp {
             call.cancel();
         }
     }
+
 
     //同步请求的 构建Type   args是泛型数据
     private ParameterizedType type(final Class raw, final Type... args) {
