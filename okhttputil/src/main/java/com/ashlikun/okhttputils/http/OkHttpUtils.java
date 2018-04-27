@@ -14,6 +14,7 @@ import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -153,19 +154,31 @@ public class OkHttpUtils implements SuperHttp {
     /**
      * 根据Tag取消请求
      */
-    public long count(Object tag) {
+    public long countRequest(Object... tag) {
         if (tag == null) {
             return 0;
         }
+
         long count = 0;
-        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
-            if (tag.equals(call.request().tag())) {
-                count++;
-            }
+        List<Call> calls1 = mOkHttpClient.dispatcher().queuedCalls();
+        List<Call> calls2 = mOkHttpClient.dispatcher().runningCalls();
+
+        if (tag.length == 0) {
+            return (calls1 == null ? 0 : calls1.size()) + (calls2 == null ? 0 : calls2.size());
         }
-        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
-            if (tag.equals(call.request().tag())) {
-                count++;
+        for (Call call : calls1) {
+            for (Object one : tag) {
+                if (one.equals(call.request().tag())) {
+                    count++;
+                }
+            }
+
+        }
+        for (Call call : calls2) {
+            for (Object one : tag) {
+                if (one.equals(call.request().tag())) {
+                    count++;
+                }
             }
         }
         return count;
