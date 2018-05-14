@@ -298,8 +298,85 @@ public class HttpRequest implements Comparator<String> {
         return this;
     }
 
+
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/3/21 9:55
+     * <p>
+     * 方法功能：构建请求body    多表单数据  键值对
+     */
+    private void addParams(Map<String, Object> params, MultipartBody.Builder builder) {
+        if (params != null && !params.isEmpty()) {
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                builder.addFormDataPart(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());//Content-Disposition;form-data; name="aaa"
+            }
+        }
+    }
+
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/3/21 9:55
+     * <p>
+     * 方法功能：构建请求body    表单数据  键值对
+     */
+    private void addParams(Map<String, Object> params, FormBody.Builder builder) {
+        if (params != null && !params.isEmpty()) {
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                builder.addEncoded(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
+            }
+        }
+    }
+
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/3/21 9:55
+     * <p>
+     * 方法功能：构建请求body    多表单  文件数据
+     */
+    private void addFlieParams(MultipartBody.Builder builder) {//表单数据
+        if (files != null && !files.isEmpty()) {
+            for (FileInput fileInput : files) {
+                builder.addFormDataPart(fileInput.key, fileInput.filename
+                        , RequestBody.create(MediaType.parse(getMimeType(fileInput.file.getAbsolutePath())), fileInput.file));
+            }
+        }
+    }
+
+
+    public Uri getUrl() {
+        return url;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public Map<String, Object> getParams() {
+        Map<String, Object> map = new HashMap<>();
+        map.putAll(params);
+        return map;
+    }
+    /********************************************************************************************
+     *                                           私有方法
+    ********************************************************************************************/
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/3/21 9:56
+     * <p>
+     * 方法功能：获取文件的mime类型  Content-type
+     */
+    private String getMimeType(String path) {
+        FileNameMap fileNameMap = URLConnection.getFileNameMap();
+        try {
+            return fileNameMap.getContentTypeFor(URLEncoder.encode(path, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return MEDIA_TYPE_STREAM.toString();
+    }
+
     //构建一个Request
-    public Request bulidRequest(Callback callback, ProgressCallBack progressCallBack) {
+    protected Request bulidRequest(Callback callback, ProgressCallBack progressCallBack) {
         Request.Builder builder = new Request.Builder();
         if (isEmpty(method)) {
             method = methods[0];
@@ -333,9 +410,10 @@ public class HttpRequest implements Comparator<String> {
      * postContent ->text/plain;charset=utf-8
      * 不存在文件application/x-www-form-urlencoded
      * 存在文件 multipart/form-data
+     * 私有
      */
 
-    public RequestBody buildRequestBody(Callback callback, ProgressCallBack progressCallBack) {
+    protected RequestBody buildRequestBody(Callback callback, ProgressCallBack progressCallBack) {
         RequestBody body = null;
         onBuildRequestBody();
         if (method.equals("GET")) {
@@ -391,86 +469,14 @@ public class HttpRequest implements Comparator<String> {
 
     /**
      * 是否正常的字符串
+     * 私有
      *
      * @return
      */
-    public boolean isEmpty(String str) {
+    private boolean isEmpty(String str) {
         return (str == null || str.length() == 0);
     }
 
-
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:55
-     * <p>
-     * 方法功能：构建请求body    多表单数据  键值对
-     */
-    private void addParams(Map<String, Object> params, MultipartBody.Builder builder) {
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                builder.addFormDataPart(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());//Content-Disposition;form-data; name="aaa"
-            }
-        }
-    }
-
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:55
-     * <p>
-     * 方法功能：构建请求body    表单数据  键值对
-     */
-    private void addParams(Map<String, Object> params, FormBody.Builder builder) {
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                builder.addEncoded(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
-            }
-        }
-    }
-
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:55
-     * <p>
-     * 方法功能：构建请求body    多表单  文件数据
-     */
-    private void addFlieParams(MultipartBody.Builder builder) {//表单数据
-        if (files != null && !files.isEmpty()) {
-            for (FileInput fileInput : files) {
-                builder.addFormDataPart(fileInput.key, fileInput.filename
-                        , RequestBody.create(MediaType.parse(getMimeType(fileInput.file.getAbsolutePath())), fileInput.file));
-            }
-        }
-    }
-
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:56
-     * <p>
-     * 方法功能：获取文件的mime类型  Content-type
-     */
-    private String getMimeType(String path) {
-        FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        try {
-            return fileNameMap.getContentTypeFor(URLEncoder.encode(path, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return MEDIA_TYPE_STREAM.toString();
-    }
-
-    public Uri getUrl() {
-        return url;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public Map<String, Object> getParams() {
-        Map<String, Object> map = new HashMap<>();
-        map.putAll(params);
-        return map;
-    }
 
     /**
      * 作者　　: 李坤

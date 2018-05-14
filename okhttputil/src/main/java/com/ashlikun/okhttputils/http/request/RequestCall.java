@@ -53,9 +53,11 @@ public class RequestCall implements SuperHttp {
 
     /**
      * 构建一个call用于请求
+     * 私有
      */
-    public Call buildCall(Callback callback) {
-        request = httpRequest.bulidRequest(callback, progressCallBack);//获得请求实体
+    private Call buildCall(Callback callback) {
+        //获得请求实体
+        request = httpRequest.bulidRequest(callback, progressCallBack);
         //如果超时时间大于0,就重新构建OkHttpClient
         if (isNewBuilder()) {
             readTimeOut = readTimeOut > 0 ? readTimeOut : OkHttpUtils.DEFAULT_MILLISECONDS;
