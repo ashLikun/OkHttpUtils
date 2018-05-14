@@ -1,26 +1,18 @@
 package com.ashlikun.okhttputils.http;
 
 
-import android.text.TextUtils;
-
+import com.ashlikun.okhttputils.http.request.HttpRequest;
 import com.ashlikun.okhttputils.http.request.RequestCall;
-import com.ashlikun.okhttputils.http.request.RequestParam;
-import com.ashlikun.okhttputils.http.response.HttpErrorCode;
-import com.ashlikun.okhttputils.http.response.HttpResponse;
 import com.ashlikun.okhttputils.json.GsonHelper;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * 作者　　: 李坤
@@ -29,13 +21,23 @@ import okhttp3.ResponseBody;
  * <p>
  * 功能介绍：http工具类
  */
-public class OkHttpUtils implements SuperHttp {
-
+public final class OkHttpUtils {
+    //默认的超时时间
+    public static final long DEFAULT_MILLISECONDS = 40_000L;
+    public static final long DEFAULT_MILLISECONDS_LONG = 200_000L;
     private volatile static OkHttpUtils INSTANCE = null;
     //okhttp核心类
     private OkHttpClient mOkHttpClient;
     //解析json
     private Gson gson;
+    /**
+     * 普通键值对公共参数
+     */
+    private Map<String, Object> commonParams;
+    /**
+     * 请求头公共参数
+     */
+    private Map<String, String> commonHeaders;
 
     //获取单例
     public static OkHttpUtils getInstance() {
@@ -62,7 +64,11 @@ public class OkHttpUtils implements SuperHttp {
         gson = GsonHelper.getGson();
     }
 
-    //初始化
+    /**
+     * 初始化
+     *
+     * @param okHttpClient
+     */
     public static void init(OkHttpClient okHttpClient) {
         INSTANCE = new OkHttpUtils(okHttpClient);
     }
@@ -75,62 +81,52 @@ public class OkHttpUtils implements SuperHttp {
     /**
      * 全局设置gson解析
      */
-    public void setParseGson(Gson gson) {
+    public OkHttpUtils setParseGson(Gson gson) {
         this.gson = gson;
+        return this;
     }
 
-    //异步请求
-    @Override
-    public <T> ExecuteCall execute(RequestCall requestCall, Callback<T> callback) {
-        Call call = requestCall.buildCall(callback);
-        ExecuteCall exc = new ExecuteCall();
-        exc.setCall(call);
-        OkHttpCallback okHttpCallback = new OkHttpCallback(exc, callback);
-        okHttpCallback.setParseGson(requestCall.getRequestParam().getParseGson());
-        call.enqueue(okHttpCallback);
-
-        return exc;
-    }
-
-    //异步请求
-    @Override
-    public <T> ExecuteCall execute(RequestParam requestParam, Callback<T> callback) {
-        RequestCall requestCall = new RequestCall.Builder(requestParam)
-                .build();
-        return execute(requestCall, callback);
+    public Gson getParseGson() {
+        return gson;
     }
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/5/27 18:37
-     * <p>
-     * 方法功能：同步请求
-     *
-     * @param requestCall 请求参数
-     * @param raw         原始数据
-     * @param args        内部数据
+     * 全局设置公共参数
      */
-
-    @Override
-    public <ResultType> ResultType syncExecute(RequestCall requestCall, Class raw, final Class... args) throws IOException {
-        Response response = requestCall.buildCall(null).execute();
-        Type type = null;
-        if (args != null && args.length >= 2) {
-            type = type(raw, type(args[0], args[1]));
-        } else {
-            type = type(raw, args);
+    public OkHttpUtils setCommonParams(Map<String, Object> commonParams) {
+        if (this.commonParams == null) {
+            this.commonParams = new HashMap<>();
         }
-        return handerResult(type, response, requestCall.getRequestParam().getParseGson());
+        this.commonParams.putAll(commonParams);
+        return this;
     }
 
-    //同步请求
-    @Override
-    public <ResultType> ResultType syncExecute(RequestParam requestParam, Class raw, final Class... args) throws IOException {
-        RequestCall requestCall = new RequestCall.Builder(requestParam)
-                .build();
-        return syncExecute(requestCall, raw, args);
+    /**
+     * 全局设置公共头部
+     */
+    public OkHttpUtils setCommonHeaders(Map<String, String> commonHeaders) {
+        if (this.commonHeaders == null) {
+            this.commonHeaders = new HashMap<>();
+        }
+        this.commonHeaders.putAll(commonHeaders);
+        return this;
     }
 
+    public Map<String, Object> getCommonParams() {
+        return commonParams;
+    }
+
+    public Map<String, String> getCommonHeaders() {
+        return commonHeaders;
+    }
+
+    public boolean isCommonHeaders() {
+        return commonHeaders != null && !commonHeaders.isEmpty();
+    }
+
+    public boolean isCommonParams() {
+        return commonParams != null && !commonParams.isEmpty();
+    }
 
     /**
      * 根据Tag取消请求
@@ -197,85 +193,29 @@ public class OkHttpUtils implements SuperHttp {
     }
 
 
-    //同步请求的 构建Type   args是泛型数据
-    private ParameterizedType type(final Class raw, final Type... args) {
-        return new ParameterizedType() {
-            @Override
-            public Type getRawType() {
-                return raw;
-            }
-
-            @Override
-            public Type[] getActualTypeArguments() {
-                return args;
-            }
-
-            @Override
-            public Type getOwnerType() {
-                return null;
-            }
-        };
+    /**
+     * 开始post请求
+     */
+    public static HttpRequest post(String url) {
+        return HttpRequest.post(url);
     }
 
-    //处理返回值
-    public static <T> T handerResult(Type type, final Response response, Gson gson) throws IOException {
-        if (type != null) {
-            if (type == Response.class) {
-                return (T) response;
-            } else if (type == ResponseBody.class) {
-                return (T) response.body();
-            } else {
-                String json = response.body().string();
-                if (type == String.class) {
-                    return (T) json;
-                } else {
-                    T res = null;
-                    try {
-                        if (TextUtils.isEmpty(json)) {
-                            throw new JsonSyntaxException("json length = 0");
-                        }
-                        if (gson == null) {
-                            Class cls = null;
-                            try {
-                                if (type instanceof Class) {
-                                    cls = (Class) type;
-                                } else {
-                                    cls = (Class) ((ParameterizedType) type).getRawType();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            if (cls != null) {
-                                if (HttpResponse.class.isAssignableFrom(cls)) {
-                                    try {
-                                        HttpResponse da = (HttpResponse) cls.newInstance();
-                                        gson = da.parseGson();
-                                    } catch (InstantiationException e) {
-                                        e.printStackTrace();
-                                    } catch (IllegalAccessException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                        if (gson == null) {
-                            gson = OkHttpUtils.getInstance().gson;
-                        }
-                        res = gson.fromJson(json, type);
-                    } catch (JsonSyntaxException e) {//数据解析异常
-                        throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
-                    }
-                    if (res instanceof HttpResponse) {
-                        ((HttpResponse) res).json = json;
-                        ((HttpResponse) res).httpcode = response.code();
-                        ((HttpResponse) res).response = response;
-                    }
-                    return res;
-                }
-            }
-        }
-        return null;
+    /**
+     * 开始get请求
+     */
+    public static HttpRequest get(String url) {
+        return HttpRequest.get(url);
     }
 
+    /**
+     * 开始请求
+     * 设置参数
+     *
+     * @param requestParam
+     * @return
+     */
+    public static RequestCall request(HttpRequest requestParam) {
+        return new RequestCall(requestParam);
+    }
 }
 

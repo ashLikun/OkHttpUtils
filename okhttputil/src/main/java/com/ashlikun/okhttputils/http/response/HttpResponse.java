@@ -24,7 +24,7 @@ import okhttp3.Response;
  * <p>
  * 功能介绍：http的基本类
  */
-public abstract class HttpResponse {
+public class HttpResponse {
     public final static String CODE_KEY = "code";
     public final static String MES_KEY = "msg";
     //gson不解析
@@ -243,5 +243,7 @@ public abstract class HttpResponse {
         return sb.toString();
     }
 
-    public abstract Gson parseGson();
+    public Gson parseGson() {
+        return null;
+    }
 }

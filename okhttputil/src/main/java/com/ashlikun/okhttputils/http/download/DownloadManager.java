@@ -29,13 +29,19 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 
-import static com.ashlikun.okhttputils.http.SuperHttp.DEFAULT_MILLISECONDS;
-
 
 /**
- * 下载管理器
+ * @author　　: 李坤
+ * 创建时间: 2018/5/10 0010 下午 5:21
+ * 邮箱　　：496546144@qq.com
+ * <p>
+ * 功能介绍：下载管理器,断点下载
  */
+
 public class DownloadManager {
+    //默认的进度间隔时间
+    public static final long DEFAULT_RATE = 200;
+
     public static String defaultFilePath;
     private OkHttpClient mClient;
 
@@ -68,9 +74,9 @@ public class DownloadManager {
                 if (manager == null) {
                     OkHttpClient.Builder client = OkHttpUtils.getInstance().getOkHttpClient()
                             .newBuilder()
-                            .readTimeout(DEFAULT_MILLISECONDS * 30, TimeUnit.MILLISECONDS)
-                            .writeTimeout(DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                            .connectTimeout(DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS);
+                            .readTimeout(OkHttpUtils.DEFAULT_MILLISECONDS * 30, TimeUnit.MILLISECONDS)
+                            .writeTimeout(OkHttpUtils.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
+                            .connectTimeout(OkHttpUtils.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS);
                     client.interceptors().clear();
                     client.networkInterceptors().clear();
                     manager = new DownloadManager(client.build());
@@ -102,8 +108,9 @@ public class DownloadManager {
         if (downloadTask != null && !isDownloading(downloadTask)) {
             DownloadTask oldTask = mCurrentTaskList.get(downloadTask.getId());
             if (oldTask != null) {
-                if (isDownloading(oldTask)) return;
-                else {
+                if (isDownloading(oldTask)) {
+                    return;
+                } else {
                     oldTask.onComplete();
                     mCurrentTaskList.remove(oldTask);
                 }

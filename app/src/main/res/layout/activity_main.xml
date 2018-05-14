@@ -5,23 +5,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+    <ImageView
+        android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="Hello World!" />
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/button1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="检查数据" />
+        android:onClick="onButt1Click"
+        android:text="请求图片" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onTestGsonClick"
-        android:text="testGson" />
+        android:onClick="onButt2Click"
+        android:text="一般请求" />
 
 </LinearLayout>

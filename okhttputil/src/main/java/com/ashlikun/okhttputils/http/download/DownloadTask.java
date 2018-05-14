@@ -17,17 +17,17 @@ package com.ashlikun.okhttputils.http.download;
 
 import android.text.TextUtils;
 
+import com.ashlikun.okhttputils.http.HttpUtils;
+import com.ashlikun.okhttputils.http.IOUtils;
+
 import java.io.BufferedInputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
-import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import okhttp3.OkHttpClient;
@@ -49,15 +49,24 @@ public class DownloadTask implements Observer<Integer> {
     private RandomAccessFile mDownLoadFile;
     private DownloadEntity dbEntity;
     private DownloadTaskListener mListener;
-    private String id;// 任务id，断点下载
-    private long totalSize;// 总大小
-    private long completedSize; //  已经下载的大小
-    private String url;// 下载url
-    private String saveDirPath;// 文件保存路径
-    private String fileName; // 文件保存的名称
-    private int downloadStatus;//下载状态
-    private int errorCode;//错误码
-    private int rate;//下载多少回调一次  默认200，单位毫秒;
+    // 任务id，断点下载
+    private String id;
+    // 总大小
+    private long totalSize;
+    //  已经下载的大小
+    private long completedSize;
+    // 下载url
+    private String url;
+    // 文件保存路径
+    private String saveDirPath;
+    // 文件保存的名称
+    private String fileName;
+    //下载状态
+    private int downloadStatus;
+    //错误码
+    private int errorCode;
+    //下载多少回调一次  默认200，单位毫秒;
+    private long rate;
 
     private Disposable disposable;
 
@@ -71,7 +80,7 @@ public class DownloadTask implements Observer<Integer> {
         this.mListener = builder.listener;
         this.rate = builder.rate;
         if (this.rate <= 0) {
-            this.rate = 200;
+            this.rate = DownloadManager.DEFAULT_RATE;
         }
     }
 
@@ -102,35 +111,33 @@ public class DownloadTask implements Observer<Integer> {
      * 分发回调事件到ui层
      */
     private void onCallBack() {
-        Observable.just(downloadStatus)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer integer) throws Exception {
-                        switch (integer) {
-                            // 下载失败
-                            case DownloadStatus.DOWNLOAD_STATUS_ERROR:
-                                mListener.onError(DownloadTask.this, errorCode);
-                                break;
-                            // 正在下载
-                            case DownloadStatus.DOWNLOAD_STATUS_DOWNLOADING:
-                                mListener.onDownloading(DownloadTask.this, completedSize, totalSize, getDownLoadPercent());
-                                break;
-                            // 取消
-                            case DownloadStatus.DOWNLOAD_STATUS_CANCEL:
-                                cancel();
-                                break;
-                            // 完成
-                            case DownloadStatus.DOWNLOAD_STATUS_COMPLETED:
-                                mListener.onDownloadSuccess(DownloadTask.this, new File(getFilePath()));
-                                break;
-                            // 停止
-                            case DownloadStatus.DOWNLOAD_STATUS_PAUSE:
-                                mListener.onPause(DownloadTask.this, completedSize, totalSize, getDownLoadPercent());
-                                break;
-                        }
-                    }
-                });
+        HttpUtils.runmainThread(downloadStatus, new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                switch (integer) {
+                    // 下载失败
+                    case DownloadStatus.DOWNLOAD_STATUS_ERROR:
+                        mListener.onError(DownloadTask.this, errorCode);
+                        break;
+                    // 正在下载
+                    case DownloadStatus.DOWNLOAD_STATUS_DOWNLOADING:
+                        mListener.onDownloading(DownloadTask.this, completedSize, totalSize, getDownLoadPercent());
+                        break;
+                    // 取消
+                    case DownloadStatus.DOWNLOAD_STATUS_CANCEL:
+                        cancel();
+                        break;
+                    // 完成
+                    case DownloadStatus.DOWNLOAD_STATUS_COMPLETED:
+                        mListener.onDownloadSuccess(DownloadTask.this, new File(getFilePath()));
+                        break;
+                    // 停止
+                    case DownloadStatus.DOWNLOAD_STATUS_PAUSE:
+                        mListener.onPause(DownloadTask.this, completedSize, totalSize, getDownLoadPercent());
+                        break;
+                }
+            }
+        });
         // 同步manager中的task信息
         DownloadManager.getInstance().updateDownloadTask(this);
     }
@@ -152,43 +159,18 @@ public class DownloadTask implements Observer<Integer> {
     private String getFilePath() throws IOException {
         // 获得文件名
         if (TextUtils.isEmpty(fileName)) {
-            fileName = getFileNameFromUrl(url);
+            fileName = HttpUtils.getNetFileName(null, url);
         }
-
         if (TextUtils.isEmpty(saveDirPath)) {
             saveDirPath = defaultFilePath;
         }
-
         if (!saveDirPath.endsWith("/")) {
             saveDirPath = saveDirPath + "/";
         }
-
-        File file = new File(saveDirPath);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-
+        IOUtils.createFolder(saveDirPath);
         String filepath = saveDirPath + fileName;
-        file = new File(saveDirPath);
-        if (!file.exists()) {
-            file.createNewFile();
-        }
+        IOUtils.createNewFile(filepath);
         return filepath;
-    }
-
-    private String getFileNameFromUrl(String url) {
-        if (!TextUtils.isEmpty(url)) {
-            return url.substring(url.lastIndexOf("/") + 1);
-        }
-        return System.currentTimeMillis() + "";
-    }
-
-    private void close(Closeable closeable) {
-        try {
-            closeable.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -236,8 +218,9 @@ public class DownloadTask implements Observer<Integer> {
 
     @Override
     public void onError(Throwable e) {
-        if (e != null)
+        if (e != null) {
             e.printStackTrace();
+        }
         if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {//下载完成取消订阅
             disposable.dispose();
         }
@@ -291,13 +274,17 @@ public class DownloadTask implements Observer<Integer> {
 
             // 开始下载
             Request request = new Request.Builder().url(url).header("RANGE",
-                    "bytes=" + completedSize + "-") // Http value set breakpoints RANGE
+                    "bytes=" + completedSize + "-")
                     .build();
 
             // 文件跳转到指定位置开始写入
             mDownLoadFile.seek(completedSize);
             Response response = mClient.newCall(request).execute();
             ResponseBody responseBody = response.body();
+            //设置文件名
+            if (TextUtils.isEmpty(fileName)) {
+                fileName = HttpUtils.getNetFileName(response, url);
+            }
             if (responseBody != null) {
                 downloadStatus = DownloadStatus.DOWNLOAD_STATUS_DOWNLOADING;
                 if (totalSize < completedSize + responseBody.contentLength()) {
@@ -348,24 +335,16 @@ public class DownloadTask implements Observer<Integer> {
             if (isDownloadFinish()) {
                 onCallBack();
             }
-
             // 下载后新数据库
             if (dbEntity != null) {
                 dbEntity.setCompletedSize(completedSize);
                 dbEntity.setDownloadStatus(downloadStatus);
                 DownloadEntity.update(dbEntity);
             }
-
             // 回收资源
-            if (bis != null) {
-                close(bis);
-            }
-            if (inputStream != null) {
-                close(inputStream);
-            }
-            if (mDownLoadFile != null) {
-                close(mDownLoadFile);
-            }
+            IOUtils.closeQuietly(bis);
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(mDownLoadFile);
         }
     }
 
@@ -380,7 +359,7 @@ public class DownloadTask implements Observer<Integer> {
         private String saveDirPath;// 保存的路径,默认时myApp的sdPath
         private String fileName; // 保存的文件名
         private int downloadStatus = DownloadStatus.DOWNLOAD_STATUS_INIT;
-        private int rate;//下载多少回调一次  默认200，单位毫秒;
+        private long rate;//下载多少回调一次  默认200，单位毫秒;
 
         private DownloadTaskListener listener;
 
@@ -445,7 +424,7 @@ public class DownloadTask implements Observer<Integer> {
          * @param rate
          * @return
          */
-        public Builder setRate(int rate) {
+        public Builder setRate(long rate) {
             this.rate = rate;
             return this;
         }

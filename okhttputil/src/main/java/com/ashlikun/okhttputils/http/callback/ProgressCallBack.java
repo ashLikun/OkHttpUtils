@@ -1,4 +1,4 @@
-package com.ashlikun.okhttputils.http.request;
+package com.ashlikun.okhttputils.http.callback;
 
 /**
  * 作者　　: 李坤
@@ -21,11 +21,5 @@ public interface ProgressCallBack {
      * @return
      */
     long getRate();
-
-    /**
-     * @param rate
-     */
-    void setRate(long rate);
-
 
 }

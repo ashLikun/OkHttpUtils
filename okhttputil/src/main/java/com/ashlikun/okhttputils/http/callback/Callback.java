@@ -1,4 +1,8 @@
-package com.ashlikun.okhttputils.http;
+package com.ashlikun.okhttputils.http.callback;
+
+import com.ashlikun.okhttputils.http.HttpException;
+import com.ashlikun.okhttputils.http.cache.CacheEntity;
+import com.ashlikun.okhttputils.http.convert.Converter;
 
 /**
  * 作者　　: 李坤
@@ -15,7 +19,7 @@ package com.ashlikun.okhttputils.http;
  * @Link {@link com.ashlikun.okhttputils.http.response.HttpResult} 直接序列化的javabean,也可以自定义HttpResult。注意json的键
  * @Link 其他实体类。注意json的键
  */
-public interface Callback<ResultType> {
+public interface Callback<ResultType> extends Converter<ResultType> {
 
     void onStart();
 
@@ -24,6 +28,8 @@ public interface Callback<ResultType> {
     void onError(HttpException e);
 
     void onSuccess(ResultType responseBody);
+
+    void onCacheSuccess(CacheEntity entity, ResultType responseBody);
 
     /**
      * 作者　　: 李坤

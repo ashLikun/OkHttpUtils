@@ -7,7 +7,7 @@ import java.io.File;
  * 创建时间:2016/12/13　15:09
  * 邮箱　　：496546144@qq.com
  * <p>
- * 功能介绍：
+ * 功能介绍：实现了一些方法
  */
 
 public interface DownloadTaskListener {

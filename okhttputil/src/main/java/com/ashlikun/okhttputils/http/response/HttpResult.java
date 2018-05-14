@@ -33,8 +33,4 @@ public class HttpResult<T> extends HttpResponse {
                 '}';
     }
 
-    @Override
-    public Gson parseGson() {
-        return null;
-    }
 }

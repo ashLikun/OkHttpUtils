@@ -29,7 +29,7 @@ ext {
     v4Version = "com.android.support:support-v4:" + superVersion
     v7AppCompat = "com.android.support:appcompat-v7:" + superVersion
     targetSdkVersion = 24
-    minSdkVersion = 14
+    minSdkVersion = 16
     versionCode = 1
     versionName = "0.0.1"
 }

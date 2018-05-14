@@ -4,7 +4,10 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.ashlikun.okhttputils.http.Callback;
+import com.ashlikun.okhttputils.http.HttpUtils;
+import com.ashlikun.okhttputils.http.OkHttpUtils;
+import com.ashlikun.okhttputils.http.callback.Callback;
+import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
 import com.ashlikun.okhttputils.json.GsonHelper;
 import com.google.gson.Gson;
 
@@ -34,13 +37,17 @@ import okhttp3.RequestBody;
  * <p>
  * 功能介绍： 请求参数封装
  * 注意：一定要调用请求方法指定请求的方法，默认时get
+ * 可以继承，从写方法
  */
 
-public class RequestParam implements Comparator<String> {
+public class HttpRequest implements Comparator<String> {
     /* valid HTTP methods */
-    private static final String[] methods = {
+    public static final String[] methods = {
             "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"
     };
+    public static final MediaType MEDIA_TYPE_PLAIN = MediaType.parse("text/plain;charset=utf-8");
+    public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json;charset=utf-8");
+    public static final MediaType MEDIA_TYPE_STREAM = MediaType.parse("application/octet-stream");
     protected Uri url;//请求地址
     private String method;//请求方法
     protected Map<String, String> headers;//请求头
@@ -52,28 +59,29 @@ public class RequestParam implements Comparator<String> {
     //标识这个请求，会传递到Request里面
     private Object tag;
 
-    public static RequestParam post(String url) {
-        RequestParam param = new RequestParam(url);
+
+    public static HttpRequest post(String url) {
+        HttpRequest param = new HttpRequest(url);
         param.setMethod("POST");
         return param;
     }
 
-    public static RequestParam get(String url) {
-        RequestParam param = new RequestParam(url);
+    public static HttpRequest get(String url) {
+        HttpRequest param = new HttpRequest(url);
         param.setMethod("GET");
         return param;
     }
 
-    public static RequestParam get() {
+    public static HttpRequest get() {
         return get("GET");
     }
 
-    public RequestParam(String url) {
+    public HttpRequest(String url) {
         url(url);
     }
 
 
-    public RequestParam appendPath(String path) {
+    public HttpRequest appendPath(String path) {
         if (url == null) {
             new Exception("先调用url方法");
         }
@@ -84,7 +92,7 @@ public class RequestParam implements Comparator<String> {
         return this;
     }
 
-    public RequestParam setMethod(String method) {
+    public HttpRequest setMethod(String method) {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].equals(method)) {
                 this.method = method;
@@ -97,7 +105,7 @@ public class RequestParam implements Comparator<String> {
     }
 
 
-    public RequestParam url(String url) {
+    public HttpRequest url(String url) {
         this.url = Uri.parse(url);
         return this;
     }
@@ -115,7 +123,7 @@ public class RequestParam implements Comparator<String> {
     }
 
     //添加对象参数
-    private RequestParam addParamObject(String key, Object valuse) {
+    private HttpRequest addParamObject(String key, Object valuse) {
         if (!isEmpty(key) && valuse != null) {
             if (params == null) {
                 newParamMap();
@@ -126,31 +134,31 @@ public class RequestParam implements Comparator<String> {
     }
 
     //添加参数
-    public RequestParam addParam(String key, Object valuse) {
+    public HttpRequest addParam(String key, Object valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
     //添加参数
-    public RequestParam addParam(String key, String valuse) {
+    public HttpRequest addParam(String key, String valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
     //添加参数
-    public RequestParam addParam(String key, int valuse) {
+    public HttpRequest addParam(String key, int valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
     //添加参数
-    public RequestParam addParam(String key, double valuse) {
+    public HttpRequest addParam(String key, double valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
     //添加头部
-    public RequestParam addHeader(String key, String valuse) {
+    public HttpRequest addHeader(String key, String valuse) {
         if (!isEmpty(key) && !isEmpty(valuse)) {
             if (headers == null) {
                 newHeaderMap();
@@ -161,7 +169,7 @@ public class RequestParam implements Comparator<String> {
     }
 
     //添加文件参数
-    public RequestParam addParam(String key, File file) {
+    public HttpRequest addParam(String key, File file) {
         FileInput param = new FileInput(key, file);
         if (param.exists()) {
             if (files == null) {
@@ -173,7 +181,7 @@ public class RequestParam implements Comparator<String> {
     }
 
     //添加文件参数
-    public RequestParam addParamFilePath(String key, String filePath) {
+    public HttpRequest addParamFilePath(String key, String filePath) {
         if (filePath == null) {
             return this;
         }
@@ -182,7 +190,7 @@ public class RequestParam implements Comparator<String> {
     }
 
     //添加文件参数
-    public RequestParam addParam(String key, List<File> files) {
+    public HttpRequest addParam(String key, List<File> files) {
         if (files == null || files.isEmpty()) {
             return this;
         }
@@ -193,7 +201,7 @@ public class RequestParam implements Comparator<String> {
     }
 
     //添加文件参数
-    public RequestParam addParamFilePath(String key, List<String> filePaths) {
+    public HttpRequest addParamFilePath(String key, List<String> filePaths) {
         if (filePaths == null || filePaths.isEmpty()) {
             return this;
         }
@@ -203,14 +211,30 @@ public class RequestParam implements Comparator<String> {
         return this;
     }
 
-    //设置直接提交得post
-    public RequestParam setContent(String content) {
+    /**
+     * 设置直接提交得post
+     * 不会添加公共参数
+     */
+    public HttpRequest setContent(String content) {
         postContent = content;
         return this;
     }
 
-    //设置直接提交得post 并且是json
-    public RequestParam setContentJson(String content) {
+    /**
+     * 设置直接提交得post 并且是json
+     */
+    public HttpRequest setContentJson(String content) {
+        //添加公共参数
+        if (OkHttpUtils.getInstance().isCommonParams()) {
+            try {
+                Gson gson = new Gson();
+                Map<String, Object> p = gson.fromJson(content, Map.class);
+                p.putAll(OkHttpUtils.getInstance().getCommonParams());
+                content = gson.toJson(p);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         postContent = content;
         isJson = true;
         return this;
@@ -224,7 +248,15 @@ public class RequestParam implements Comparator<String> {
      * 注意：在这个方法调用以后添加的参数将无效
      * 2：如果存在文件就不能用content提交
      */
-    public RequestParam toJson() {
+    public HttpRequest toJson() {
+        //添加公共参数
+        if (OkHttpUtils.getInstance().isCommonParams()) {
+            if (params == null) {
+                newParamMap();
+            }
+            params.putAll(OkHttpUtils.getInstance().getCommonParams());
+        }
+        //转换成json
         if (params != null && !params.isEmpty() && !isHavafiles()) {
             postContent = GsonHelper.getGson().toJson(params);
             params.clear();
@@ -235,12 +267,20 @@ public class RequestParam implements Comparator<String> {
     }
 
     /**
+     * 构建请求
+     * 这里返回的对象才可以执行请求
+     */
+    public RequestCall buildCall() {
+        return new RequestCall(this);
+    }
+
+    /**
      * 解析结果的gson
      *
      * @param gson
      * @return
      */
-    public RequestParam parseGson(Gson gson) {
+    public HttpRequest parseGson(Gson gson) {
         this.gson = gson;
         return this;
     }
@@ -253,27 +293,32 @@ public class RequestParam implements Comparator<String> {
         return tag;
     }
 
-    public RequestParam tag(Object tag) {
+    public HttpRequest tag(Object tag) {
         this.tag = tag;
         return this;
     }
 
     //构建一个Request
-    public Request bulidRequest(Callback callback) {
+    public Request bulidRequest(Callback callback, ProgressCallBack progressCallBack) {
         Request.Builder builder = new Request.Builder();
         if (isEmpty(method)) {
             method = methods[0];
         }
-        RequestBody requestBody = buildRequestBody(callback);
+        RequestBody requestBody = buildRequestBody(callback, progressCallBack);
         Headers.Builder header = new Headers.Builder();
+        //添加公共请求头
+        if (OkHttpUtils.getInstance().isCommonHeaders()) {
+            for (Map.Entry<String, String> entry : OkHttpUtils.getInstance().getCommonHeaders().entrySet()) {
+                header.add(entry.getKey(), entry.getValue());
+            }
+        }
         if (isHavaHeader()) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 header.add(entry.getKey(), entry.getValue());
             }
         }
-        String urlStr = url.toString().replaceAll("//", "/");
         return builder
-                .url(urlStr)
+                .url(url.toString())
                 .headers(header.build())
                 .method(method, requestBody)
                 .tag(tag)
@@ -290,19 +335,23 @@ public class RequestParam implements Comparator<String> {
      * 存在文件 multipart/form-data
      */
 
-    public RequestBody buildRequestBody(Callback callback) {
+    public RequestBody buildRequestBody(Callback callback, ProgressCallBack progressCallBack) {
         RequestBody body = null;
         onBuildRequestBody();
         if (method.equals("GET")) {
+            //添加公共参数
+            if (OkHttpUtils.getInstance().isCommonParams()) {
+                url = HttpUtils.createUrlFromParams(url, OkHttpUtils.getInstance().getCommonParams());
+            }
             //get请求把参数放在url里面, 没有请求实体
-            url = appendQueryParams(url, params);
+            url = HttpUtils.createUrlFromParams(url, params);
             body = null;
         } else if (!isEmpty(postContent)) {
             //只提交content
             if (isJson) {
-                body = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), postContent);
+                body = RequestBody.create(MEDIA_TYPE_JSON, postContent);
             } else {
-                body = RequestBody.create(MediaType.parse("text/plain;charset=utf-8"), postContent);
+                body = RequestBody.create(MEDIA_TYPE_PLAIN, postContent);
             }
             //content方式是不能提交文件的
         } else {
@@ -310,41 +359,35 @@ public class RequestParam implements Comparator<String> {
             if (isHavafiles()) {
                 MultipartBody.Builder builder = new MultipartBody.Builder();
                 builder.setType(MultipartBody.FORM);
-                addParams(builder);
+                //添加公共参数
+                if (OkHttpUtils.getInstance().isCommonParams()) {
+                    addParams(OkHttpUtils.getInstance().getCommonParams(), builder);
+                }
+                addParams(params, builder);
                 addFlieParams(builder);
                 body = builder.build();
             } else {//不存在文件用 FormBody
                 FormBody.Builder builder = new FormBody.Builder();
-                addParams(builder);
+                //添加公共参数
+                if (OkHttpUtils.getInstance().isCommonParams()) {
+                    addParams(OkHttpUtils.getInstance().getCommonParams(), builder);
+                }
+                addParams(params, builder);
                 body = builder.build();
             }
         }
         //是否添加进度回调
-        if (body != null && callback != null && callback instanceof ProgressCallBack) {
-            body = new ProgressRequestBody(body, (ProgressCallBack) callback);
+        if (body != null && callback != null) {
+            if (callback instanceof ProgressCallBack) {
+                progressCallBack = (ProgressCallBack) callback;
+            }
+            if (progressCallBack != null) {
+                body = new ProgressRequestBody(body, progressCallBack);
+            }
         }
         return body;
     }
 
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 10:00
-     * <p>
-     * 方法功能：get请求构建url
-     */
-
-    private Uri appendQueryParams(Uri url, Map<String, Object> params) {
-        if (url == null || params == null || params.isEmpty()) {
-            return url;
-        }
-        Uri.Builder builder = url.buildUpon();
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                builder.appendQueryParameter(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
-            }
-        }
-        return builder.build();
-    }
 
     /**
      * 是否正常的字符串
@@ -362,7 +405,7 @@ public class RequestParam implements Comparator<String> {
      * <p>
      * 方法功能：构建请求body    多表单数据  键值对
      */
-    private void addParams(MultipartBody.Builder builder) {
+    private void addParams(Map<String, Object> params, MultipartBody.Builder builder) {
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 builder.addFormDataPart(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());//Content-Disposition;form-data; name="aaa"
@@ -376,7 +419,7 @@ public class RequestParam implements Comparator<String> {
      * <p>
      * 方法功能：构建请求body    表单数据  键值对
      */
-    private void addParams(FormBody.Builder builder) {
+    private void addParams(Map<String, Object> params, FormBody.Builder builder) {
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 builder.addEncoded(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
@@ -412,7 +455,21 @@ public class RequestParam implements Comparator<String> {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return "application/octet-stream";
+        return MEDIA_TYPE_STREAM.toString();
+    }
+
+    public Uri getUrl() {
+        return url;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public Map<String, Object> getParams() {
+        Map<String, Object> map = new HashMap<>();
+        map.putAll(params);
+        return map;
     }
 
     /**
@@ -428,10 +485,16 @@ public class RequestParam implements Comparator<String> {
 
     }
 
+    /**
+     * 方便从写
+     */
     public void newParamMap() {
         params = new TreeMap<>(this);
     }
 
+    /**
+     * 方便从写
+     */
     public void newHeaderMap() {
         headers = new HashMap<>();
     }

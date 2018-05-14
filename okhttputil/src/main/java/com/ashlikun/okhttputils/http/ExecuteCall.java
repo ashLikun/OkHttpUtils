@@ -29,14 +29,14 @@ public class ExecuteCall {
         return call == null ? true : call.isCanceled();
     }
 
-    protected void setCompleted(boolean completed) {
+    public void setCompleted(boolean completed) {
         if (completed) {
             call = null;
         }
         isCompleted = completed;
     }
 
-    protected void setCall(Call call) {
+    public void setCall(Call call) {
         this.call = call;
     }
 

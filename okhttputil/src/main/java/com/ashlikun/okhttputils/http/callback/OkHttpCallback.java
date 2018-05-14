@@ -1,19 +1,20 @@
-package com.ashlikun.okhttputils.http;
+package com.ashlikun.okhttputils.http.callback;
 
+import com.ashlikun.okhttputils.http.ExecuteCall;
+import com.ashlikun.okhttputils.http.HttpException;
+import com.ashlikun.okhttputils.http.HttpUtils;
+import com.ashlikun.okhttputils.http.cache.CacheEntity;
+import com.ashlikun.okhttputils.http.cache.CachePolicy;
 import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 import okhttp3.Response;
@@ -26,10 +27,11 @@ import okhttp3.Response;
  * 功能介绍：okhttp的直接回调
  */
 
-class OkHttpCallback<ResultType> implements okhttp3.Callback {
+public class OkHttpCallback<ResultType> implements okhttp3.Callback {
     ExecuteCall exc;
     Callback<ResultType> callback;
     Gson gson;
+    CachePolicy cachePolicy;
 
     public OkHttpCallback(ExecuteCall exc, Callback<ResultType> callback) {
         this.exc = exc;
@@ -37,6 +39,10 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
         if (callback != null) {
             callback.onStart();
         }
+    }
+
+    public void setCachePolicy(CachePolicy cachePolicy) {
+        this.cachePolicy = cachePolicy;
     }
 
     public void setParseGson(Gson gson) {
@@ -72,7 +78,7 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
         if (exc.getCall().isCanceled()) {
             return;
         }
-        switchThread(new Consumer<Integer>() {
+        HttpUtils.runmainThread(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
                 callback.onError(throwable);
@@ -89,7 +95,7 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
             return;
         }
         callback.onSuccessSubThread(resultType);
-        switchThread(new Consumer<Integer>() {
+        HttpUtils.runmainThread(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
                 if (callback.onSuccessHandelCode(resultType)) {
@@ -108,19 +114,30 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
             response.close();
             return;
         }
-        if (response.isSuccessful()) {
-            try {
-                ResultType resultType = OkHttpUtils.handerResult(getType(), response, gson);
-                postResponse(response, resultType);
-            } catch (IOException e) {
-                e.printStackTrace();
-                HttpException res = new HttpException(HttpErrorCode.HTTP_DATA_ERROR, HttpErrorCode.MSG_DATA_ERROR);
-                res.setOriginalException(e);
-                postFailure(res);
-                response.close();
-            }
-        } else {
+        //错误请求
+        if (response.code() == 404 || response.code() >= 500) {
             postFailure(getOnResponseHttpException(response.code(), response.message()));
+            response.close();
+            return;
+        }
+        try {
+            ResultType resultType = callback.convertResponse(response, gson);
+            //缓存
+            if (cachePolicy != null) {
+                cachePolicy.save(response,
+                        CacheEntity.getHanderResult(resultType));
+            }
+            if (resultType == null) {
+                postFailure(new HttpException(HttpErrorCode.HTTP_DATA_ERROR, HttpErrorCode.MSG_DATA_ERROR));
+                response.close();
+                return;
+            }
+            postResponse(response, resultType);
+        } catch (Exception e) {
+            e.printStackTrace();
+            HttpException res = new HttpException(HttpErrorCode.HTTP_DATA_ERROR, HttpErrorCode.MSG_DATA_ERROR);
+            res.setOriginalException(e);
+            postFailure(res);
             response.close();
         }
 
@@ -152,35 +169,4 @@ class OkHttpCallback<ResultType> implements okhttp3.Callback {
         }
     }
 
-    private void switchThread(Consumer next) {
-        Observable.just(1).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(next);
-    }
-
-    /**
-     * 获取回调里面的泛型
-     */
-    private Type getType() {
-        Type types = callback.getClass().getGenericSuperclass();
-        Type[] parentypes;//泛型类型集合
-        if (types instanceof ParameterizedType) {
-            parentypes = ((ParameterizedType) types).getActualTypeArguments();
-        } else {
-            parentypes = callback.getClass().getGenericInterfaces();
-            for (Type childtype : parentypes) {
-                if (childtype instanceof ParameterizedType) {
-                    Type rawType = ((ParameterizedType) childtype).getRawType();
-                    if (rawType instanceof Class && Callback.class.isAssignableFrom(((Class) rawType))) {//实现的接口是Callback
-                        parentypes = ((ParameterizedType) childtype).getActualTypeArguments();//Callback里面的类型
-                    }
-                }
-            }
-        }
-        if (parentypes == null || parentypes.length == 0) {
-            new Throwable("HttpSubscription  ->>>  callBack回调 不能没有泛型，请查看HttpCallBack是否有泛型");
-        } else {
-            return parentypes[0];
-        }
-        return null;
-    }
 }

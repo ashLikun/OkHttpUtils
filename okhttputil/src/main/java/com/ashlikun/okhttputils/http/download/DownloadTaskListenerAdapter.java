@@ -16,6 +16,7 @@ public abstract class DownloadTaskListenerAdapter implements DownloadTaskListene
      * @param totalSize
      * @param percent
      */
+    @Override
     public void onPause(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
 
     }
@@ -25,6 +26,7 @@ public abstract class DownloadTaskListenerAdapter implements DownloadTaskListene
      *
      * @param downloadTask
      */
+    @Override
     public void onCancel(DownloadTask downloadTask) {
 
     }
@@ -36,6 +38,7 @@ public abstract class DownloadTaskListenerAdapter implements DownloadTaskListene
      * @param downloadTask
      * @param errorCode    {@link DownloadStatus}
      */
+    @Override
     public void onError(DownloadTask downloadTask, int errorCode) {
 
     }

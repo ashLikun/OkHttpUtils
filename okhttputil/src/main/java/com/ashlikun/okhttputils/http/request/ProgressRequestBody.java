@@ -1,5 +1,7 @@
 package com.ashlikun.okhttputils.http.request;
 
+import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 

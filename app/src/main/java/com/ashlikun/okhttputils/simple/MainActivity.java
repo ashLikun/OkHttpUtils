@@ -1,15 +1,19 @@
 package com.ashlikun.okhttputils.simple;
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.ashlikun.okhttputils.http.OkHttpUtils;
-import com.ashlikun.okhttputils.http.SimpleCallback;
-import com.ashlikun.okhttputils.http.request.RequestParam;
+import com.ashlikun.okhttputils.http.cache.CacheEntity;
+import com.ashlikun.okhttputils.http.callback.AbsCallback;
+import com.ashlikun.okhttputils.http.callback.FileCallback;
 import com.ashlikun.okhttputils.json.GsonHelper;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,23 +40,7 @@ public class MainActivity extends AppCompatActivity {
 //                return 1;
 //            }
 //        });
-//
-        RequestParam p = RequestParam.get("https://jielehua.vcash.cn/api/jlh/apply/getApplyProgress/");
-        p.addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B");
-        //4690943?accessToken=8079CE15-038E-4977-8443-E885730DE268
-        p.appendPath("118915");
-        p.addParam("accessToken", 111111);
-        p.addParam("aasda", 2222.333);
-        p.addParam("9966", "33333");
-        p.addParam("aaaaa", "44444");
-        p.addParamFilePath("aa", "filePath");
-        p.toJson();
-        OkHttpUtils.getInstance().execute(p, new SimpleCallback<HomeHttpResult<JlhData>>() {
-            @Override
-            public void onSuccess(HomeHttpResult<JlhData> responseBody) {
-            }
-
-        });
+//                //4690943?accessToken=8079CE15-038E-4977-8443-E885730DE268
 
 //        try {
 //            String string = OkHttpUtils.getInstance().syncExecute(p,String.class);
@@ -89,7 +77,25 @@ public class MainActivity extends AppCompatActivity {
 //        Log.e("aaa", "" + "");
     }
 
-    public void onTestGsonClick(View view) {
+    public void onButt1Click(View view) {
+        OkHttpUtils.get("https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=399118516,1470088676&fm=27&gp=0.jpg")
+                .buildCall()
+                .execute(new FileCallback() {
+                    @Override
+                    public void onLoading(long progress, long total, boolean done, boolean isUpdate) {
+                        Log.e("onLoading", "progress = " + progress + "    total = " + total + "  done = " + done + " isUpdate = " + isUpdate);
+                    }
+
+                    @Override
+                    public void onSuccess(File responseBody) {
+                        super.onSuccess(responseBody);
+                        ImageView imageView = (ImageView) findViewById(R.id.image);
+                        imageView.setImageBitmap(BitmapFactory.decodeFile(responseBody.getAbsolutePath()));
+                    }
+                });
+    }
+
+    public void onButt2Click(View view) {
         HuodongData data = new HuodongData();
         HuodongData data2 = new HuodongData();
         data.hashCode();
@@ -100,6 +106,29 @@ public class MainActivity extends AppCompatActivity {
         map.put("ddd", "333");
         String json = GsonHelper.getGson().toJson(new TestData());
         Log.e("ddd", json);
+
+
+        OkHttpUtils.post("https://api.0gow.com/interface?action=n_goodslist")
+                .addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B")
+                .addParam("id", 325)
+                .addParam("page", 1)
+                .addParam("type", 2)
+                .addParam("NM_REFERER", "/goods/1313517")
+                .addParam("NM_URI", "/category/427/325")
+                .buildCall()
+                .firstUseCache()
+                .execute(new AbsCallback<GoodListData>() {
+                    @Override
+                    public void onSuccess(GoodListData responseBody) {
+                        Log.e("onSuccess", responseBody.toString());
+                    }
+
+                    @Override
+                    public void onCacheSuccess(CacheEntity entity, GoodListData responseBody) {
+                        super.onCacheSuccess(entity, responseBody);
+                        Log.e("onCacheSuccess", responseBody.toString() + entity.result);
+                    }
+                });
     }
 
     public static class TestData {

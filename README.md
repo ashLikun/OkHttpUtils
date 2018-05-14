@@ -17,7 +17,14 @@ allprojects {
 
 ```gradle
 dependencies {
-    compile 'com.github.ashLikun:OkHttpUtils:{latest version}'
+    implementation 'com.github.ashLikun:OkHttpUtils:{latest version}'
+    //依赖的第三方库
+     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+     implementation 'io.reactivex.rxjava2:rxjava:2.x.y'
+     implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+     implementation 'com.google.code.gson:gson:2.8.2'
+     //如果使用下载，或者自定义缓存（不是http默认的）就要用到数据库
+     implementation 'com.github.ashLikun:LiteOrm:1.0.3'
 }
 ```
         RequestParam p =  RequestParam.get();//get请求,可以是post--->RequestParam.post();
