@@ -11,19 +11,27 @@ import java.lang.reflect.Type;
 
 /**
  * Created by Administrator on 2016/8/4.
+ * gson的默认值处理
  */
+
 public class JsonTypeAdapter {
 
     public static class IntegerTypeAdapter implements JsonDeserializer<Integer> {
         // json转为对象时调用,实现JsonDeserializer<>接口
         @Override
         public Integer deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.getAsJsonPrimitive().getAsString() == null
-                    || json.getAsJsonPrimitive().getAsString() == ""
-                    || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
+            if (json == null) {
+                return null;
+            }
+            String value = json.getAsJsonPrimitive().getAsString();
+            if (TextUtils.isEmpty(value) || TextUtils.equals(value, "NULL")) {
                 return null;
             } else {
-                return json.getAsJsonPrimitive().getAsInt();
+                try {
+                    return json.getAsJsonPrimitive().getAsInt();
+                } catch (Exception e) {
+                    return null;
+                }
             }
         }
 
@@ -33,11 +41,14 @@ public class JsonTypeAdapter {
         // json转为对象时调用,实现JsonDeserializer<>接口
         @Override
         public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.getAsJsonPrimitive().getAsString() == null
-                    || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
+            if (json == null) {
+                return null;
+            }
+            String value = json.getAsJsonPrimitive().getAsString();
+            if (value == null || TextUtils.equals(value.toUpperCase(), "NULL")) {
                 return null;
             } else {
-                return json.getAsJsonPrimitive().getAsString();
+                return value;
             }
         }
 
@@ -47,12 +58,18 @@ public class JsonTypeAdapter {
         // json转为对象时调用,实现JsonDeserializer<>接口
         @Override
         public Long deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.getAsJsonPrimitive().getAsString() == null
-                    || json.getAsJsonPrimitive().getAsString() == ""
-                    || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
+            if (json == null) {
+                return null;
+            }
+            String value = json.getAsJsonPrimitive().getAsString();
+            if (TextUtils.isEmpty(value) || TextUtils.equals(value, "NULL")) {
                 return null;
             } else {
-                return json.getAsJsonPrimitive().getAsLong();
+                try {
+                    return json.getAsJsonPrimitive().getAsLong();
+                } catch (Exception e) {
+                    return null;
+                }
             }
         }
 
@@ -63,12 +80,18 @@ public class JsonTypeAdapter {
         // json转为对象时调用,实现JsonDeserializer<>接口
         @Override
         public Double deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.getAsJsonPrimitive().getAsString() == null
-                    || json.getAsJsonPrimitive().getAsString() == ""
-                    || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
+            if (json == null) {
+                return null;
+            }
+            String value = json.getAsJsonPrimitive().getAsString();
+            if (TextUtils.isEmpty(value) || TextUtils.equals(value, "NULL")) {
                 return null;
             } else {
-                return json.getAsJsonPrimitive().getAsDouble();
+                try {
+                    return json.getAsJsonPrimitive().getAsDouble();
+                } catch (Exception e) {
+                    return null;
+                }
             }
         }
 
@@ -79,12 +102,38 @@ public class JsonTypeAdapter {
         // json转为对象时调用,实现JsonDeserializer<>接口
         @Override
         public Float deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.getAsJsonPrimitive().getAsString() == null
-                    || json.getAsJsonPrimitive().getAsString() == ""
-                    || TextUtils.equals(json.getAsJsonPrimitive().getAsString().toUpperCase(), "NULL")) {
+            if (json == null) {
+                return null;
+            }
+            String value = json.getAsJsonPrimitive().getAsString();
+            if (TextUtils.isEmpty(value) || TextUtils.equals(value, "NULL")) {
                 return null;
             } else {
-                return json.getAsJsonPrimitive().getAsFloat();
+                try {
+                    return json.getAsJsonPrimitive().getAsFloat();
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public static class ShortTypeAdapter implements JsonDeserializer<Short> {
+        // json转为对象时调用,实现JsonDeserializer<>接口
+        @Override
+        public Short deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json == null) {
+                return null;
+            }
+            String value = json.getAsJsonPrimitive().getAsString();
+            if (TextUtils.isEmpty(value) || TextUtils.equals(value, "NULL")) {
+                return null;
+            } else {
+                try {
+                    return json.getAsJsonPrimitive().getAsShort();
+                } catch (Exception e) {
+                    return null;
+                }
             }
         }
     }

@@ -136,19 +136,19 @@ public final class OkHttpUtils {
             return;
         }
         for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
-            if (tag.equals(call.request().tag())) {
+            if (call != null && tag.equals(call.request().tag())) {
                 call.cancel();
             }
         }
         for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
-            if (tag.equals(call.request().tag())) {
+            if (call != null && tag.equals(call.request().tag())) {
                 call.cancel();
             }
         }
     }
 
     /**
-     * 根据Tag取消请求
+     * 根据Tag获取请求个数
      */
     public long countRequest(Object... tag) {
         if (tag == null) {
@@ -164,7 +164,7 @@ public final class OkHttpUtils {
         }
         for (Call call : calls1) {
             for (Object one : tag) {
-                if (one.equals(call.request().tag())) {
+                if (one != null && one.equals(call.request().tag())) {
                     count++;
                 }
             }
@@ -172,7 +172,7 @@ public final class OkHttpUtils {
         }
         for (Call call : calls2) {
             for (Object one : tag) {
-                if (one.equals(call.request().tag())) {
+                if (one != null && one.equals(call.request().tag())) {
                     count++;
                 }
             }
@@ -185,10 +185,14 @@ public final class OkHttpUtils {
      */
     public void cancelAll() {
         for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
-            call.cancel();
+            if (call != null) {
+                call.cancel();
+            }
         }
         for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
-            call.cancel();
+            if (call != null) {
+                call.cancel();
+            }
         }
     }
 
