@@ -31,8 +31,10 @@ public class HttpResponse {
     public transient Response response;
     public transient String json;
     public transient int httpcode;
-    //缓存已经实例化的JSONObject,JSONArray对象
-    private transient JSONObject cache;
+    /**
+     * 缓存已经实例化的JSONObject,JSONArray对象
+     */
+    private transient Object cache;
 
     @SerializedName(CODE_KEY)
     public int code = HttpCode.ERROR;
@@ -60,6 +62,13 @@ public class HttpResponse {
         return unicode2String(message);
     }
 
+    /**
+     * 获取根部json对象
+     * 说明后续这个结果都是json对象
+     *
+     * @return
+     * @throws JSONException
+     */
     public JSONObject getJSONObject() throws JSONException {
         if (cache == null) {
             if (json == null) {
@@ -69,7 +78,26 @@ public class HttpResponse {
             json = null;
             cache = jObj;
         }
-        return cache;
+        return (JSONObject) cache;
+    }
+
+    /**
+     * 获取根部json数组
+     * 说明后续这个结果都是json数组
+     *
+     * @return
+     * @throws JSONException
+     */
+    public JSONArray getJSONArray() throws JSONException {
+        if (cache == null) {
+            if (json == null) {
+                json = "";
+            }
+            JSONArray jsonArray = new JSONArray(json);
+            json = null;
+            cache = jsonArray;
+        }
+        return (JSONArray) cache;
     }
 
 
@@ -84,18 +112,14 @@ public class HttpResponse {
         return code == HttpCode.SUCCEED;
     }
 
-    public String getKeyToString(String... key) throws JSONException {
-        Object resStr = getJSONObject();
+    public Object getKeyToObject(String... key) throws JSONException {
+        Object res = getJSONObject();
         if (key != null) {
             for (int i = 0; i < key.length; i++) {
-                String currKey = key[i];//当前的key
-                resStr = getCacheJSON(currKey, resStr);
+                res = getCacheJSON(key[i], res);
             }
         }
-        if (resStr == null) {
-            return null;
-        }
-        return resStr.toString();
+        return res;
     }
 
     /**
@@ -107,27 +131,48 @@ public class HttpResponse {
         if (key == null || key.length == 0) {
             return null;
         }
-        return GsonHelper.getGson().fromJson(getKeyToString(key), type);
+        Object o = getKeyToObject(key);
+        if (o == null) {
+            return null;
+        }
+        return GsonHelper.getGson().fromJson(o.toString(), type);
     }
 
     /**
      * 基本类型的获取
+     * 方法功能：根据key获取对象,多个key代表多个等级,只能获取基础数据类型
      */
-    public <T> T getValueBase(Type type, String... key) throws JsonParseException, JSONException {
+    public <T> T getValueBase(String... key) throws ClassCastException, JsonParseException, JSONException {
         if (key == null || key.length == 0) {
             return null;
         }
-        if (key.length == 1) {
-            return (T) (getJSONObject().get(key[0]));
-        }
-        return GsonHelper.getGson().fromJson(getKeyToString(key), type);
+        return (T) getKeyToObject(key);
     }
 
     public int getIntValue(String... key) {
         try {
-            Integer res = getValueBase(Integer.class, key);
+            Integer res = getValueBase(key);
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
+            e.printStackTrace();
+            return 0;
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return 0;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public long getLongValue(String... key) {
+        try {
+            Long res = getValueBase(key);
+            return res == null ? 0 : res;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            return 0;
+        } catch (ClassCastException e) {
             e.printStackTrace();
             return 0;
         } catch (JSONException e) {
@@ -138,9 +183,12 @@ public class HttpResponse {
 
     public String getStringValue(String... key) {
         try {
-            String res = getValueBase(String.class, key);
+            String res = getValueBase(key);
             return res == null ? "" : res;
         } catch (JsonParseException e) {
+            e.printStackTrace();
+            return "";
+        } catch (ClassCastException e) {
             e.printStackTrace();
             return "";
         } catch (JSONException e) {
@@ -150,23 +198,33 @@ public class HttpResponse {
     }
 
     public boolean getBooleanValue(String... key) {
+        return getBooleanValue(false, key);
+    }
+
+    public boolean getBooleanValue(boolean defaultValue, String... key) {
         try {
-            Boolean res = getValueBase(Boolean.class, key);
-            return res == null ? false : res;
+            Boolean res = getValueBase(key);
+            return res == defaultValue ? false : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
-            return false;
+            return defaultValue;
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return defaultValue;
         } catch (JSONException e) {
             e.printStackTrace();
-            return false;
+            return defaultValue;
         }
     }
 
     public float getFloatValue(String... key) {
         try {
-            Float res = getValueBase(Float.class, key);
+            Float res = getValueBase(key);
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
+            e.printStackTrace();
+            return 0;
+        } catch (ClassCastException e) {
             e.printStackTrace();
             return 0;
         } catch (JSONException e) {
@@ -177,9 +235,12 @@ public class HttpResponse {
 
     public double getDoubleValue(String... key) {
         try {
-            Double res = getValueBase(Double.class, key);
+            Double res = getValueBase(key);
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
+            e.printStackTrace();
+            return 0;
+        } catch (ClassCastException e) {
             e.printStackTrace();
             return 0;
         } catch (JSONException e) {

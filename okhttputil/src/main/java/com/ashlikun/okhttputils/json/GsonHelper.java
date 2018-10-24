@@ -21,6 +21,7 @@ public class GsonHelper {
                 .registerTypeAdapter(long.class, new JsonTypeAdapter.LongTypeAdapter())
                 .registerTypeAdapter(float.class, new JsonTypeAdapter.FloatTypeAdapter())
                 .registerTypeAdapter(double.class, new JsonTypeAdapter.DoubleTypeAdapter())
+                .registerTypeAdapter(short.class, new JsonTypeAdapter.ShortTypeAdapter())
                 .serializeNulls()
                 .create();
     }
