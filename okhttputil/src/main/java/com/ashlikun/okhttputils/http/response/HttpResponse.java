@@ -2,6 +2,7 @@ package com.ashlikun.okhttputils.http.response;
 
 import android.text.TextUtils;
 
+import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.json.GsonHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -151,8 +152,8 @@ public class HttpResponse {
 
     public int getIntValue(String... key) {
         try {
-            Integer res = getValueBase(key);
-            return res == null ? 0 : res;
+            Integer result = HttpUtils.toInteger(getValueBase(key));
+            return result == null ? 0 : result;
         } catch (JsonParseException e) {
             e.printStackTrace();
             return 0;
@@ -167,7 +168,7 @@ public class HttpResponse {
 
     public long getLongValue(String... key) {
         try {
-            Long res = getValueBase(key);
+            Long res = HttpUtils.toLong(getValueBase(key));
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -183,7 +184,7 @@ public class HttpResponse {
 
     public String getStringValue(String... key) {
         try {
-            String res = getValueBase(key);
+            String res = HttpUtils.toString(getValueBase(key));
             return res == null ? "" : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -203,7 +204,7 @@ public class HttpResponse {
 
     public boolean getBooleanValue(boolean defaultValue, String... key) {
         try {
-            Boolean res = getValueBase(key);
+            Boolean res = HttpUtils.toBoolean(getValueBase(key));
             return res == defaultValue ? false : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -219,7 +220,7 @@ public class HttpResponse {
 
     public float getFloatValue(String... key) {
         try {
-            Float res = getValueBase(key);
+            Float res = HttpUtils.toFloat(getValueBase(key));
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
@@ -235,7 +236,7 @@ public class HttpResponse {
 
     public double getDoubleValue(String... key) {
         try {
-            Double res = getValueBase(key);
+            Double res = HttpUtils.toDouble(getValueBase(key));
             return res == null ? 0 : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
