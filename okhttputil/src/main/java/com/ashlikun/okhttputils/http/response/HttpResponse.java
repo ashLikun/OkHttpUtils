@@ -54,8 +54,12 @@ public class HttpResponse {
         return code;
     }
 
-    //获取头部code
-    public int getHttpcode() {
+    /**
+     * 获取头部code
+     *
+     * @return
+     */
+    public int getHttpCode() {
         return httpcode;
     }
 
@@ -151,36 +155,45 @@ public class HttpResponse {
     }
 
     public int getIntValue(String... key) {
+        return getIntValue(0, key);
+    }
+
+    public int getIntValue(int defaultValue, String... key) {
         try {
             Integer result = HttpUtils.toInteger(getValueBase(key));
-            return result == null ? 0 : result;
+            return result == null ? defaultValue : result;
         } catch (JsonParseException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (ClassCastException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (JSONException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         }
     }
 
     public long getLongValue(String... key) {
+        return getLongValue(0, key);
+    }
+
+    public long getLongValue(long defaultValue, String... key) {
         try {
             Long res = HttpUtils.toLong(getValueBase(key));
-            return res == null ? 0 : res;
+            return res == null ? defaultValue : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (ClassCastException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (JSONException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         }
     }
+
 
     public String getStringValue(String... key) {
         try {
@@ -219,34 +232,42 @@ public class HttpResponse {
     }
 
     public float getFloatValue(String... key) {
+        return getFloatValue(0, key);
+    }
+
+    public float getFloatValue(float defaultValue, String... key) {
         try {
             Float res = HttpUtils.toFloat(getValueBase(key));
-            return res == null ? 0 : res;
+            return res == null ? defaultValue : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (ClassCastException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (JSONException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         }
     }
 
     public double getDoubleValue(String... key) {
+        return getDoubleValue(0, key);
+    }
+
+    public double getDoubleValue(double defaultValue, String... key) {
         try {
             Double res = HttpUtils.toDouble(getValueBase(key));
-            return res == null ? 0 : res;
+            return res == null ? defaultValue : res;
         } catch (JsonParseException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (ClassCastException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         } catch (JSONException e) {
             e.printStackTrace();
-            return 0;
+            return defaultValue;
         }
     }
 
