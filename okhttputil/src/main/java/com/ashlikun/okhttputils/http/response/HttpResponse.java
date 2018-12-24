@@ -2,8 +2,8 @@ package com.ashlikun.okhttputils.http.response;
 
 import android.text.TextUtils;
 
+import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.HttpUtils;
-import com.ashlikun.okhttputils.json.GsonHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;

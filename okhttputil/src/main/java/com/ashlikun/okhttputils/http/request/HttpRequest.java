@@ -4,11 +4,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.callback.Callback;
 import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
-import com.ashlikun.okhttputils.json.GsonHelper;
 import com.google.gson.Gson;
 
 import java.io.File;

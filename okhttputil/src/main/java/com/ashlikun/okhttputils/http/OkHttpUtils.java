@@ -1,9 +1,9 @@
 package com.ashlikun.okhttputils.http;
 
 
+import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
 import com.ashlikun.okhttputils.http.request.RequestCall;
-import com.ashlikun.okhttputils.json.GsonHelper;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -39,7 +39,11 @@ public final class OkHttpUtils {
      */
     private Map<String, String> commonHeaders;
 
-    //获取单例
+    /**
+     * 获取单例
+     *
+     * @return
+     */
     public static OkHttpUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (OkHttpUtils.class) {

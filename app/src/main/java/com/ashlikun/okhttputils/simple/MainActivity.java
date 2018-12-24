@@ -7,11 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.callback.AbsCallback;
 import com.ashlikun.okhttputils.http.callback.FileCallback;
-import com.ashlikun.okhttputils.json.GsonHelper;
 
 import java.io.File;
 import java.util.HashMap;
