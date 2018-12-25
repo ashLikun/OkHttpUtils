@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation project(':okhttputil')
     implementation 'com.github.ashLikun:LiteOrm:1.0.5'
-    implementation 'com.github.ashLikun:MultiTypeGson:1.0.8'
+    implementation 'com.github.ashLikun:MultiTypeGson:1.0.9'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.x.y'
     implementation 'com.squareup.okhttp3:okhttp:3.9.0'

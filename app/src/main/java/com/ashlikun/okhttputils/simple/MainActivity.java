@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         map.put("bbb", null);
         map.put("ccc", "222");
         map.put("ddd", "333");
-        String json = GsonHelper.getGson().toJson(new TestData());
+        String json = GsonHelper.getGsonNotNull().toJson(new TestData());
         Log.e("ddd", json);
 
 

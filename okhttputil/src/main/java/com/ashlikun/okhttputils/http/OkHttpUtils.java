@@ -65,7 +65,7 @@ public final class OkHttpUtils {
         } else {
             mOkHttpClient = okHttpClient;
         }
-        gson = GsonHelper.getGson();
+        gson = GsonHelper.getGsonNotNull();
     }
 
     /**

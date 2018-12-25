@@ -140,7 +140,7 @@ public class HttpResponse {
         if (o == null) {
             return null;
         }
-        return GsonHelper.getGson().fromJson(o.toString(), type);
+        return GsonHelper.getGsonNotNull().fromJson(o.toString(), type);
     }
 
     /**
