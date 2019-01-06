@@ -124,7 +124,7 @@ public class RequestCall implements SuperHttp {
         okHttpCallback.setParseGson(getHttpRequest().getParseGson());
         okHttpCallback.setCachePolicy(cachePolicy);
         call.enqueue(okHttpCallback);
-        return null;
+        return exc;
     }
 
     /**
