@@ -20,7 +20,7 @@ import okhttp3.Response;
  * <p>
  * 功能介绍：缓存的实体类,只保存数据的String
  */
-@Table("CacheEntity")
+@Table("HttpCacheEntity")
 public class CacheEntity {
     @PrimaryKey(AssignType.BY_MYSELF)
     /**缓存的key*/

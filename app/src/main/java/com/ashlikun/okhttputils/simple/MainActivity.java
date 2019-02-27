@@ -1,11 +1,9 @@
 package com.ashlikun.okhttputils.simple;
 
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onButt1Click(View view) {
-        OkHttpUtils.get("https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=399118516,1470088676&fm=27&gp=0.jpg")
+        OkHttpUtils.get("http://video.meiyayuming.com.cn/api/public/?service=Bankcard.Getsms&token=49c81ed94b4b637796b66d0886ed611e&type=1&uid=14551")
                 .buildCall()
                 .execute(new FileCallback() {
                     @Override
@@ -89,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(File responseBody) {
                         super.onSuccess(responseBody);
-                        ImageView imageView = (ImageView) findViewById(R.id.image);
-                        imageView.setImageBitmap(BitmapFactory.decodeFile(responseBody.getAbsolutePath()));
                     }
                 });
     }

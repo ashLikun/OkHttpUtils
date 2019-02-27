@@ -2,6 +2,8 @@ package com.ashlikun.okhttputils.http;
 
 
 import com.ashlikun.gson.GsonHelper;
+import com.ashlikun.okhttputils.http.cookie.CookieJarImpl;
+import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
 import com.ashlikun.okhttputils.http.request.RequestCall;
 import com.google.gson.Gson;
@@ -61,6 +63,7 @@ public final class OkHttpUtils {
                     .readTimeout(DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
                     .writeTimeout(DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
                     .connectTimeout(DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
+                    .cookieJar(new CookieJarImpl(new DBCookieStore()))
                     .build();
         } else {
             mOkHttpClient = okHttpClient;

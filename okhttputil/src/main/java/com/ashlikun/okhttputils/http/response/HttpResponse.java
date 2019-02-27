@@ -49,7 +49,6 @@ public class HttpResponse {
         this.message = getStringValue(HttpResponse.MES_KEY);
     }
 
-    @HttpCode.IHttpCode
     public int getCode() {
         return code;
     }
