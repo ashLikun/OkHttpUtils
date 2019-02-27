@@ -84,7 +84,7 @@ public class SerializableCookie implements Serializable {
     }
 
     private String getCookieToken() {
-        return getCookie().name() + "@" + getCookie().domain();
+        return name + "@" + domain;
     }
 
     public void save() {
