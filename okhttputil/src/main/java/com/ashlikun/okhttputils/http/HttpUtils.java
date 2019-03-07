@@ -147,8 +147,8 @@ public class HttpUtils {
                         if (TextUtils.isEmpty(json)) {
                             throw new JsonSyntaxException("json length = 0");
                         }
+                        Class cls = null;
                         if (gson == null) {
-                            Class cls = null;
                             try {
                                 if (type instanceof Class) {
                                     cls = (Class) type;
@@ -174,7 +174,23 @@ public class HttpUtils {
                         if (gson == null) {
                             gson = OkHttpUtils.getInstance().getParseGson();
                         }
-                        res = gson.fromJson(json, type);
+                        try {
+                            res = gson.fromJson(json, type);
+                        } catch (JsonSyntaxException e) {
+                            //处理HttpResponse 类型错误
+                            if (cls != null && HttpResponse.class.isAssignableFrom(cls)) {
+                                HttpResponse pp = gson.fromJson(json, HttpResponse.class);
+                                try {
+                                    res = (T) cls.newInstance();
+                                    ((HttpResponse) res).code = pp.code;
+                                    ((HttpResponse) res).message = pp.message;
+                                } catch (Exception e1) {
+                                    throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
+                                }
+                            } else {
+                                throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
+                            }
+                        }
                     } catch (JsonSyntaxException e) {//数据解析异常
                         throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
                     }
@@ -277,9 +293,9 @@ public class HttpUtils {
             return (Boolean) value;
         } else if (value instanceof String) {
             String stringValue = (String) value;
-            if ("true" .equalsIgnoreCase(stringValue)) {
+            if ("true".equalsIgnoreCase(stringValue)) {
                 return true;
-            } else if ("false" .equalsIgnoreCase(stringValue)) {
+            } else if ("false".equalsIgnoreCase(stringValue)) {
                 return false;
             }
         }
