@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.callback.Callback;
+import com.ashlikun.okhttputils.http.request.HttpRequest;
 import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
 import com.google.gson.Gson;
@@ -14,7 +15,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.FileNameMap;
+import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import io.reactivex.Observable;
@@ -38,6 +42,22 @@ public class HttpUtils {
     public static void runmainThread(int id, Consumer<Integer> next) {
         Observable.just(id).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(next);
+    }
+
+    /**
+     * 作者　　: 李坤
+     * 创建时间: 2017/3/21 9:56
+     * <p>
+     * 方法功能：获取文件的mime类型  Content-type
+     */
+    public static String getMimeType(String path) {
+        FileNameMap fileNameMap = URLConnection.getFileNameMap();
+        try {
+            return fileNameMap.getContentTypeFor(URLEncoder.encode(path, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return HttpRequest.MEDIA_TYPE_STREAM.toString();
     }
 
     /**

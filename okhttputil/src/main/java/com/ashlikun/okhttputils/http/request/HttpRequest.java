@@ -12,10 +12,6 @@ import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
 import com.google.gson.Gson;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -53,6 +49,7 @@ public class HttpRequest implements Comparator<String> {
     protected Map<String, String> headers;//请求头
     protected Map<String, Object> params;//普通键值对参数  get
     private String postContent;//请求内容，如果设置这个参数  其他的参数将不会提交  post
+    private MediaType contentType;//请求类型
     private List<FileInput> files;//上传文件
     private Gson gson;
     private boolean isJson = false;
@@ -104,6 +101,13 @@ public class HttpRequest implements Comparator<String> {
         return this;
     }
 
+    /**
+     * 设置请求类型
+     */
+    public HttpRequest setContentType(MediaType contentType) {
+        this.contentType = contentType;
+        return this;
+    }
 
     public HttpRequest url(String url) {
         this.url = Uri.parse(url);
@@ -168,9 +172,17 @@ public class HttpRequest implements Comparator<String> {
         return this;
     }
 
-    //添加文件参数
+    /**
+     * 添加文件参数
+     */
     public HttpRequest addParam(String key, File file) {
-        FileInput param = new FileInput(key, file);
+        return addParam(new FileInput(key, file));
+    }
+
+    /**
+     * 添加文件参数
+     */
+    public HttpRequest addParam(FileInput param) {
         if (param.exists()) {
             if (files == null) {
                 files = new ArrayList<>();
@@ -180,7 +192,9 @@ public class HttpRequest implements Comparator<String> {
         return this;
     }
 
-    //添加文件参数
+    /**
+     * 添加文件参数
+     */
     public HttpRequest addParamFilePath(String key, String filePath) {
         if (filePath == null) {
             return this;
@@ -189,7 +203,9 @@ public class HttpRequest implements Comparator<String> {
         return this;
     }
 
-    //添加文件参数
+    /**
+     * 添加文件参数
+     */
     public HttpRequest addParam(String key, List<File> files) {
         if (files == null || files.isEmpty()) {
             return this;
@@ -200,7 +216,9 @@ public class HttpRequest implements Comparator<String> {
         return this;
     }
 
-    //添加文件参数
+    /**
+     * 添加文件参数
+     */
     public HttpRequest addParamFilePath(String key, List<String> filePaths) {
         if (filePaths == null || filePaths.isEmpty()) {
             return this;
@@ -308,7 +326,8 @@ public class HttpRequest implements Comparator<String> {
     private void addParams(Map<String, Object> params, MultipartBody.Builder builder) {
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, Object> entry : params.entrySet()) {
-                builder.addFormDataPart(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());//Content-Disposition;form-data; name="aaa"
+                //Content-Disposition;form-data; name="aaa"
+                builder.addFormDataPart(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
             }
         }
     }
@@ -322,7 +341,7 @@ public class HttpRequest implements Comparator<String> {
     private void addParams(Map<String, Object> params, FormBody.Builder builder) {
         if (params != null && !params.isEmpty()) {
             for (Map.Entry<String, Object> entry : params.entrySet()) {
-                builder.addEncoded(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
+                builder.add(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
             }
         }
     }
@@ -337,7 +356,7 @@ public class HttpRequest implements Comparator<String> {
         if (files != null && !files.isEmpty()) {
             for (FileInput fileInput : files) {
                 builder.addFormDataPart(fileInput.key, fileInput.filename
-                        , RequestBody.create(MediaType.parse(getMimeType(fileInput.file.getAbsolutePath())), fileInput.file));
+                        , RequestBody.create(fileInput.contentType, fileInput.file));
             }
         }
     }
@@ -356,24 +375,11 @@ public class HttpRequest implements Comparator<String> {
         map.putAll(params);
         return map;
     }
+
     /********************************************************************************************
      *                                           私有方法
-    ********************************************************************************************/
-    /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:56
-     * <p>
-     * 方法功能：获取文件的mime类型  Content-type
-     */
-    private String getMimeType(String path) {
-        FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        try {
-            return fileNameMap.getContentTypeFor(URLEncoder.encode(path, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return MEDIA_TYPE_STREAM.toString();
-    }
+     ********************************************************************************************/
+
 
     //构建一个Request
     protected Request bulidRequest(Callback callback, ProgressCallBack progressCallBack) {
@@ -427,16 +433,18 @@ public class HttpRequest implements Comparator<String> {
         } else if (!isEmpty(postContent)) {
             //只提交content
             if (isJson) {
-                body = RequestBody.create(MEDIA_TYPE_JSON, postContent);
+                body = RequestBody.create(contentType == null ? MEDIA_TYPE_JSON :
+                        contentType, postContent);
             } else {
-                body = RequestBody.create(MEDIA_TYPE_PLAIN, postContent);
+                body = RequestBody.create(contentType == null ? MEDIA_TYPE_PLAIN :
+                        contentType, postContent);
             }
             //content方式是不能提交文件的
         } else {
             //存在文件用MultipartBody
             if (isHavafiles()) {
                 MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.setType(MultipartBody.FORM);
+                builder.setType(contentType == null ? MultipartBody.FORM : contentType);
                 //添加公共参数
                 if (OkHttpUtils.getInstance().isCommonParams()) {
                     addParams(OkHttpUtils.getInstance().getCommonParams(), builder);

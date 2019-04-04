@@ -1,6 +1,10 @@
 package com.ashlikun.okhttputils.http.request;
 
+import com.ashlikun.okhttputils.http.HttpUtils;
+
 import java.io.File;
+
+import okhttp3.MediaType;
 
 /**
  * 作者　　: 李坤
@@ -13,12 +17,16 @@ import java.io.File;
 public class FileInput {
     public String key;
     public String filename;
+    public MediaType contentType;
     public File file;
 
     public FileInput(String key, String filename, File file) {
         this.key = key;
         this.filename = filename;
         this.file = file;
+        if (exists()) {
+            contentType = MediaType.parse(HttpUtils.getMimeType(file.getAbsolutePath()));
+        }
     }
 
     public FileInput(String key, File file) {
@@ -26,7 +34,9 @@ public class FileInput {
         this.file = file;
         if (exists()) {
             this.filename = file.getName();
+            contentType = MediaType.parse(HttpUtils.getMimeType(file.getAbsolutePath()));
         }
+
     }
 
     public boolean exists() {
@@ -44,7 +54,9 @@ public class FileInput {
         return "FileInput{" +
                 "key='" + key + '\'' +
                 ", filename='" + filename + '\'' +
+                ", contentType='" + contentType + '\'' +
                 ", file=" + file +
                 '}';
     }
+
 }
