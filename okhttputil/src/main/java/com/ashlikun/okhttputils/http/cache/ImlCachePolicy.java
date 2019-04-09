@@ -19,35 +19,10 @@ import okhttp3.Response;
  * <p>
  * 功能介绍：
  */
-public class ImlCachePolicy implements CachePolicy {
-    HttpRequest request;
-    /**
-     * 先使用缓存，不管是否存在，仍然请求网络
-     * 这是自定义缓存，和http标准的缓存不一样
-     */
-    private boolean isFirstUseCache = false;
+public class ImlCachePolicy extends BaseCachePolicy {
 
-    @Override
-    public void setRequest(HttpRequest request) {
-        this.request = request;
-    }
-
-    @Override
-    public void setFirstUseCache(boolean firstUseCache) {
-        isFirstUseCache = firstUseCache;
-    }
-
-    @Override
-    public boolean isFirstUseCache() {
-        return isFirstUseCache;
-    }
-
-    @Override
-    public CacheEntity getCache() {
-        if (request == null) {
-            return null;
-        }
-        return CacheManage.queryById(CacheManage.getCacheKey(request));
+    public ImlCachePolicy(HttpRequest request) {
+        super(request);
     }
 
     @Override
@@ -79,7 +54,8 @@ public class ImlCachePolicy implements CachePolicy {
 
     @Override
     public void save(Response response, String result) {
-        if (isFirstUseCache && request != null) {
+        //保存缓存
+        if (request != null && cacheMode != null && cacheMode != CacheMode.NO_CACHE) {
             CacheEntity.createCacheEntity(request, response,
                     CacheEntity.getHanderResult(result)).save();
         }

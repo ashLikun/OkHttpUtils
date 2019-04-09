@@ -2,6 +2,8 @@ package com.ashlikun.okhttputils.http;
 
 
 import com.ashlikun.gson.GsonHelper;
+import com.ashlikun.okhttputils.http.cache.CacheEntity;
+import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.cookie.CookieJarImpl;
 import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
@@ -40,6 +42,14 @@ public final class OkHttpUtils {
      * 请求头公共参数
      */
     private Map<String, String> commonHeaders;
+    /**
+     * 全局缓存模式
+     */
+    private CacheMode mCacheMode = CacheMode.NO_CACHE;
+    /**
+     * 全局缓存过期时间,默认永不过期
+     */
+    protected long mCacheTime = CacheEntity.CACHE_NEVER_EXPIRE;
 
     /**
      * 获取单例
@@ -227,6 +237,36 @@ public final class OkHttpUtils {
      */
     public static RequestCall request(HttpRequest requestParam) {
         return new RequestCall(requestParam);
+    }
+
+    /**
+     * 设置全局的缓存模式
+     *
+     * @param mCacheMode
+     */
+    public static void setCacheMode(CacheMode mCacheMode) {
+        getInstance().mCacheMode = mCacheMode;
+    }
+
+    /**
+     * 获取全局的缓存模式
+     */
+    public static CacheMode getCacheMode() {
+        return getInstance().mCacheMode;
+    }
+
+    /**
+     * 设置全局的缓存过期时间
+     */
+    public static void setCacheTime(long cacheTime) {
+        getInstance().mCacheTime = cacheTime;
+    }
+
+    /**
+     * 获取全局的缓存过期时间
+     */
+    public static long getCacheTime() {
+        return getInstance().mCacheTime;
     }
 }
 

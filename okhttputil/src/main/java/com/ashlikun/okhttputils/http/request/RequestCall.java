@@ -5,6 +5,7 @@ import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.SuperHttp;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
+import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.cache.CachePolicy;
 import com.ashlikun.okhttputils.http.cache.ImlCachePolicy;
 import com.ashlikun.okhttputils.http.callback.Callback;
@@ -41,10 +42,9 @@ public class RequestCall implements SuperHttp {
     List<Interceptor> networkInterceptors;
     ProgressCallBack progressCallBack;
     /**
-     * 先使用缓存，不管是否存在，仍然请求网络
-     * 这是自定义缓存，和http标准的缓存不一样
+     * 缓存代理
      */
-    CachePolicy cachePolicy;
+    private CachePolicy cachePolicy;
 
     public RequestCall(HttpRequest httpRequest) {
         this.httpRequest = httpRequest;
@@ -76,6 +76,12 @@ public class RequestCall implements SuperHttp {
             call = clone.build().newCall(request);
         } else {
             call = OkHttpUtils.getInstance().getOkHttpClient().newCall(request);
+        }
+        //设置缓存信息
+        cachePolicy = new ImlCachePolicy(httpRequest);
+        if (httpRequest.cacheMode != null) {
+            cachePolicy.setCacheMode(httpRequest.cacheMode);
+            cachePolicy.setCacheTime(httpRequest.cacheTime);
         }
         return call;
     }
@@ -116,9 +122,13 @@ public class RequestCall implements SuperHttp {
         Call call = buildCall(callback);
         ExecuteCall exc = new ExecuteCall();
         exc.setCall(call);
-        //获取缓存，先回调
-        if (cachePolicy != null && cachePolicy.isFirstUseCache()) {
-            cachePolicy.callback(callback);
+        //如果缓存 不存在才请求网络，否则使用缓存
+        if (cachePolicy.getCacheMode() == CacheMode.IF_NONE_CACHE_REQUEST) {
+            if (cachePolicy.getCache() != null) {
+                //有缓存
+                cachePolicy.callback(callback);
+                return exc;
+            }
         }
         OkHttpCallback okHttpCallback = new OkHttpCallback(exc, callback);
         okHttpCallback.setParseGson(getHttpRequest().getParseGson());
@@ -132,13 +142,23 @@ public class RequestCall implements SuperHttp {
      */
     @Override
     public <ResultType> ResultType syncExecute(Class raw, Class... args) throws IOException {
-        Response response = buildCall(null).execute();
         Type type = null;
         if (args != null && args.length >= 2) {
             type = type(raw, type(args[0], args[1]));
         } else {
             type = type(raw, args);
         }
+        //如果缓存 不存在才请求网络，否则使用缓存
+        if (cachePolicy.getCacheMode() != CacheMode.NO_CACHE) {
+            CacheEntity cacheEntity = cachePolicy.getCache();
+            if (cacheEntity != null) {
+                //有缓存
+                return HttpUtils.handerResult(type,
+                        cacheEntity, getHttpRequest().getParseGson());
+            }
+        }
+        Response response = buildCall(null).execute();
+
         ResultType data = HttpUtils.handerResult(type, response, getHttpRequest().getParseGson());
         //保存缓存
         if (cachePolicy != null) {
@@ -182,27 +202,6 @@ public class RequestCall implements SuperHttp {
             interceptors = new ArrayList<>();
         }
         interceptors.add(interceptor);
-        return this;
-    }
-
-    /**
-     * 先使用缓存，不管是否存在，仍然请求网络
-     * 需要使用'com.github.ashLikun:LiteOrm:1.0.3'库
-     * 只会是一般的String返回类型才能缓存（包括封装对象）,File，Bitmap不可以
-     */
-    public RequestCall firstUseCache() {
-        if (cachePolicy == null) {
-            cachePolicy = new ImlCachePolicy();
-        }
-        cachePolicy.setFirstUseCache(true);
-        cachePolicy.setRequest(getHttpRequest());
-        return this;
-    }
-
-    public RequestCall setCachePolicy(CachePolicy policy) {
-        if (policy != null) {
-            cachePolicy = policy;
-        }
         return this;
     }
 

@@ -7,6 +7,7 @@ import android.util.Log;
 import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
+import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.callback.Callback;
 import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
 import com.google.gson.Gson;
@@ -45,17 +46,20 @@ public class HttpRequest implements Comparator<String> {
     public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json;charset=utf-8");
     public static final MediaType MEDIA_TYPE_STREAM = MediaType.parse("application/octet-stream");
     protected Uri url;//请求地址
-    private String method;//请求方法
+    protected String method;//请求方法
     protected Map<String, String> headers;//请求头
     protected Map<String, Object> params;//普通键值对参数  get
-    private String postContent;//请求内容，如果设置这个参数  其他的参数将不会提交  post
-    private MediaType contentType;//请求类型
-    private List<FileInput> files;//上传文件
-    private Gson gson;
-    private boolean isJson = false;
+    protected String postContent;//请求内容，如果设置这个参数  其他的参数将不会提交  post
+    protected MediaType contentType;//请求类型
+    protected List<FileInput> files;//上传文件
+    protected Gson gson;
+    protected boolean isJson = false;
     //标识这个请求，会传递到Request里面
-    private Object tag;
-
+    protected Object tag;
+    //缓存模式
+    protected CacheMode cacheMode;
+    //缓存超时时间
+    protected long cacheTime;
 
     public static HttpRequest post(String url) {
         HttpRequest param = new HttpRequest(url);
@@ -70,11 +74,13 @@ public class HttpRequest implements Comparator<String> {
     }
 
     public static HttpRequest get() {
-        return get("GET");
+        return get("");
     }
 
     public HttpRequest(String url) {
         url(url);
+        cacheMode = OkHttpUtils.getCacheMode();
+        cacheTime = OkHttpUtils.getCacheTime();
     }
 
 
@@ -239,6 +245,22 @@ public class HttpRequest implements Comparator<String> {
     }
 
     /**
+     * 设置缓存模式
+     */
+    public HttpRequest setCacheMode(CacheMode cacheMode) {
+        this.cacheMode = cacheMode;
+        return this;
+    }
+
+    /**
+     * 设置缓存时间
+     */
+    public HttpRequest setCacheTime(long cacheTime) {
+        this.cacheTime = cacheTime;
+        return this;
+    }
+
+    /**
      * 设置直接提交得post 并且是json
      */
     public HttpRequest setContentJson(String content) {
@@ -383,6 +405,8 @@ public class HttpRequest implements Comparator<String> {
 
     //构建一个Request
     protected Request bulidRequest(Callback callback, ProgressCallBack progressCallBack) {
+        //
+
         Request.Builder builder = new Request.Builder();
         if (isEmpty(method)) {
             method = methods[0];

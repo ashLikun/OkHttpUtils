@@ -13,15 +13,27 @@ import okhttp3.Response;
  * 功能介绍：缓存执行的接口
  */
 public interface CachePolicy {
-    public void save(Response response, String result);
+    void save(Response response, String result);
 
-    public void setRequest(HttpRequest request);
-
-    public void setFirstUseCache(boolean firstUseCache);
-
-    public boolean isFirstUseCache();
+    void setRequest(HttpRequest request);
 
     CacheEntity getCache();
 
-    public <T> void callback(final Callback<T> callback);
+    void setCacheMode(CacheMode cacheMode);
+
+    void setCacheTime(long time);
+
+    long getCacheTime();
+
+    CacheMode getCacheMode();
+
+    /**
+     * 回调缓存数据
+     *
+     * @param callback
+     * @param <T>
+     */
+    <T> void callback(final Callback<T> callback);
+
+
 }

@@ -8,12 +8,11 @@ import android.view.View;
 import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
+import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.callback.AbsCallback;
 import com.ashlikun.okhttputils.http.callback.FileCallback;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -93,16 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onButt2Click(View view) {
         HuodongData data = new HuodongData();
-        HuodongData data2 = new HuodongData();
         data.hashCode();
-        Map<String, String> map = new HashMap<>();
-        map.put("aaa", "111");
-        map.put("bbb", null);
-        map.put("ccc", "222");
-        map.put("ddd", "333");
-        String json = GsonHelper.getGsonNotNull().toJson(new TestData());
-        Log.e("ddd", json);
-
 
         OkHttpUtils.post("https://api.0gow.com/interface?action=n_goodslist")
                 .addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B")
@@ -111,18 +101,19 @@ public class MainActivity extends AppCompatActivity {
                 .addParam("type", 2)
                 .addParam("NM_REFERER", "/goods/1313517")
                 .addParam("NM_URI", "/category/427/325")
+                .setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
+                .setCacheTime(3600000)
                 .buildCall()
-                .firstUseCache()
                 .execute(new AbsCallback<GoodListData>() {
                     @Override
                     public void onSuccess(GoodListData responseBody) {
-                        Log.e("onSuccess", responseBody.toString());
+                        Log.e("onSuccess", GsonHelper.getGson().toJson(responseBody));
                     }
 
                     @Override
                     public void onCacheSuccess(CacheEntity entity, GoodListData responseBody) {
                         super.onCacheSuccess(entity, responseBody);
-                        Log.e("onCacheSuccess", responseBody.toString() + entity.result);
+                        Log.e("onCacheSuccess", GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result);
                     }
                 });
     }

@@ -4,6 +4,7 @@ import com.ashlikun.okhttputils.http.ExecuteCall;
 import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
+import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.cache.CachePolicy;
 import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 import com.google.gson.Gson;
@@ -43,6 +44,10 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
 
     public void setCachePolicy(CachePolicy cachePolicy) {
         this.cachePolicy = cachePolicy;
+        //回掉缓存
+        if (cachePolicy.getCacheMode() == CacheMode.FIRST_CACHE_THEN_REQUEST) {
+            cachePolicy.callback(callback);
+        }
     }
 
     public void setParseGson(Gson gson) {
@@ -72,6 +77,10 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         }
         res.setOriginalException(e);
         postFailure(res);
+        //网络失败，回掉缓存
+        if (cachePolicy.getCacheMode() == CacheMode.REQUEST_FAILED_READ_CACHE) {
+            cachePolicy.callback(callback);
+        }
     }
 
     private void postFailure(final HttpException throwable) {

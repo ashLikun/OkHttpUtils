@@ -22,6 +22,10 @@ import okhttp3.Response;
  */
 @Table("HttpCacheEntity")
 public class CacheEntity {
+    /**
+     * 缓存永不过期
+     */
+    public static final long CACHE_NEVER_EXPIRE = -1;
     @PrimaryKey(AssignType.BY_MYSELF)
     /**缓存的key*/
     public String key;
