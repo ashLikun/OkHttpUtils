@@ -14,9 +14,9 @@ public interface DownloadTaskListener {
     /**
      * 下载中
      *
-     * @param completedSize
-     * @param totalSize
-     * @param percent
+     * @param completedSize 完成的大小
+     * @param totalSize     总大小
+     * @param percent       百分比
      * @param downloadTask
      */
     void onDownloading(DownloadTask downloadTask, long completedSize, long totalSize, double percent);

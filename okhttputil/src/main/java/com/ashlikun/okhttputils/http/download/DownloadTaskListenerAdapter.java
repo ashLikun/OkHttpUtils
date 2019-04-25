@@ -9,6 +9,19 @@ package com.ashlikun.okhttputils.http.download;
  */
 public abstract class DownloadTaskListenerAdapter implements DownloadTaskListener {
     /**
+     * 下载中
+     *
+     * @param completedSize
+     * @param totalSize
+     * @param percent
+     * @param downloadTask
+     */
+    @Override
+    public void onDownloading(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
+
+    }
+
+    /**
      * 下载暂停
      *
      * @param downloadTask

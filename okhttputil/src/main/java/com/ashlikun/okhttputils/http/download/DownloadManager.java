@@ -105,10 +105,10 @@ public class DownloadManager {
      * @param downloadTask
      */
     public void addDownloadTask(DownloadTask downloadTask) {
-        if (downloadTask != null && !isDownloading(downloadTask)) {
+        if (downloadTask != null && !downloadTask.isDownloading()) {
             DownloadTask oldTask = mCurrentTaskList.get(downloadTask.getId());
             if (oldTask != null) {
-                if (isDownloading(oldTask)) {
+                if (oldTask.isDownloading()) {
                     return;
                 } else {
                     oldTask.onComplete();
@@ -128,14 +128,6 @@ public class DownloadManager {
         }
     }
 
-    private boolean isDownloading(DownloadTask task) {
-        if (task != null) {
-            if (task.getDownloadStatus() == DownloadStatus.DOWNLOAD_STATUS_DOWNLOADING) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * 暂停下载任务
