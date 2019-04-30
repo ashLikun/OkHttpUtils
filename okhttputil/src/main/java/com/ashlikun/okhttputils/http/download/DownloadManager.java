@@ -238,12 +238,6 @@ public class DownloadManager {
 
     private DownloadTask parseEntity2Task(DownloadEntity entity) {
         if (entity != null) {
-            DownloadTask.Builder builder = new DownloadTask.Builder()//
-                    .setDownloadStatus(entity.getDownloadStatus())//
-                    .setFileName(entity.getFileName())//
-                    .setSaveDirPath(entity.getSaveDirPath())//
-                    .setUrl(entity.getUrl())//
-                    .setId(entity.getDownloadId());//
             DownloadTask currTask = new DownloadTask.Builder()
                     .setDownloadStatus(entity.getDownloadStatus())//
                     .setFileName(entity.getFileName())//
