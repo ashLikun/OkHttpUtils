@@ -44,7 +44,7 @@ public interface DownloadTaskListener {
      * @param file
      * @param downloadTask
      */
-    abstract void onDownloadSuccess(DownloadTask downloadTask, File file);
+    void onDownloadSuccess(DownloadTask downloadTask, File file);
 
     /**
      * 下载失败

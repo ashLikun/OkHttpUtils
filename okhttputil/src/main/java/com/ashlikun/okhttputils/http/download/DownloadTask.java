@@ -221,14 +221,16 @@ public class DownloadTask implements Observer<Integer> {
         if (e != null) {
             e.printStackTrace();
         }
-        if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {//下载完成取消订阅
+        //下载完成取消订阅
+        if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {
             disposable.dispose();
         }
     }
 
     @Override
     public void onComplete() {
-        if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {//下载完成取消订阅
+        //下载完成取消订阅
+        if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {
             disposable.dispose();
         }
     }
@@ -303,7 +305,8 @@ public class DownloadTask implements Observer<Integer> {
                     dbEntity = new DownloadEntity(id, totalSize, 0L, url, saveDirPath, fileName, downloadStatus);
                     dbEntity.save();
                 }
-                long timeOld = System.currentTimeMillis();//上一次的时间
+                //上一次的时间
+                long timeOld = System.currentTimeMillis();
                 while ((length = bis.read(buffer)) > 0 && downloadStatus != DownloadStatus.DOWNLOAD_STATUS_CANCEL
                         && downloadStatus != DownloadStatus.DOWNLOAD_STATUS_PAUSE) {
                     mDownLoadFile.write(buffer, 0, length);
@@ -348,6 +351,19 @@ public class DownloadTask implements Observer<Integer> {
         }
     }
 
+    /**
+     * 是否正在下载
+     */
+    public boolean isDownloading() {
+        return getDownloadStatus() == DownloadStatus.DOWNLOAD_STATUS_DOWNLOADING;
+    }
+
+    /**
+     * 是否下载完成
+     */
+    public boolean isCompleted() {
+        return getDownloadStatus() == DownloadStatus.DOWNLOAD_STATUS_COMPLETED;
+    }
 
     public Disposable getDisposable() {
         return disposable;
