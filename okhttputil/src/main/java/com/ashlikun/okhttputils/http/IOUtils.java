@@ -101,13 +101,16 @@ public class IOUtils {
     }
 
     public static boolean createNewFile(File targetFile) {
-        if (targetFile.exists()) {
+        if (targetFile.exists() && !targetFile.isFile()) {
             delFileOrFolder(targetFile);
         }
-        try {
-            return targetFile.createNewFile();
-        } catch (IOException e) {
-            return false;
+        if (!targetFile.exists()) {
+            try {
+                return targetFile.createNewFile();
+            } catch (IOException e) {
+                return false;
+            }
         }
+        return true;
     }
 }
