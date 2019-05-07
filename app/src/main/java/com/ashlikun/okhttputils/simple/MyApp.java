@@ -3,10 +3,15 @@ package com.ashlikun.okhttputils.simple;
 import android.app.Application;
 
 import com.ashlikun.okhttputils.http.OkHttpUtils;
+import com.ashlikun.okhttputils.http.cookie.CookieJarImpl;
+import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore;
 import com.ashlikun.orm.LiteOrmUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 /**
  * 作者　　: 李坤
@@ -50,6 +55,14 @@ public class MyApp extends Application {
         Map<String, String> head = new HashMap<>();
         head.put("appver", "2.6.0");
         head.put("devicetype", "android");
+        OkHttpClient mOkHttpClient = new OkHttpClient.Builder()
+                .readTimeout(100000, TimeUnit.MILLISECONDS)
+                .writeTimeout(100000, TimeUnit.MILLISECONDS)
+                .connectTimeout(100000, TimeUnit.MILLISECONDS)
+                .cookieJar(new CookieJarImpl(new DBCookieStore()))
+                .addInterceptor(new MarvelSigningInterceptor())
+                .build();
+        OkHttpUtils.init(mOkHttpClient);
         OkHttpUtils.getInstance()
                 .setCommonParams(params)
                 .setCommonHeaders(head);
