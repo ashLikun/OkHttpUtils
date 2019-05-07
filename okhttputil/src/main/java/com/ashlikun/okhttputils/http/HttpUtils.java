@@ -11,7 +11,14 @@ import com.ashlikun.okhttputils.http.request.ProgressRequestBody;
 import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -21,7 +28,9 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -205,8 +214,23 @@ public class HttpUtils {
             ContentRequestBody contentRequestBody = (ContentRequestBody) body;
             String content = contentRequestBody.getContent();
             try {
-                Gson gson = new Gson();
-                Map<String, Object> p = gson.fromJson(content, Map.class);
+                //处理Number数据格式化异常
+                Gson gson = new GsonBuilder()
+                        .registerTypeAdapter(new TypeToken<Map<String, Object>>() {
+                        }.getType(), new JsonDeserializer<Map<String, Object>>() {
+                            @Override
+                            public Map<String, Object> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                                Map<String, Object> treeMap = new HashMap<>();
+                                JsonObject jsonObject = json.getAsJsonObject();
+                                Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
+                                for (Map.Entry<String, JsonElement> entry : entrySet) {
+                                    treeMap.put(entry.getKey(), entry.getValue());
+                                }
+                                return treeMap;
+                            }
+                        }).create();
+                Map<String, Object> p = gson.fromJson(content, new TypeToken<Map<String, Object>>() {
+                }.getType());
                 if (p != null) {
                     p.put(key, value);
                 }
