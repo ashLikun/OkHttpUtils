@@ -94,15 +94,17 @@ public class MainActivity extends AppCompatActivity {
         HuodongData data = new HuodongData();
         data.hashCode();
 
-        OkHttpUtils.post("https://api.0gow.com/interface?action=n_goodslist")
-                .addHeader("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B")
+        OkHttpUtils.post("http://ly.lingyunexpress.com/tools/kapp_tool.ashx")
+                .addHeader("action", "tchat_users_list")
+                .addParam("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B")
                 .addParam("id", 325)
                 .addParam("page", 1)
                 .addParam("type", 2)
                 .addParam("NM_REFERER", "/goods/1313517")
                 .addParam("NM_URI", "/category/427/325")
-                .setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
+                .setCacheMode(CacheMode.NO_CACHE)
                 .setCacheTime(3600000)
+                .toJson()
                 .buildCall()
                 .execute(new AbsCallback<GoodListData>() {
                     @Override

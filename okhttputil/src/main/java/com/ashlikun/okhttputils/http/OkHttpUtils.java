@@ -27,7 +27,7 @@ import okhttp3.OkHttpClient;
  */
 public final class OkHttpUtils {
     //默认的超时时间
-    public static final long DEFAULT_MILLISECONDS = 40_000L;
+    public static final long DEFAULT_MILLISECONDS = 60_000L;
     public static final long DEFAULT_MILLISECONDS_LONG = 200_000L;
     private volatile static OkHttpUtils INSTANCE = null;
     //okhttp核心类

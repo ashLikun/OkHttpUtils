@@ -138,4 +138,8 @@ public class ProgressRequestBody extends RequestBody implements Observer<Long> {
     public void onComplete() {
 
     }
+
+    public RequestBody getRequestBody() {
+        return requestBody;
+    }
 }

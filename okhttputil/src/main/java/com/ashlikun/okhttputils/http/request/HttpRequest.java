@@ -277,6 +277,7 @@ public class HttpRequest implements Comparator<String> {
         }
         postContent = content;
         isJson = true;
+        setMethod("POST");
         return this;
     }
 
@@ -457,10 +458,10 @@ public class HttpRequest implements Comparator<String> {
         } else if (!isEmpty(postContent)) {
             //只提交content
             if (isJson) {
-                body = RequestBody.create(contentType == null ? MEDIA_TYPE_JSON :
+                body = ContentRequestBody.create(contentType == null ? MEDIA_TYPE_JSON :
                         contentType, postContent);
             } else {
-                body = RequestBody.create(contentType == null ? MEDIA_TYPE_PLAIN :
+                body = ContentRequestBody.create(contentType == null ? MEDIA_TYPE_PLAIN :
                         contentType, postContent);
             }
             //content方式是不能提交文件的

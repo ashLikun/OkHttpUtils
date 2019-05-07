@@ -5,7 +5,9 @@ import android.text.TextUtils;
 
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.callback.Callback;
+import com.ashlikun.okhttputils.http.request.ContentRequestBody;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
+import com.ashlikun.okhttputils.http.request.ProgressRequestBody;
 import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 import com.ashlikun.okhttputils.http.response.HttpResponse;
 import com.google.gson.Gson;
@@ -24,6 +26,11 @@ import java.util.Map;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import okhttp3.FormBody;
+import okhttp3.Headers;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -146,6 +153,116 @@ public class HttpUtils {
             filename = strings[strings.length - 1];
         }
         return filename;
+    }
+
+    /**
+     * 请求里面添加一个参数
+     *
+     * @return 修改后的Request
+     */
+    public static Request.Builder addRequestParams(Request request, String key, Object value) {
+        if (request == null || TextUtils.isEmpty(key) || value == null) {
+            return null;
+        }
+        Request.Builder builder = request.newBuilder();
+        String method = request.method();
+        if ("GET".equals(method)) {
+            builder.url(request.url()
+                    .newBuilder()
+                    .setEncodedQueryParameter(key, value.toString())
+                    .build());
+        } else if ("POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method) || "PATCH".equals(method)) {
+            setRequestBody(request.body(), method, builder, key, value, true);
+        }
+        return builder;
+    }
+
+    /**
+     * 修改请求参数里面的某个字段
+     *
+     * @return 修改后的Request
+     */
+    public static Request.Builder setRequestParams(Request request, String key, Object value) {
+        if (request == null || TextUtils.isEmpty(key) || value == null) {
+            return null;
+        }
+        Request.Builder builder = request.newBuilder();
+        String method = request.method();
+        if ("GET".equals(method)) {
+            builder.url(request.url()
+                    .newBuilder()
+                    .setEncodedQueryParameter(key, value.toString())
+                    .build());
+        } else if ("POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method) || "PATCH".equals(method)) {
+            setRequestBody(request.body(), method, builder, key, value, false);
+        }
+        return builder;
+    }
+
+    private static void setRequestBody(RequestBody body, String method, Request.Builder builder, String key, Object value, boolean isAdd) {
+        if (body != null && body instanceof ContentRequestBody) {
+            //data方式提交，一般是json
+            ContentRequestBody contentRequestBody = (ContentRequestBody) body;
+            String content = contentRequestBody.getContent();
+            try {
+                Gson gson = new Gson();
+                Map<String, Object> p = gson.fromJson(content, Map.class);
+                if (p != null) {
+                    p.put(key, value);
+                }
+                content = gson.toJson(p);
+            } catch (Exception e) {
+            }
+
+            builder.method(method, ContentRequestBody.create(contentRequestBody.contentType(), content));
+        } else if (body != null && body instanceof FormBody) {
+            //表单提交
+            FormBody formBody = (FormBody) body;
+            int size = formBody.size();
+            if (size > 0) {
+                FormBody.Builder newFormBody = new FormBody.Builder();
+                for (int i = 0; i < size; i++) {
+                    if (!isAdd && formBody.name(i).equals(key)) {
+                        //修改这个值
+                        newFormBody.add(formBody.name(i), value.toString());
+                    } else {
+                        //其他不变
+                        newFormBody.add(formBody.name(i), formBody.value(i));
+                    }
+                }
+                if (isAdd) {
+                    newFormBody.add(key, value.toString());
+                }
+                builder.method(method, newFormBody.build());
+            }
+        } else if (body != null && body instanceof MultipartBody) {
+            //复杂表单
+            MultipartBody multipartBody = (MultipartBody) body;
+            int size = multipartBody.size();
+            if (size > 0) {
+                MultipartBody.Builder newMultipartBody = new MultipartBody.Builder();
+                for (int i = 0; i < size; i++) {
+                    MultipartBody.Part part = multipartBody.part(i);
+                    Headers headers = part.headers();
+                    String partValue = headers.get("Content-Disposition");
+                    //不是文件 , 并且是当前key
+                    if (!isAdd && !partValue.contains("filename") && partValue.contains(key)) {
+                        newMultipartBody.addPart(headers, RequestBody.create(null, value.toString()));
+                    } else {
+                        //其他不变
+                        newMultipartBody.addPart(headers, part.body());
+                    }
+                }
+                if (isAdd) {
+                    newMultipartBody.addFormDataPart(key, value.toString());
+                }
+                builder.method(method, newMultipartBody.build());
+            }
+        } else if (body != null && body instanceof ProgressRequestBody) {
+            //带进度
+            ProgressRequestBody progressRequestBody = (ProgressRequestBody) body;
+            setRequestBody(progressRequestBody.getRequestBody(), method, builder, key, value, isAdd);
+        }
     }
 
     /**

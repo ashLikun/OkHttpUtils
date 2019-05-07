@@ -26,6 +26,9 @@ import okhttp3.Response;
  * 功能介绍：http的基本类
  */
 public class HttpResponse {
+    public static int SUCCEED = 0;//正常请求
+    public static int ERROR = 1;//请求出错
+
     public final static String CODE_KEY = "code";
     public final static String MES_KEY = "msg";
     //gson不解析
@@ -38,7 +41,7 @@ public class HttpResponse {
     private transient Object cache;
 
     @SerializedName(CODE_KEY)
-    public int code = HttpCode.ERROR;
+    public int code = ERROR;
     @SerializedName(MES_KEY)
     public String message;
 
@@ -113,7 +116,7 @@ public class HttpResponse {
      */
 
     public boolean isSucceed() {
-        return code == HttpCode.SUCCEED;
+        return code == SUCCEED;
     }
 
     public Object getKeyToObject(String... key) throws JSONException {
