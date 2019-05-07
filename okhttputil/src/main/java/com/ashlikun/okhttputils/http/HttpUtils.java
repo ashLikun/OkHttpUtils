@@ -229,7 +229,8 @@ public class HttpUtils {
                                 return treeMap;
                             }
                         }).create();
-                Map<String, Object> p = gson.fromJson(content, Map.class);
+                Map<String, Object> p = gson.fromJson(content, new TypeToken<Map<String, Object>>() {
+                }.getType());
                 if (p != null) {
                     p.put(key, value);
                 }
