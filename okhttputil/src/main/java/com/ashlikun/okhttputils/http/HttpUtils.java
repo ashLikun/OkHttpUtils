@@ -300,71 +300,78 @@ public class HttpUtils {
                 return (T) response.body();
             } else {
                 String json = response.body().string();
-                if (type == String.class) {
-                    return (T) json;
-                } else {
-                    T res = null;
-                    try {
-                        if (TextUtils.isEmpty(json)) {
-                            throw new JsonSyntaxException("json length = 0");
-                        }
-                        Class cls = null;
-                        if (gson == null) {
-                            try {
-                                if (type instanceof Class) {
-                                    cls = (Class) type;
-                                } else {
-                                    cls = (Class) ((ParameterizedType) type).getRawType();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            if (cls != null) {
-                                if (HttpResponse.class.isAssignableFrom(cls)) {
-                                    try {
-                                        HttpResponse da = (HttpResponse) cls.newInstance();
-                                        gson = da.parseGson();
-                                    } catch (InstantiationException e) {
-                                        e.printStackTrace();
-                                    } catch (IllegalAccessException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                        if (gson == null) {
-                            gson = OkHttpUtils.getInstance().getParseGson();
-                        }
-                        try {
-                            res = gson.fromJson(json, type);
-                        } catch (JsonSyntaxException e) {
-                            //处理HttpResponse 类型错误
-                            if (cls != null && HttpResponse.class.isAssignableFrom(cls)) {
-                                HttpResponse pp = gson.fromJson(json, HttpResponse.class);
-                                try {
-                                    res = (T) cls.newInstance();
-                                    ((HttpResponse) res).code = pp.code;
-                                    ((HttpResponse) res).message = pp.message;
-                                } catch (Exception e1) {
-                                    throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
-                                }
-                            } else {
-                                throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
-                            }
-                        }
-                    } catch (JsonSyntaxException e) {//数据解析异常
-                        throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
-                    }
-                    if (res instanceof HttpResponse) {
-                        ((HttpResponse) res).json = json;
-                        ((HttpResponse) res).httpcode = response.code();
-                        ((HttpResponse) res).response = response;
-                    }
-                    return res;
-                }
+                handerResult(type, response, json, gson);
             }
         }
         return null;
+    }
+
+    /**
+     * 处理返回值,只解析String或者自定义类型
+     */
+    public static <T> T handerResult(Type type, final Response response, final String json, Gson gson) throws IOException {
+        if (type == String.class) {
+            return (T) json;
+        } else {
+            T res = null;
+            try {
+                if (TextUtils.isEmpty(json)) {
+                    throw new JsonSyntaxException("json length = 0");
+                }
+                Class cls = null;
+                if (gson == null) {
+                    try {
+                        if (type instanceof Class) {
+                            cls = (Class) type;
+                        } else {
+                            cls = (Class) ((ParameterizedType) type).getRawType();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (cls != null) {
+                        if (HttpResponse.class.isAssignableFrom(cls)) {
+                            try {
+                                HttpResponse da = (HttpResponse) cls.newInstance();
+                                gson = da.parseGson();
+                            } catch (InstantiationException e) {
+                                e.printStackTrace();
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                if (gson == null) {
+                    gson = OkHttpUtils.getInstance().getParseGson();
+                }
+                try {
+                    res = gson.fromJson(json, type);
+                } catch (JsonSyntaxException e) {
+                    //处理HttpResponse 类型错误
+                    if (cls != null && HttpResponse.class.isAssignableFrom(cls)) {
+                        HttpResponse pp = gson.fromJson(json, HttpResponse.class);
+                        try {
+                            res = (T) cls.newInstance();
+                            ((HttpResponse) res).code = pp.code;
+                            ((HttpResponse) res).message = pp.message;
+                        } catch (Exception e1) {
+                            throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
+                        }
+                    } else {
+                        throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
+                    }
+                }
+            } catch (JsonSyntaxException e) {//数据解析异常
+                throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
+            }
+            if (res instanceof HttpResponse) {
+                ((HttpResponse) res).json = json;
+                ((HttpResponse) res).httpcode = response.code();
+                ((HttpResponse) res).response = response;
+            }
+            return res;
+        }
     }
 
     /**
