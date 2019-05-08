@@ -148,6 +148,7 @@ public class RequestCall implements SuperHttp {
         } else {
             type = type(raw, args);
         }
+        Call call = buildCall(null);
         //如果缓存 不存在才请求网络，否则使用缓存
         if (cachePolicy.getCacheMode() != CacheMode.NO_CACHE) {
             CacheEntity cacheEntity = cachePolicy.getCache();
@@ -157,7 +158,7 @@ public class RequestCall implements SuperHttp {
                         cacheEntity, getHttpRequest().getParseGson());
             }
         }
-        Response response = buildCall(null).execute();
+        Response response = call.execute();
 
         ResultType data = HttpUtils.handerResult(type, response, getHttpRequest().getParseGson());
         //保存缓存

@@ -28,6 +28,7 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,11 +38,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import okhttp3.FormBody;
 import okhttp3.Headers;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.internal.Util;
+import okio.Buffer;
+import okio.BufferedSource;
 
 /**
  * 作者　　: 李坤
@@ -455,6 +460,27 @@ public class HttpUtils {
         return null;
     }
 
+    /**
+     * 从Response 里面把body内容克隆出来，保证Response的body还可以继续使用
+     * @return 可能为null
+     */
+    public static String getResponseColneBody(Response response) {
+        try {
+            if (response.isSuccessful() && response.body() != null) {
+                BufferedSource source = response.body().source();
+                if (source != null) {
+                    source.request(java.lang.Long.MAX_VALUE);
+                    Buffer buffer = source.buffer();
+                    MediaType contentType = response.body().contentType();
+                    Charset charset = contentType != null ? contentType.charset(Util.UTF_8) : Util.UTF_8;
+                    return buffer.clone().readString(charset);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public static Boolean toBoolean(Object value) {
         if (value instanceof Boolean) {
