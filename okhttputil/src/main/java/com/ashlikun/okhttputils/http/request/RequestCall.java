@@ -143,7 +143,9 @@ public class RequestCall implements SuperHttp {
     @Override
     public <ResultType> ResultType syncExecute(Class raw, Class... args) throws IOException {
         Type type = null;
-        if (args != null && args.length >= 2) {
+        if (args == null || args.length == 0) {
+            type = raw;
+        } else if (args != null && args.length >= 2) {
             type = type(raw, type(args[0], args[1]));
         } else {
             type = type(raw, args);

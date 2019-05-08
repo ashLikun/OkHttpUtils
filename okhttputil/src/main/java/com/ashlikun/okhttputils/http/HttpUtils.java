@@ -304,8 +304,7 @@ public class HttpUtils {
             } else if (type == ResponseBody.class) {
                 return (T) response.body();
             } else {
-                String json = response.body().string();
-                handerResult(type, response, json, gson);
+                return handerResult(type, response, response.body().string(), gson);
             }
         }
         return null;
@@ -462,6 +461,7 @@ public class HttpUtils {
 
     /**
      * 从Response 里面把body内容克隆出来，保证Response的body还可以继续使用
+     *
      * @return 可能为null
      */
     public static String getResponseColneBody(Response response) {
