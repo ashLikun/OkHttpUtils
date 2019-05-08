@@ -57,6 +57,9 @@ public class CacheEntity {
      * @return
      */
     public static <ResultType> String getHanderResult(ResultType resultType) {
+        if (resultType == null) {
+            return null;
+        }
         if (resultType instanceof HttpResponse) {
             return ((HttpResponse) resultType).json;
         } else {

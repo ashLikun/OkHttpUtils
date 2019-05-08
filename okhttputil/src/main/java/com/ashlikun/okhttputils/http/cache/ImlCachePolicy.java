@@ -1,5 +1,7 @@
 package com.ashlikun.okhttputils.http.cache;
 
+import android.text.TextUtils;
+
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.callback.Callback;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
@@ -55,9 +57,8 @@ public class ImlCachePolicy extends BaseCachePolicy {
     @Override
     public void save(Response response, String result) {
         //保存缓存
-        if (request != null && cacheMode != null && cacheMode != CacheMode.NO_CACHE) {
-            CacheEntity.createCacheEntity(request, response,
-                    CacheEntity.getHanderResult(result)).save();
+        if (request != null && cacheMode != null && cacheMode != CacheMode.NO_CACHE && !TextUtils.isEmpty(result)) {
+            CacheEntity.createCacheEntity(request, response, result).save();
         }
     }
 }
