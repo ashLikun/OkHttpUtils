@@ -352,19 +352,9 @@ public class HttpUtils {
                 try {
                     res = gson.fromJson(json, type);
                 } catch (JsonSyntaxException e) {
-                    //处理HttpResponse 类型错误
-                    if (cls != null && HttpResponse.class.isAssignableFrom(cls)) {
-                        HttpResponse pp = gson.fromJson(json, HttpResponse.class);
-                        try {
-                            res = (T) cls.newInstance();
-                            ((HttpResponse) res).code = pp.code;
-                            ((HttpResponse) res).message = pp.message;
-                        } catch (Exception e1) {
-                            throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
-                        }
-                    } else {
-                        throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
-                    }
+                    e.printStackTrace();
+                    //数据解析异常
+                    throw new IOException(HttpErrorCode.MSG_DATA_ERROR + "  \n  原异常：" + e.toString() + "\n json = " + json);
                 }
             } catch (JsonSyntaxException e) {//数据解析异常
                 throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
