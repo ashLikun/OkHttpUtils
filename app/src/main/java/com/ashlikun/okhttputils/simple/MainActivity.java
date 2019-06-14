@@ -11,7 +11,9 @@ import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.callback.AbsCallback;
-import com.ashlikun.okhttputils.http.callback.FileCallback;
+import com.ashlikun.okhttputils.http.download.DownloadManager;
+import com.ashlikun.okhttputils.http.download.DownloadTask;
+import com.ashlikun.okhttputils.http.download.DownloadTaskListener;
 
 import java.io.File;
 
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        DownloadManager.initPath(getApplication().getCacheDir().getPath());
 //        LiteOrmUtil.init(new LiteOrmUtil.OnNeedListener() {
 //            @Override
 //            public Application getApplication() {
@@ -76,19 +78,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onButt1Click(View view) {
-        OkHttpUtils.get("http://video.meiyayuming.com.cn/api/public/?service=Bankcard.Getsms&token=49c81ed94b4b637796b66d0886ed611e&type=1&uid=14551")
-                .buildCall()
-                .execute(new FileCallback() {
+        DownloadManager.getInstance().addDownloadTask(new DownloadTask.Builder().setId("resmp;csr=1bbd")
+                .setUrl("https://imtt.dd.qq.com/16891/E75CC08F59CA2836B8A48263E7DDEE4C.apk?fsname=com.nmlg.renrenying_1.4.2_12.apk&amp;csr=1bbd")
+                .setListener(new DownloadTaskListener() {
+
+
                     @Override
-                    public void onLoading(long progress, long total, boolean done, boolean isUpdate) {
-                        Log.e("onLoading", "progress = " + progress + "    total = " + total + "  done = " + done + " isUpdate = " + isUpdate);
+                    public void onDownloading(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
+                        Log.e("aaa", "onDownloading percent = " + percent);
                     }
 
                     @Override
-                    public void onSuccess(File responseBody) {
-                        super.onSuccess(responseBody);
+                    public void onPause(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
+
                     }
-                });
+
+                    @Override
+                    public void onCancel(DownloadTask downloadTask) {
+
+                    }
+
+                    @Override
+                    public void onDownloadSuccess(DownloadTask downloadTask, File file) {
+
+                    }
+
+                    @Override
+                    public void onError(DownloadTask downloadTask, int errorCode) {
+
+                    }
+                }).build());
     }
 
     public void onButt2Click(View view) {

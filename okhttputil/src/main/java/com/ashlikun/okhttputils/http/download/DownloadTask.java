@@ -42,7 +42,7 @@ import static com.ashlikun.okhttputils.http.download.DownloadManager.defaultFile
  * 下载线程
  */
 public class DownloadTask implements Observer<Integer> {
-
+    private static final int BUFFER_SIZE = 1024 * 16;
     private static String FILE_MODE = "rwd";
     private OkHttpClient mClient;
 
@@ -297,8 +297,8 @@ public class DownloadTask implements Observer<Integer> {
                 }
                 // 获得文件流
                 inputStream = responseBody.byteStream();
-                bis = new BufferedInputStream(inputStream);
-                byte[] buffer = new byte[2 * 1024];
+                bis = new BufferedInputStream(inputStream, BUFFER_SIZE);
+                byte[] buffer = new byte[BUFFER_SIZE];
                 int length = 0;
                 // 开始下载数据库中插入下载信息
                 if (dbEntity == null) {
