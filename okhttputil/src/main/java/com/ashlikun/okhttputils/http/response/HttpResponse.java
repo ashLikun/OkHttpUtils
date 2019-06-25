@@ -26,8 +26,8 @@ import okhttp3.Response;
  * 功能介绍：http的基本类
  */
 public class HttpResponse {
-    public static int SUCCEED = 0;//正常请求
-    public static int ERROR = 1;//请求出错
+    public static int SUCCEED = 1;//正常请求
+    public static int ERROR = 0;//请求出错
 
     public final static String CODE_KEY = "code";
     public final static String MES_KEY = "msg";
