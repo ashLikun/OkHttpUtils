@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http.cache;
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
 import com.ashlikun.orm.LiteOrmUtil;
+import com.ashlikun.orm.db.assit.WhereBuilder;
 
 import java.util.List;
 
@@ -22,6 +23,10 @@ public class CacheManage {
         LiteOrmUtil.get().delete(entity);
     }
 
+    public static void delete(String key) {
+        LiteOrmUtil.get().delete(new WhereBuilder(CacheEntity.class).where("key", key));
+    }
+
     public static void deleteAll() {
         LiteOrmUtil.get().delete(CacheEntity.class);
     }
@@ -33,6 +38,7 @@ public class CacheManage {
     public static List<CacheEntity> queryAll() {
         return LiteOrmUtil.get().query(CacheEntity.class);
     }
+
     public static String getCacheKey(HttpRequest request) {
         if (request == null) {
             return null;

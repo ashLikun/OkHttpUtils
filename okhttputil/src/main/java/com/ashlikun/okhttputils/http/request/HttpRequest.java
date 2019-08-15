@@ -395,7 +395,9 @@ public class HttpRequest implements Comparator<String> {
 
     public Map<String, Object> getParams() {
         Map<String, Object> map = new HashMap<>();
-        map.putAll(params);
+        if (params != null) {
+            map.putAll(params);
+        }
         return map;
     }
 

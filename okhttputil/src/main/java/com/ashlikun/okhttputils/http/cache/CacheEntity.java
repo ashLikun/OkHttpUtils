@@ -27,7 +27,7 @@ public class CacheEntity {
      */
     public static final long CACHE_NEVER_EXPIRE = -1;
     @PrimaryKey(AssignType.BY_MYSELF)
-    /**缓存的key*/
+    /**缓存的key**/
     public String key;
     /**
      * 缓存的时间
