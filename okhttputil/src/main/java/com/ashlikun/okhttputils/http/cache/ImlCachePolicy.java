@@ -9,6 +9,7 @@ import com.ashlikun.okhttputils.http.request.HttpRequest;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Response;
@@ -43,7 +44,7 @@ public class ImlCachePolicy extends BaseCachePolicy {
 
             }
         }).subscribeOn(Schedulers.io())//指定 subscribe() 发生在 IO 线程
-                .observeOn(Schedulers.io())//指定回调在io线程
+                .observeOn(AndroidSchedulers.mainThread())//指定回调在主线程
                 .subscribe(new Consumer<T>() {
                     @Override
                     public void accept(T t) throws Exception {
