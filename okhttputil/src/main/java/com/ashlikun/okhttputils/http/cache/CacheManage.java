@@ -15,24 +15,51 @@ import java.util.List;
  * 功能介绍：缓存管理器
  */
 public class CacheManage {
-    public static void update(CacheEntity entity) {
-        LiteOrmUtil.get().update(entity);
+    public static boolean update(CacheEntity entity) {
+        try {
+            LiteOrmUtil.get().update(entity);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    public static void delete(CacheEntity entity) {
-        LiteOrmUtil.get().delete(entity);
+    public static boolean delete(CacheEntity entity) {
+        try {
+            LiteOrmUtil.get().delete(entity);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    public static void delete(String key) {
-        LiteOrmUtil.get().delete(new WhereBuilder(CacheEntity.class).where("key", key));
+    public static boolean delete(String key) {
+        try {
+            LiteOrmUtil.get().delete(new WhereBuilder(CacheEntity.class).where("key", key));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean delete(HttpRequest request) {
+        return delete(getCacheKey(request));
     }
 
     public static void deleteAll() {
-        LiteOrmUtil.get().delete(CacheEntity.class);
+        try {
+            LiteOrmUtil.get().delete(CacheEntity.class);
+        } catch (Exception e) {
+
+        }
     }
 
     public static CacheEntity queryById(String id) {
         return LiteOrmUtil.get().queryById(id, CacheEntity.class);
+    }
+
+    public static CacheEntity queryById(HttpRequest request) {
+        return LiteOrmUtil.get().queryById(getCacheKey(request), CacheEntity.class);
     }
 
     public static List<CacheEntity> queryAll() {
