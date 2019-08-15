@@ -35,7 +35,7 @@ public class CacheManage {
 
     public static boolean delete(String key) {
         try {
-            LiteOrmUtil.get().delete(new WhereBuilder(CacheEntity.class).where("key", key));
+            LiteOrmUtil.get().delete(new WhereBuilder(CacheEntity.class).where("key=?", key));
             return true;
         } catch (Exception e) {
             return false;
