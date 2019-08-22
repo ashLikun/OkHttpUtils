@@ -353,10 +353,17 @@ public class HttpUtils {
                     res = gson.fromJson(json, type);
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
-                    //数据解析异常
+                    //数据解析异常，统一回调错误
+                    if (OkHttpUtils.getInstance().onDataParseError != null) {
+                        OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e.toString(), json);
+                    }
                     throw new IOException(HttpErrorCode.MSG_DATA_ERROR + "  \n  原异常：" + e.toString() + "\n json = " + json);
                 }
-            } catch (JsonSyntaxException e) {//数据解析异常
+            } catch (JsonSyntaxException e) {
+                //数据解析异常，统一回调错误
+                if (OkHttpUtils.getInstance().onDataParseError != null) {
+                    OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e.toString(), json);
+                }
                 throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
             }
             if (res instanceof HttpResponse) {

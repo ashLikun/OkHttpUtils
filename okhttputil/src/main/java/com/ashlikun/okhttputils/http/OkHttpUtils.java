@@ -50,6 +50,10 @@ public final class OkHttpUtils {
      * 全局缓存过期时间,默认永不过期
      */
     protected long mCacheTime = CacheEntity.CACHE_NEVER_EXPIRE;
+    /**
+     * 当数据解析错误
+     */
+    protected OnDataParseError onDataParseError = null;
 
     /**
      * 获取单例
@@ -260,6 +264,13 @@ public final class OkHttpUtils {
      */
     public static void setCacheTime(long cacheTime) {
         getInstance().mCacheTime = cacheTime;
+    }
+
+    /**
+     * 设置全局的缓存过期时间
+     */
+    public static void setOnDataParseError(OnDataParseError onDataParseError) {
+        getInstance().onDataParseError = onDataParseError;
     }
 
     /**
