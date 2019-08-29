@@ -1,7 +1,5 @@
 package com.ashlikun.okhttputils.simple;
 
-import com.ashlikun.okhttputils.http.HttpUtils;
-
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -20,13 +18,13 @@ public class MarvelSigningInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request.Builder request = null;
         chain.proceed(chain.request());
-        try {
-            Thread.sleep(5000);
-            request = HttpUtils.setRequestParams(chain.request(), "accessToken", "aaaaaaaaaaaaaaaa");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Response response = chain.proceed(request.build());
-        return response;
+//        try {
+//            Thread.sleep(5000);
+//            request = HttpUtils.setRequestParams(chain.request(), "accessToken", "aaaaaaaaaaaaaaaa");
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        Response response = chain.proceed(request.build());
+        return  chain.proceed(chain.request());
     }
 }

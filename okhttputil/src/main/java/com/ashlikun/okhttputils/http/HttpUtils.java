@@ -2,6 +2,7 @@ package com.ashlikun.okhttputils.http;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.callback.Callback;
@@ -295,6 +296,71 @@ public class HttpUtils {
     }
 
     /**
+     * 获取 request 整个数据
+     */
+    public static String getRequestToString(Request request) {
+        if (request == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Url   : " + request.url().url().toString());
+        sb.append("\nMethod: " + request.method());
+        sb.append("\nHeads : " + request.headers().toString());
+        RequestBody requestBody = request.body();
+        if (requestBody == null) {
+            return "";
+        }
+        try {
+            Buffer bufferedSink = new Buffer();
+            requestBody.writeTo(bufferedSink);
+            Charset charset = requestBody.contentType().charset();
+            charset = charset == null ? Charset.forName("utf-8") : charset;
+            sb.append("\n");
+            sb.append(bufferedSink.readString(charset));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 打印返回消息
+     *
+     * @param response 返回的对象
+     */
+    public static String getResponseToString(Response response) {
+        if (response == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Heads : " + response.headers().toString());
+        try {
+            ResponseBody responseBody = response.body();
+            long contentLength = responseBody.contentLength();
+            BufferedSource source = responseBody.source();
+            try {
+                source.request(Long.MAX_VALUE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Buffer buffer = source.buffer();
+            Charset charset = responseBody.contentType().charset();
+            charset = charset == null ? Charset.forName("utf-8") : charset;
+            MediaType contentType = responseBody.contentType();
+            if (contentType != null) {
+                charset = contentType.charset();
+            }
+            if (contentLength != 0) {
+                sb.append("\n");
+                sb.append(buffer.clone().readString(charset));
+            }
+        } catch (Exception e) {
+
+        }
+        return sb.toString();
+    }
+
+    /**
      * 处理返回值
      */
     public static <T> T handerResult(Type type, final Response response, Gson gson) throws IOException {
@@ -355,14 +421,14 @@ public class HttpUtils {
                     e.printStackTrace();
                     //数据解析异常，统一回调错误
                     if (OkHttpUtils.getInstance().onDataParseError != null) {
-                        OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e.toString(), json);
+                        OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                     }
                     throw new IOException(HttpErrorCode.MSG_DATA_ERROR + "  \n  原异常：" + e.toString() + "\n json = " + json);
                 }
             } catch (JsonSyntaxException e) {
                 //数据解析异常，统一回调错误
                 if (OkHttpUtils.getInstance().onDataParseError != null) {
-                    OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e.toString(), json);
+                    OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                 }
                 throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
             }
@@ -371,6 +437,7 @@ public class HttpUtils {
                 ((HttpResponse) res).httpcode = response.code();
                 ((HttpResponse) res).response = response;
             }
+            Log.e("aaa", getResponseToString(response));
             return res;
         }
     }

@@ -1,5 +1,7 @@
 package com.ashlikun.okhttputils.http;
 
+import okhttp3.Response;
+
 /**
  * 作者　　: 李坤
  * 创建时间: 2019/8/22　17:18
@@ -11,9 +13,10 @@ public interface OnDataParseError {
     /**
      * 在子线程
      *
-     * @param code     错误code
-     * @param errorMsg 错误消息（异常msg）
-     * @param json     解析的json数据
+     * @param code      错误code
+     * @param exception 异常 一般是JsonSyntaxException
+     * @param response  Response
+     * @param json      解析的json数据
      */
-    void onError(int code, String errorMsg, String json);
+    void onError(int code, Exception exception, Response response, String json);
 }

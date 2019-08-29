@@ -120,11 +120,11 @@ public class MainActivity extends AppCompatActivity {
                 .addParam("id", 325)
                 .addParam("page", 1)
                 .addParam("type", 2)
+                .addParamFilePath("image", "/data/data/com.ashlikun.okhttputils.simple/cache/1565591018918.jpg")
                 .addParam("NM_REFERER", "/goods/1313517")
                 .addParam("NM_URI", "/category/427/325")
                 .setCacheMode(CacheMode.NO_CACHE)
                 .setCacheTime(3600000)
-                .toJson()
                 .buildCall()
                 .execute(new AbsCallback<GoodListData>() {
                     @Override
