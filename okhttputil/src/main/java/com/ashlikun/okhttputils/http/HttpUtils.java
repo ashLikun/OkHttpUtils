@@ -2,7 +2,6 @@ package com.ashlikun.okhttputils.http;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.callback.Callback;
@@ -437,7 +436,6 @@ public class HttpUtils {
                 ((HttpResponse) res).httpcode = response.code();
                 ((HttpResponse) res).response = response;
             }
-            Log.e("aaa", getResponseToString(response));
             return res;
         }
     }
