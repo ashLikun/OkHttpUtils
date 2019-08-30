@@ -36,6 +36,7 @@ import java.util.Set;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -62,6 +63,14 @@ public class HttpUtils {
 
     public static void runmainThread(int id, Consumer<Integer> next) {
         Observable.just(id).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(next);
+    }
+
+    /**
+     * 运行到子线程
+     */
+    public static void runNewThread(Consumer<Integer> next) {
+        Observable.just(1).observeOn(Schedulers.computation())
                 .subscribe(next);
     }
 
@@ -416,18 +425,28 @@ public class HttpUtils {
                 }
                 try {
                     res = gson.fromJson(json, type);
-                } catch (JsonSyntaxException e) {
+                } catch (final JsonSyntaxException e) {
                     e.printStackTrace();
-                    //数据解析异常，统一回调错误
+                    //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
                     if (OkHttpUtils.getInstance().onDataParseError != null) {
-                        OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
+                        runNewThread(new Consumer<Integer>() {
+                            @Override
+                            public void accept(Integer integer) throws Exception {
+                                OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
+                            }
+                        });
                     }
                     throw new IOException(HttpErrorCode.MSG_DATA_ERROR + "  \n  原异常：" + e.toString() + "\n json = " + json);
                 }
-            } catch (JsonSyntaxException e) {
-                //数据解析异常，统一回调错误
+            } catch (final JsonSyntaxException e) {
+                //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
                 if (OkHttpUtils.getInstance().onDataParseError != null) {
-                    OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
+                    runNewThread(new Consumer<Integer>() {
+                        @Override
+                        public void accept(Integer integer) throws Exception {
+                            OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
+                        }
+                    });
                 }
                 throw new IOException(HttpErrorCode.MSG_DATA_ERROR2 + "  \n  原异常：" + e.toString() + "\n json = " + json);
             }
