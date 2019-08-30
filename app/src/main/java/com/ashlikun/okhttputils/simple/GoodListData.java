@@ -1,7 +1,6 @@
 package com.ashlikun.okhttputils.simple;
 
 import com.ashlikun.okhttputils.http.response.HttpResponse;
-import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class GoodListData extends HttpResponse {
     public int currentPage;
     public int pageCount;
     public int currentRows;
-    public List<ListBean> list;
+    public List<ListBean> data;
 
 
     public static class ListBean {

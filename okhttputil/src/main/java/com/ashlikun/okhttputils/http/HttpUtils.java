@@ -2,6 +2,7 @@ package com.ashlikun.okhttputils.http;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.callback.Callback;
@@ -315,19 +316,19 @@ public class HttpUtils {
         sb.append("\nMethod: " + request.method());
         sb.append("\nHeads : " + request.headers().toString());
         RequestBody requestBody = request.body();
-        if (requestBody == null) {
-            return "";
+        if (requestBody != null) {
+            try {
+                Buffer bufferedSink = new Buffer();
+                requestBody.writeTo(bufferedSink);
+                Charset charset = requestBody.contentType().charset();
+                charset = charset == null ? Charset.forName("utf-8") : charset;
+                sb.append("\n");
+                sb.append(bufferedSink.readString(charset));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        try {
-            Buffer bufferedSink = new Buffer();
-            requestBody.writeTo(bufferedSink);
-            Charset charset = requestBody.contentType().charset();
-            charset = charset == null ? Charset.forName("utf-8") : charset;
-            sb.append("\n");
-            sb.append(bufferedSink.readString(charset));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         return sb.toString();
     }
 
@@ -342,28 +343,30 @@ public class HttpUtils {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Heads : " + response.headers().toString());
-        try {
-            ResponseBody responseBody = response.body();
-            long contentLength = responseBody.contentLength();
-            BufferedSource source = responseBody.source();
+        ResponseBody responseBody = response.body();
+        if (responseBody != null) {
             try {
-                source.request(Long.MAX_VALUE);
-            } catch (IOException e) {
+                long contentLength = responseBody.contentLength();
+                BufferedSource source = responseBody.source();
+                try {
+                    source.request(Long.MAX_VALUE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Buffer buffer = source.buffer();
+                Charset charset = responseBody.contentType().charset();
+                charset = charset == null ? Charset.forName("utf-8") : charset;
+                MediaType contentType = responseBody.contentType();
+                if (contentType != null) {
+                    charset = contentType.charset();
+                }
+                if (contentLength != 0) {
+                    sb.append("\n");
+                    sb.append(buffer.clone().readString(charset));
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            Buffer buffer = source.buffer();
-            Charset charset = responseBody.contentType().charset();
-            charset = charset == null ? Charset.forName("utf-8") : charset;
-            MediaType contentType = responseBody.contentType();
-            if (contentType != null) {
-                charset = contentType.charset();
-            }
-            if (contentLength != 0) {
-                sb.append("\n");
-                sb.append(buffer.clone().readString(charset));
-            }
-        } catch (Exception e) {
-
         }
         return sb.toString();
     }
@@ -432,6 +435,8 @@ public class HttpUtils {
                         runNewThread(new Consumer<Integer>() {
                             @Override
                             public void accept(Integer integer) throws Exception {
+                                Log.e("aa", getRequestToString(response.request()));
+                                Log.e("aaa", getResponseToString(response));
                                 OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                             }
                         });
@@ -444,6 +449,8 @@ public class HttpUtils {
                     runNewThread(new Consumer<Integer>() {
                         @Override
                         public void accept(Integer integer) throws Exception {
+                            Log.e("aa", getRequestToString(response.request()));
+                            Log.e("aaa", getResponseToString(response));
                             OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                         }
                     });
