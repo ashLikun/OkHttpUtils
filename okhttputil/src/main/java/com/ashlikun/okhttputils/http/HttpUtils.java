@@ -2,7 +2,6 @@ package com.ashlikun.okhttputils.http;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.callback.Callback;
@@ -435,8 +434,6 @@ public class HttpUtils {
                         runNewThread(new Consumer<Integer>() {
                             @Override
                             public void accept(Integer integer) throws Exception {
-                                Log.e("aa", getRequestToString(response.request()));
-                                Log.e("aaa", getResponseToString(response));
                                 OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                             }
                         });
@@ -449,8 +446,6 @@ public class HttpUtils {
                     runNewThread(new Consumer<Integer>() {
                         @Override
                         public void accept(Integer integer) throws Exception {
-                            Log.e("aa", getRequestToString(response.request()));
-                            Log.e("aaa", getResponseToString(response));
                             OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                         }
                     });
