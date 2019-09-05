@@ -80,4 +80,6 @@ dependencies {
         -dontwarn okio.**
         -dontwarn javax.annotation.Nullable
         -dontwarn javax.annotation.ParametersAreNonnullByDefault
+         不混淆使用Table注解（数据库） 的类
+        -keep @com.ashlikun.orm.db.annotation.Table class * {*;}
 
