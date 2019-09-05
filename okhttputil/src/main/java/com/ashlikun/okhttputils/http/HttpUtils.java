@@ -45,7 +45,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.internal.Util;
 import okio.Buffer;
 import okio.BufferedSource;
 
@@ -57,6 +56,8 @@ import okio.BufferedSource;
  * 功能介绍：用到的工具方法
  */
 public class HttpUtils {
+    public static Charset UTF_8 = Charset.forName("UTF-8");
+
     public static void runmainThread(Consumer<Integer> next) {
         runmainThread(1, next);
     }
@@ -252,7 +253,7 @@ public class HttpUtils {
             } catch (Exception e) {
             }
 
-            builder.method(method, ContentRequestBody.create(contentRequestBody.contentType(), content));
+            builder.method(method, ContentRequestBody.createNew(contentRequestBody.contentType(), content));
         } else if (body != null && body instanceof FormBody) {
             //表单提交
             FormBody formBody = (FormBody) body;
@@ -555,7 +556,7 @@ public class HttpUtils {
                     source.request(java.lang.Long.MAX_VALUE);
                     Buffer buffer = source.buffer();
                     MediaType contentType = response.body().contentType();
-                    Charset charset = contentType != null ? contentType.charset(Util.UTF_8) : Util.UTF_8;
+                    Charset charset = contentType != null ? contentType.charset(UTF_8) : UTF_8;
                     return buffer.clone().readString(charset);
                 }
             }

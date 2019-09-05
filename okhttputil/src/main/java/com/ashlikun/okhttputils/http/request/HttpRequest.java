@@ -460,10 +460,10 @@ public class HttpRequest implements Comparator<String> {
         } else if (!isEmpty(postContent)) {
             //只提交content
             if (isJson) {
-                body = ContentRequestBody.create(contentType == null ? MEDIA_TYPE_JSON :
+                body = ContentRequestBody.createNew(contentType == null ? MEDIA_TYPE_JSON :
                         contentType, postContent);
             } else {
-                body = ContentRequestBody.create(contentType == null ? MEDIA_TYPE_PLAIN :
+                body = ContentRequestBody.createNew(contentType == null ? MEDIA_TYPE_PLAIN :
                         contentType, postContent);
             }
             //content方式是不能提交文件的

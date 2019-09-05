@@ -67,11 +67,11 @@ public class CookieManager {
      * 按条件查询对象并返回集合
      */
     public List<SerializableCookie> query(String selection, String[] selectionArgs) {
-        return LiteOrmUtil.get().query(QueryBuilder.create(SerializableCookie.class).where(selection, selectionArgs));
+        return LiteOrmUtil.get().query(QueryBuilder.create(SerializableCookie.class).where(selection, (Object[]) selectionArgs));
     }
 
     public void delete(String whereClause, String[] whereArgs) {
-        LiteOrmUtil.get().delete(WhereBuilder.create(SerializableCookie.class).where(whereClause, whereArgs));
+        LiteOrmUtil.get().delete(WhereBuilder.create(SerializableCookie.class).where(whereClause, (Object[]) whereArgs));
     }
 
     public void deleteAll() {

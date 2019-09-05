@@ -159,7 +159,6 @@ public class DownloadManager {
      * @param id 任务id
      */
     public void cancel(String id) {
-
         DownloadTask task = getDownloadTask(id);
         if (task != null) {
             try {

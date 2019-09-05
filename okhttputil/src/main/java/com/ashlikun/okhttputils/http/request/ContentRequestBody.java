@@ -1,12 +1,13 @@
 package com.ashlikun.okhttputils.http.request;
 
 
+import com.ashlikun.okhttputils.http.HttpUtils;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okhttp3.internal.Util;
 import okio.BufferedSink;
 
 /**
@@ -46,12 +47,12 @@ public class ContentRequestBody extends RequestBody {
         sink.write(content, 0, byteCount);
     }
 
-    public static RequestBody create(MediaType contentType, String content) {
-        Charset charset = Util.UTF_8;
+    public static RequestBody createNew(MediaType contentType, String content) {
+        Charset charset = HttpUtils.UTF_8;
         if (contentType != null) {
             charset = contentType.charset();
             if (charset == null) {
-                charset = Util.UTF_8;
+                charset = HttpUtils.UTF_8;
                 contentType = MediaType.parse(contentType + "; charset=utf-8");
             }
         }
