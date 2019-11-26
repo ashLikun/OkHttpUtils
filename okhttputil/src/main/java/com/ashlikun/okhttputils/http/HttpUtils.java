@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -522,6 +523,12 @@ public class HttpUtils {
         Type[] parentypes;//泛型类型集合
         if (types instanceof ParameterizedType) {
             parentypes = ((ParameterizedType) types).getActualTypeArguments();
+            if (parentypes == null && parentypes.length != 0) {
+                if (parentypes[0] instanceof TypeVariable) {
+                    //如果已经到了泛型的具体类型,那么直接返回types
+                    return types;
+                }
+            }
         } else {
             parentypes = mClass.getGenericInterfaces();
             for (Type childtype : parentypes) {
