@@ -45,6 +45,9 @@ public class HttpResponse {
     @SerializedName(MES_KEY)
     public String message;
 
+    public HttpResponse() {
+    }
+
     public HttpResponse(String json) {
         this.json = json;
     }
