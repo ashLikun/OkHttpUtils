@@ -45,6 +45,10 @@ public class HttpResponse {
     @SerializedName(MES_KEY)
     public String message;
 
+    public HttpResponse(String json) {
+        this.json = json;
+    }
+
     //当Gson自动解析异常的时候会调用，由内部调用
     public void setOnGsonErrorData(String json) {
         this.json = json;
@@ -210,6 +214,22 @@ public class HttpResponse {
         } catch (JSONException e) {
             e.printStackTrace();
             return "";
+        }
+    }
+
+    public String getStringValue2(String defaultValue, String... key) {
+        try {
+            String res = HttpUtils.toString(getValueBase(key));
+            return res == null ? defaultValue : res;
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+            return defaultValue;
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return defaultValue;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return defaultValue;
         }
     }
 
