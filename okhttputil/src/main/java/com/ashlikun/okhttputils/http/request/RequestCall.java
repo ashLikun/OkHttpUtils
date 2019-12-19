@@ -32,12 +32,13 @@ import okhttp3.Response;
  * 方法功能：根据请求参数封装Okhttp的Request和Call，对外提供更多的接口：cancel(),3个超时时间
  */
 public class RequestCall implements SuperHttp {
+    private final int TIME_OUT = -1;
     private Request request;
     private Call call;
     private HttpRequest httpRequest;
-    private long readTimeOut;
-    private long writeTimeOut;
-    private long connTimeOut;
+    private long readTimeOut = TIME_OUT;
+    private long writeTimeOut = TIME_OUT;
+    private long connTimeOut = TIME_OUT;
     List<Interceptor> interceptors;
     List<Interceptor> networkInterceptors;
     ProgressCallBack progressCallBack;
@@ -63,10 +64,16 @@ public class RequestCall implements SuperHttp {
             readTimeOut = readTimeOut > 0 ? readTimeOut : OkHttpUtils.DEFAULT_MILLISECONDS;
             writeTimeOut = writeTimeOut > 0 ? writeTimeOut : OkHttpUtils.DEFAULT_MILLISECONDS;
             connTimeOut = connTimeOut > 0 ? connTimeOut : OkHttpUtils.DEFAULT_MILLISECONDS;
-            OkHttpClient.Builder clone = OkHttpUtils.getInstance().getOkHttpClient().newBuilder()
-                    .readTimeout(readTimeOut, TimeUnit.MILLISECONDS)
-                    .writeTimeout(writeTimeOut, TimeUnit.MILLISECONDS)
-                    .connectTimeout(connTimeOut, TimeUnit.MILLISECONDS);
+            OkHttpClient.Builder clone = OkHttpUtils.getInstance().getOkHttpClient().newBuilder();
+            if (readTimeOut != TIME_OUT) {
+                clone.readTimeout(readTimeOut, TimeUnit.MILLISECONDS);
+            }
+            if (writeTimeOut != TIME_OUT) {
+                clone.writeTimeout(readTimeOut, TimeUnit.MILLISECONDS);
+            }
+            if (connTimeOut != TIME_OUT) {
+                clone.connectTimeout(readTimeOut, TimeUnit.MILLISECONDS);
+            }
             if (interceptors != null && !interceptors.isEmpty()) {
                 clone.interceptors().addAll(interceptors);
             }
