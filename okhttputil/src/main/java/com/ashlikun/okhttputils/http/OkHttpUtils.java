@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 /**
  * 作者　　: 李坤
@@ -271,6 +272,19 @@ public final class OkHttpUtils {
      */
     public static void setOnDataParseError(OnDataParseError onDataParseError) {
         getInstance().onDataParseError = onDataParseError;
+    }
+
+    public static OnDataParseError getOnDataParseError() {
+        return getInstance().onDataParseError;
+    }
+
+    /**
+     * 发送解析错误
+     */
+    public static void sendOnDataParseError(int code, Exception exception, Response response, String json) {
+        if (getInstance().onDataParseError != null) {
+            getInstance().onDataParseError.onError(code, exception, response, json);
+        }
     }
 
     /**
