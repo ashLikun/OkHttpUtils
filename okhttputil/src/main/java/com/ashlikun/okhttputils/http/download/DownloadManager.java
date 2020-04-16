@@ -16,17 +16,14 @@
 package com.ashlikun.okhttputils.http.download;
 
 
+import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 
 
@@ -120,11 +117,7 @@ public class DownloadManager {
             downloadTask.setDownloadStatus(DownloadStatus.DOWNLOAD_STATUS_INIT);
             // 保存下载task列表
             mCurrentTaskList.put(downloadTask.getId(), downloadTask);
-
-            Observable.just(1).subscribeOn(Schedulers.io())//指定 subscribe() 发生在 IO 线程
-                    .observeOn(Schedulers.io()).//指定回调在io线程
-                    subscribe(downloadTask);
-
+            HttpUtils.runNewThread(downloadTask);
         }
     }
 
@@ -161,16 +154,8 @@ public class DownloadManager {
     public void cancel(String id) {
         DownloadTask task = getDownloadTask(id);
         if (task != null) {
-            try {
-                task.cancel();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            task.setDownloadStatus(DownloadStatus.DOWNLOAD_STATUS_CANCEL);
-            Disposable subscription = task.getDisposable();
-            if (subscription != null) {
-                subscription.dispose();
-            }
+            task.cancel();
+            task.setCancel();
         }
     }
 

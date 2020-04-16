@@ -6,12 +6,8 @@ import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.callback.Callback;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+import java.io.IOException;
+
 import okhttp3.Response;
 
 /**
@@ -30,27 +26,27 @@ public class ImlCachePolicy extends BaseCachePolicy {
     @Override
     public <T> void callback(final Callback<T> callback) {
         final CacheEntity[] entity = {null};
-        Observable.create(new ObservableOnSubscribe<T>() {
+        HttpUtils.runNewThread(new Runnable() {
             @Override
-            public void subscribe(ObservableEmitter<T> e) throws Exception {
+            public void run() {
                 entity[0] = getCache();
                 //有缓存
                 if (entity[0] != null) {
-                    e.onNext((T) HttpUtils.handerResult(HttpUtils.getType(callback.getClass()),
-                            entity[0], request.getParseGson()));
-                } else {
-                    e.onComplete();
+                    HttpUtils.runmainThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                T t = HttpUtils.handerResult(HttpUtils.getType(callback.getClass()),
+                                        entity[0], request.getParseGson());
+                                callback.onCacheSuccess(entity[0], t);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 }
-
             }
-        }).subscribeOn(Schedulers.io())//指定 subscribe() 发生在 IO 线程
-                .observeOn(AndroidSchedulers.mainThread())//指定回调在主线程
-                .subscribe(new Consumer<T>() {
-                    @Override
-                    public void accept(T t) throws Exception {
-                        callback.onCacheSuccess(entity[0], t);
-                    }
-                });
+        });
     }
 
 

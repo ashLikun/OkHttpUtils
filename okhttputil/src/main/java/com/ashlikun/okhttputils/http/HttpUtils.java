@@ -1,6 +1,8 @@
 package com.ashlikun.okhttputils.http;
 
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
@@ -33,10 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -57,22 +55,29 @@ import okio.BufferedSource;
  */
 public class HttpUtils {
     public static Charset UTF_8 = Charset.forName("UTF-8");
+    static Handler mainHandle;
 
-    public static void runmainThread(Consumer<Integer> next) {
-        runmainThread(1, next);
+    public static Handler getMainHandle() {
+        if (mainHandle == null) {
+            synchronized (HttpUtils.class) {
+                if (mainHandle == null) {
+                    mainHandle = new Handler(Looper.getMainLooper());
+                }
+            }
+        }
+        return mainHandle;
     }
 
-    public static void runmainThread(int id, Consumer<Integer> next) {
-        Observable.just(id).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(next);
+    public static void runmainThread(Runnable runnable) {
+        getMainHandle().post(runnable);
     }
+
 
     /**
      * 运行到子线程
      */
-    public static void runNewThread(Consumer<Integer> next) {
-        Observable.just(1).observeOn(Schedulers.computation())
-                .subscribe(next);
+    public static void runNewThread(Runnable runnable) {
+        OkHttpUtils.getInstance().getOkHttpClient().dispatcher().executorService().execute(runnable);
     }
 
     /**
@@ -432,9 +437,9 @@ public class HttpUtils {
                     e.printStackTrace();
                     //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
                     if (OkHttpUtils.getInstance().onDataParseError != null) {
-                        runNewThread(new Consumer<Integer>() {
+                        runNewThread(new Runnable() {
                             @Override
-                            public void accept(Integer integer) throws Exception {
+                            public void run() {
                                 OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                             }
                         });
@@ -444,9 +449,9 @@ public class HttpUtils {
             } catch (final JsonSyntaxException e) {
                 //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
                 if (OkHttpUtils.getInstance().onDataParseError != null) {
-                    runNewThread(new Consumer<Integer>() {
+                    runNewThread(new Runnable() {
                         @Override
-                        public void accept(Integer integer) throws Exception {
+                        public void run() {
                             OkHttpUtils.getInstance().onDataParseError.onError(HttpErrorCode.HTTP_DATA_ERROR, e, response, json);
                         }
                     });

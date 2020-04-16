@@ -26,8 +26,6 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-
-import io.reactivex.functions.Consumer;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -113,9 +111,9 @@ public class FileConvert implements Converter<File> {
     }
 
     private void onProgress(final long progress, final long total, final boolean done) {
-        HttpUtils.runmainThread(new Consumer<Integer>() {
+        HttpUtils.runmainThread(new Runnable() {
             @Override
-            public void accept(Integer integer) throws Exception {
+            public void run() {
                 callBack.onLoading(progress, total, done, false);
             }
         });

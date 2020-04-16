@@ -11,6 +11,7 @@ import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.callback.AbsCallback;
+import com.ashlikun.okhttputils.http.callback.AbsProgressCallback;
 import com.ashlikun.okhttputils.http.download.DownloadManager;
 import com.ashlikun.okhttputils.http.download.DownloadTask;
 import com.ashlikun.okhttputils.http.download.DownloadTaskListener;
@@ -18,6 +19,35 @@ import com.ashlikun.okhttputils.http.download.DownloadTaskListener;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
+    public DownloadTask task = new DownloadTask.Builder().setId("resmp;csr=1bbd")
+            .setUrl("http://s.shouji.qihucdn.com/200407/28e9b1ac86444ec466f56ff0df9aa7b9/com.qihoo360.mobilesafe_267.apk?en=curpage%3D%26exp%3D1587610389%26from%3Dopenbox_detail_index%26m2%3D%26ts%3D1587005589%26tok%3D8ac5571c83e9bb8497076a3435f3c90d%26f%3Dz.apk")
+            .setListener(new DownloadTaskListener() {
+                @Override
+                public void onDownloading(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
+                    Log.e("aaa", "onDownloading percent = " + percent);
+                }
+
+                @Override
+                public void onPause(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
+                    Log.e("aaa", "onPause percent = " + percent);
+                }
+
+                @Override
+                public void onCancel(DownloadTask downloadTask) {
+                    Log.e("aaa", "onCancel ");
+                }
+
+                @Override
+                public void onDownloadSuccess(DownloadTask downloadTask, File file) {
+                    Log.e("aaa", "onDownloadSuccess  " + file.getPath());
+                }
+
+                @Override
+                public void onError(DownloadTask downloadTask, int errorCode) {
+                    Log.e("aaa", "onError " + errorCode);
+
+                }
+            }).build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,55 +107,41 @@ public class MainActivity extends AppCompatActivity {
 //        Log.e("aaa", "" + "");
     }
 
+    public void onButt0Click(View view) {
+        task.setCancel();
+    }
+
     public void onButt1Click(View view) {
-        DownloadManager.getInstance().addDownloadTask(new DownloadTask.Builder().setId("resmp;csr=1bbd")
-                .setUrl("https://imtt.dd.qq.com/16891/E75CC08F59CA2836B8A48263E7DDEE4C.apk?fsname=com.nmlg.renrenying_1.4.2_12.apk&amp;csr=1bbd")
-                .setListener(new DownloadTaskListener() {
-
-
-                    @Override
-                    public void onDownloading(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
-                        Log.e("aaa", "onDownloading percent = " + percent);
-                    }
-
-                    @Override
-                    public void onPause(DownloadTask downloadTask, long completedSize, long totalSize, double percent) {
-
-                    }
-
-                    @Override
-                    public void onCancel(DownloadTask downloadTask) {
-
-                    }
-
-                    @Override
-                    public void onDownloadSuccess(DownloadTask downloadTask, File file) {
-
-                    }
-
-                    @Override
-                    public void onError(DownloadTask downloadTask, int errorCode) {
-
-                    }
-                }).build());
+        DownloadManager.getInstance().addDownloadTask(task);
     }
 
     public void onButt2Click(View view) {
         HuodongData data = new HuodongData();
         data.hashCode();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < 300; i++) {
+            stringBuilder.append(aa);
+        }
 
         OkHttpUtils.post("http://ly.lingyunexpress.com/tools/kapp_tool.ashx")
                 .addHeader("action", "tchat_users_list")
                 .addParam("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B")
                 .addParam("id", 325)
                 .addParam("page", 1)
-                .addParam("type", 2)
-                .addParamFilePath("image", "/data/data/com.ashlikun.okhttputils.simple/cache/1565591018918.jpg")
+                .addParam("type", stringBuilder)
+                .addParam("111", 2)
+                .addParamFilePath("image", "/data/user/0/com.ashlikun.okhttputils.simple/cache/com.qihoo360.mobilesafe_267.apk")
                 .addParam("NM_REFERER", "/goods/1313517")
                 .addParam("NM_URI", "/category/427/325")
                 .setCacheMode(CacheMode.NO_CACHE)
                 .setCacheTime(3600000)
                 .buildCall()
+                .progressCallback(new AbsProgressCallback() {
+                    @Override
+                    public void onLoading(long progress, long total, boolean done, boolean isUpdate) {
+                        Log.e("aaa", "progress = " + progress + "   total = " + total + "    done = " + done + "   isUpdate = " + isUpdate);
+                    }
+                })
                 .execute(new AbsCallback<GoodListData>() {
                     @Override
                     public void onSuccess(GoodListData responseBody) {
@@ -146,4 +162,5 @@ public class MainActivity extends AppCompatActivity {
         String ccc = "222";
         String ddd = "333";
     }
+    String aa = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 }

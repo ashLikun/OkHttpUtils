@@ -16,7 +16,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -87,9 +86,9 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         if (exc.getCall().isCanceled()) {
             return;
         }
-        HttpUtils.runmainThread(new Consumer<Integer>() {
+        HttpUtils.runmainThread(new Runnable() {
             @Override
-            public void accept(Integer integer) throws Exception {
+            public void run() {
                 callback.onError(throwable);
                 exc.setCompleted(true);
                 callback.onCompleted();
@@ -104,9 +103,9 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
             return;
         }
         callback.onSuccessSubThread(resultType);
-        HttpUtils.runmainThread(new Consumer<Integer>() {
+        HttpUtils.runmainThread(new Runnable() {
             @Override
-            public void accept(Integer integer) throws Exception {
+            public void run() {
                 if (callback.onSuccessHandelCode(resultType)) {
                     callback.onSuccess(resultType);
                 }

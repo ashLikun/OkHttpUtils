@@ -17,7 +17,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    //java8
+    compileOptions {
+        //定义生成的META-INF/library_release文件名 More than one file was found with OS independent path 'META-INF/library_release.kotlin_module'
+//        kotlinOptions.freeCompilerArgs += ['-module-name', 'com.ashlikun.utils']
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -27,9 +33,7 @@ dependencies {
     implementation project(':okhttputil')
     implementation 'com.github.ashLikun:LiteOrm:2.0.0'
     implementation 'com.github.ashLikun:MultiTypeGson:2.0.0'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.x.y'
-    implementation 'com.squareup.okhttp3:okhttp:4.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:3+'
     implementation 'com.google.code.gson:gson:2.8.5'
 
 

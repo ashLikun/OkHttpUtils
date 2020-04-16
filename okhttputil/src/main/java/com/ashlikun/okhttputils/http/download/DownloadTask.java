@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -41,7 +38,7 @@ import static com.ashlikun.okhttputils.http.download.DownloadManager.defaultFile
 /**
  * 下载线程
  */
-public class DownloadTask implements Observer<Integer> {
+public class DownloadTask implements Runnable {
     private static final int BUFFER_SIZE = 1024 * 16;
     private static String FILE_MODE = "rwd";
     private OkHttpClient mClient;
@@ -67,8 +64,8 @@ public class DownloadTask implements Observer<Integer> {
     private int errorCode;
     //下载多少回调一次  默认200，单位毫秒;
     private long rate;
-
-    private Disposable disposable;
+    //是否取消
+    private boolean isCancel = false;
 
     private DownloadTask(Builder builder) {
         mClient = new OkHttpClient();
@@ -96,7 +93,8 @@ public class DownloadTask implements Observer<Integer> {
     /**
      * 删除数据库文件和已经下载的文件
      */
-    public void cancel() throws IOException {
+    protected void cancel() {
+        totalSize = 0;
         mListener.onCancel(DownloadTask.this);
         if (dbEntity != null) {
             DownloadEntity.delete(dbEntity);
@@ -110,11 +108,11 @@ public class DownloadTask implements Observer<Integer> {
     /**
      * 分发回调事件到ui层
      */
-    private void onCallBack() {
-        HttpUtils.runmainThread(downloadStatus, new Consumer<Integer>() {
+    private void onCallBack(int downloadStatus) {
+        HttpUtils.runmainThread(new Runnable() {
             @Override
-            public void accept(Integer integer) throws Exception {
-                switch (integer) {
+            public void run() {
+                switch (downloadStatus) {
                     // 下载失败
                     case DownloadStatus.DOWNLOAD_STATUS_ERROR:
                         mListener.onError(DownloadTask.this, errorCode);
@@ -156,7 +154,7 @@ public class DownloadTask implements Observer<Integer> {
         }
     }
 
-    private String getFilePath() throws IOException {
+    private String getFilePath() {
         // 获得文件名
         if (TextUtils.isEmpty(fileName)) {
             fileName = HttpUtils.getNetFileName(null, url);
@@ -216,34 +214,20 @@ public class DownloadTask implements Observer<Integer> {
     }
 
 
-    @Override
-    public void onError(Throwable e) {
-        if (e != null) {
-            e.printStackTrace();
-        }
-        //下载完成取消订阅
-        if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {
-            disposable.dispose();
-        }
-    }
-
-    @Override
     public void onComplete() {
         //下载完成取消订阅
         if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {
-            disposable.dispose();
+            isCancel = true;
         }
     }
 
-
-    @Override
-    public void onSubscribe(Disposable d) {
-        //保存Subscription 方便取消订阅
-        disposable = d;
+    public void setCancel() {
+        setDownloadStatus(DownloadStatus.DOWNLOAD_STATUS_CANCEL);
+        isCancel = true;
     }
 
     @Override
-    public void onNext(Integer o) {
+    public void run() {
         InputStream inputStream = null;
         BufferedInputStream bis = null;
         try {
@@ -318,11 +302,14 @@ public class DownloadTask implements Observer<Integer> {
                         dbEntity.setCompletedSize(completedSize);
                         DownloadEntity.update(dbEntity);
                         //回调
-                        onCallBack();
+                        onCallBack(downloadStatus);
+                    }
+                    if (isCancel) {
+                        break;
                     }
                 }
                 // 防止最后一次不足rate时间，导致percent无法达到100%
-                onCallBack();
+                onCallBack(downloadStatus);
             }
         } catch (FileNotFoundException e) {
             // file not found
@@ -335,14 +322,16 @@ public class DownloadTask implements Observer<Integer> {
             downloadStatus = DownloadStatus.DOWNLOAD_STATUS_ERROR;
             errorCode = DownloadStatus.DOWNLOAD_ERROR_IO_ERROR;
         } finally {
-            if (isDownloadFinish()) {
-                onCallBack();
-            }
-            // 下载后新数据库
-            if (dbEntity != null) {
-                dbEntity.setCompletedSize(completedSize);
-                dbEntity.setDownloadStatus(downloadStatus);
-                DownloadEntity.update(dbEntity);
+            if (!isCancel) {
+                if (isDownloadFinish()) {
+                    onCallBack(downloadStatus);
+                }
+                // 下载后新数据库
+                if (dbEntity != null) {
+                    dbEntity.setCompletedSize(completedSize);
+                    dbEntity.setDownloadStatus(downloadStatus);
+                    DownloadEntity.update(dbEntity);
+                }
             }
             // 回收资源
             IOUtils.closeQuietly(bis);
@@ -363,10 +352,6 @@ public class DownloadTask implements Observer<Integer> {
      */
     public boolean isCompleted() {
         return getDownloadStatus() == DownloadStatus.DOWNLOAD_STATUS_COMPLETED;
-    }
-
-    public Disposable getDisposable() {
-        return disposable;
     }
 
     public static class Builder {
