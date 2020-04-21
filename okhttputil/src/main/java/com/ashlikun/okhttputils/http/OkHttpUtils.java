@@ -87,12 +87,14 @@ public final class OkHttpUtils {
     }
 
     /**
-     * 初始化
+     * 初始化一个全局的OkHttpClient
      *
      * @param okHttpClient
      */
     public static void init(OkHttpClient okHttpClient) {
-        INSTANCE = new OkHttpUtils(okHttpClient);
+        synchronized (OkHttpUtils.class) {
+            INSTANCE = new OkHttpUtils(okHttpClient);
+        }
     }
 
 
