@@ -15,14 +15,12 @@ import java.io.IOException;
 public interface SuperHttp {
 
 
-
-
     //异步回调
     <T> ExecuteCall execute(Callback<T> callback);
 
 
     //同步执行
-    public <ResultType> ResultType syncExecute(Class raw, final Class... args) throws IOException;
+    <ResultType> ResultType syncExecute(Class raw, final Class... args) throws IOException;
 
 
 }

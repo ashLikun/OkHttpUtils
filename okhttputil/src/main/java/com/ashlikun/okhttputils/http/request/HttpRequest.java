@@ -5,14 +5,17 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.ashlikun.gson.GsonHelper;
+import com.ashlikun.okhttputils.http.ExecuteCall;
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
+import com.ashlikun.okhttputils.http.SuperHttp;
 import com.ashlikun.okhttputils.http.cache.CacheMode;
 import com.ashlikun.okhttputils.http.callback.Callback;
 import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -37,7 +40,7 @@ import okhttp3.RequestBody;
  * 可以继承，从写方法
  */
 
-public class HttpRequest implements Comparator<String> {
+public class HttpRequest implements Comparator<String>, SuperHttp {
     /* valid HTTP methods */
     public static final String[] methods = {
             "GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE"
@@ -399,6 +402,22 @@ public class HttpRequest implements Comparator<String> {
             map.putAll(params);
         }
         return map;
+    }
+
+    /**
+     * 异步回调
+     */
+    @Override
+    public <T> ExecuteCall execute(Callback<T> callback) {
+        return buildCall().execute(callback);
+    }
+
+    /**
+     * 同步执行
+     */
+    @Override
+    public <ResultType> ResultType syncExecute(Class raw, Class... args) throws IOException {
+        return buildCall().syncExecute(raw, args);
     }
 
     /********************************************************************************************
