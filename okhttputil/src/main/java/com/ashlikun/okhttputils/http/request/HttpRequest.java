@@ -138,9 +138,7 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     //添加对象参数
     private HttpRequest addParamObject(String key, Object valuse) {
         if (!isEmpty(key) && valuse != null) {
-            if (params == null) {
-                newParamMap();
-            }
+            checkParamMap();
             params.put(key, valuse);
         }
         return this;
@@ -179,6 +177,26 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
             headers.put(key, valuse);
         }
         return this;
+    }
+
+    /**
+     * 添加 公共参数
+     *
+     * @return
+     */
+    protected void addCommonParams() {
+        if (OkHttpUtils.getInstance().isCommonParams()) {
+            checkParamMap();
+            Map<String, Object> pp = OkHttpUtils.getInstance().getCommonParams();
+            if (pp != null && !pp.isEmpty() && params != null) {
+                for (Map.Entry<String, Object> entry : pp.entrySet()) {
+                    //如果已经有了就不添加，公共参数优先级低
+                    if (!params.containsKey(entry.getKey())) {
+                        addParam(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -271,9 +289,9 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
         if (OkHttpUtils.getInstance().isCommonParams()) {
             try {
                 Gson gson = new Gson();
-                Map<String, Object> p = gson.fromJson(content, Map.class);
-                p.putAll(OkHttpUtils.getInstance().getCommonParams());
-                content = gson.toJson(p);
+                params = gson.fromJson(content, Map.class);
+                addCommonParams();
+                content = gson.toJson(params);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -285,21 +303,13 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     }
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/4/12 0012 17:22
-     * <p>
      * 方法功能：把键值对转换成json放到content里面,最后调用
      * 注意：在这个方法调用以后添加的参数将无效
      * 2：如果存在文件就不能用content提交
      */
     public HttpRequest toJson() {
         //添加公共参数
-        if (OkHttpUtils.getInstance().isCommonParams()) {
-            if (params == null) {
-                newParamMap();
-            }
-            params.putAll(OkHttpUtils.getInstance().getCommonParams());
-        }
+        addCommonParams();
         //转换成json
         if (params != null && !params.isEmpty() && !isHavafiles()) {
             postContent = GsonHelper.getGson().toJson(params);
@@ -342,11 +352,7 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
         return this;
     }
 
-
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:55
-     * <p>
      * 方法功能：构建请求body    多表单数据  键值对
      */
     private void addParams(Map<String, Object> params, MultipartBody.Builder builder) {
@@ -359,9 +365,6 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     }
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:55
-     * <p>
      * 方法功能：构建请求body    表单数据  键值对
      */
     private void addParams(Map<String, Object> params, FormBody.Builder builder) {
@@ -373,9 +376,6 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     }
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:55
-     * <p>
      * 方法功能：构建请求body    多表单  文件数据
      */
     private void addFlieParams(MultipartBody.Builder builder) {//表单数据
@@ -425,7 +425,9 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
      ********************************************************************************************/
 
 
-    //构建一个Request
+    /**
+     * 构建一个Request
+     */
     protected Request bulidRequest(Callback callback, ProgressCallBack progressCallBack) {
         //
 
@@ -455,24 +457,20 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     }
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/4/12 0012 17:31
-     * <p>
-     * 方法功能：构建请求body
+     * 构建请求body
      * postContent ->text/plain;charset=utf-8
      * 不存在文件application/x-www-form-urlencoded
      * 存在文件 multipart/form-data
      * 私有
      */
-
     protected RequestBody buildRequestBody(Callback callback, ProgressCallBack progressCallBack) {
         RequestBody body = null;
         onBuildRequestBody();
+        //添加公共参数,只提交content的时候已经处理好了公共参数
+        if (isEmpty(postContent)) {
+            addCommonParams();
+        }
         if (method.equals("GET")) {
-            //添加公共参数
-            if (OkHttpUtils.getInstance().isCommonParams()) {
-                url = HttpUtils.createUrlFromParams(url, OkHttpUtils.getInstance().getCommonParams());
-            }
             //get请求把参数放在url里面, 没有请求实体
             url = HttpUtils.createUrlFromParams(url, params);
             body = null;
@@ -491,19 +489,12 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
             if (isHavafiles()) {
                 MultipartBody.Builder builder = new MultipartBody.Builder();
                 builder.setType(contentType == null ? MultipartBody.FORM : contentType);
-                //添加公共参数
-                if (OkHttpUtils.getInstance().isCommonParams()) {
-                    addParams(OkHttpUtils.getInstance().getCommonParams(), builder);
-                }
+
                 addParams(params, builder);
                 addFlieParams(builder);
                 body = builder.build();
             } else {//不存在文件用 FormBody
                 FormBody.Builder builder = new FormBody.Builder();
-                //添加公共参数
-                if (OkHttpUtils.getInstance().isCommonParams()) {
-                    addParams(OkHttpUtils.getInstance().getCommonParams(), builder);
-                }
                 addParams(params, builder);
                 body = builder.build();
             }
@@ -533,11 +524,6 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
 
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/8/8 9:45
-     * 邮箱　　：496546144@qq.com
-     * 方法功能：
-     * <p>
      * 可以添加签名，在全部参数添加完毕后,如果调用toJson方法那么params没有值，content有值
      * 实现者可以继承从写
      */
@@ -548,8 +534,10 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     /**
      * 方便从写
      */
-    public void newParamMap() {
-        params = new TreeMap<>(this);
+    public void checkParamMap() {
+        if (params == null) {
+            params = new TreeMap<>(this);
+        }
     }
 
     /**
