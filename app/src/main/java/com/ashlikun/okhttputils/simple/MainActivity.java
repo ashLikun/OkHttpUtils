@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onButt1Click(View view) {
-        DownloadManager.getInstance().addDownloadTask(task);
     }
 
     public void onButt2Click(View view) {
@@ -123,16 +122,8 @@ public class MainActivity extends AppCompatActivity {
             stringBuilder.append(aa);
         }
 
-        OkHttpUtils.post("http://ly.lingyunexpress.com/tools/kapp_tool.ashx")
-                .addHeader("action", "tchat_users_list")
-                .addParam("accessToken", "A8C5CF33-64A1-49F4-ADBC-4DBF05D5F94B")
-                .addParam("id", 325)
-                .addParam("page", 1)
-                .addParam("type", stringBuilder)
-                .addParam("111", 2)
-                .addParamFilePath("image", "/data/user/0/com.ashlikun.okhttputils.simple/cache/com.qihoo360.mobilesafe_267.apk")
-                .addParam("NM_REFERER", "/goods/1313517")
-                .addParam("NM_URI", "/category/427/325")
+        OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend")
+                .addHeader("action", "recommend")
                 .setCacheMode(CacheMode.NO_CACHE)
                 .setCacheTime(3600000)
                 .buildCall()

@@ -1,7 +1,7 @@
 package com.ashlikun.okhttputils.http.cache;
 
 import com.ashlikun.okhttputils.http.request.HttpRequest;
-import com.ashlikun.okhttputils.http.response.HttpResponse;
+import com.ashlikun.okhttputils.http.response.IHttpResponse;
 import com.ashlikun.orm.LiteOrmUtil;
 import com.ashlikun.orm.db.annotation.PrimaryKey;
 import com.ashlikun.orm.db.annotation.Table;
@@ -60,8 +60,8 @@ public class CacheEntity {
         if (resultType == null) {
             return null;
         }
-        if (resultType instanceof HttpResponse) {
-            return ((HttpResponse) resultType).json;
+        if (resultType instanceof IHttpResponse) {
+            return ((IHttpResponse) resultType).getJson();
         } else {
             return resultType.toString();
         }

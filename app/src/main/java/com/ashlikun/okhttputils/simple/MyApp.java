@@ -2,6 +2,7 @@ package com.ashlikun.okhttputils.simple;
 
 import android.app.Application;
 
+import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.cookie.CookieJarImpl;
 import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore;
@@ -40,6 +41,7 @@ public class MyApp extends Application {
 //                return 2;
 //            }
 //        });
+
         LiteOrmUtil.init(this);
         LiteOrmUtil.setVersionCode(11);
         Map<String, Object> params = new HashMap<>();

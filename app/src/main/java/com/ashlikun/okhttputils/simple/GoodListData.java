@@ -16,10 +16,11 @@ public class GoodListData extends HttpResponse {
     public int currentPage;
     public int pageCount;
     public int currentRows;
-    public List<ListBean> data;
+    public List<ListBean> list;
 
 
     public static class ListBean {
+        public int title;
         public String goods_id;
         public String goods_name;
         public String type;

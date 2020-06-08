@@ -16,6 +16,7 @@ import com.ashlikun.okhttputils.http.convert.Converter;
  * @Link {@link okhttp3.Response}//对这个操作要在子线程
  * @Link {@link okhttp3.ResponseBody}
  * @Link {@link com.ashlikun.okhttputils.http.response.HttpResponse} 只解析了code和msg
+ * @Link {@link com.ashlikun.okhttputils.http.response.IHttpResponse} 可以实现这个接口，照样有HttpResponse的功能
  * @Link {@link com.ashlikun.okhttputils.http.response.HttpResult} 直接序列化的javabean,也可以自定义HttpResult。注意json的键
  * @Link 其他实体类。注意json的键
  */

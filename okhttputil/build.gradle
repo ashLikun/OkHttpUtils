@@ -30,7 +30,7 @@ dependencies {
     compileOnly 'com.squareup.okhttp3:okhttp:3+'
     compileOnly 'com.google.code.gson:gson:2.8.5'
     compileOnly 'com.github.ashLikun:MultiTypeGson:2.0.0'
-    compileOnly 'com.github.ashLikun:LiteOrm:2.0.0'
+    compileOnly 'com.github.ashLikun:LiteOrm:2.0.1'
 }
 
 apply from: '../maven.gradle'

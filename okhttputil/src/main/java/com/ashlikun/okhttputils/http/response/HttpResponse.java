@@ -25,13 +25,13 @@ import okhttp3.Response;
  * <p>
  * 功能介绍：http的基本类
  */
-public class HttpResponse {
+public class HttpResponse implements IHttpResponse {
     public static int SUCCEED = 1;//正常请求
     public static int ERROR = 0;//请求出错
 
     public final static String CODE_KEY = "code";
     public final static String MES_KEY = "msg";
-    //gson不解析
+    //gson不解析,当是缓存的时候是空的
     public transient Response response;
     public transient String json;
     public transient int httpcode;
@@ -40,7 +40,7 @@ public class HttpResponse {
      */
     private transient Object cache;
 
-    @SerializedName(CODE_KEY)
+    @SerializedName(value = CODE_KEY)
     public int code = ERROR;
     @SerializedName(MES_KEY)
     public String message;
@@ -59,8 +59,14 @@ public class HttpResponse {
         this.message = getStringValue(HttpResponse.MES_KEY);
     }
 
+    @Override
     public int getCode() {
         return code;
+    }
+
+    @Override
+    public void setCode(int code) {
+        this.code = code;
     }
 
     /**
@@ -68,12 +74,34 @@ public class HttpResponse {
      *
      * @return
      */
+    @Override
     public int getHttpCode() {
         return httpcode;
     }
 
+    @Override
+    public void setHttpCode(int httpCode) {
+        this.httpcode = httpcode;
+    }
+
+    @Override
     public String getMessage() {
         return unicode2String(message);
+    }
+
+    @Override
+    public void setJson(String json) {
+        this.json = json;
+    }
+
+    @Override
+    public String getJson() {
+        return json;
+    }
+
+    @Override
+    public void setResponse(Response response) {
+        this.response = response;
     }
 
     /**
@@ -121,7 +149,7 @@ public class HttpResponse {
      * <p>
      * 方法功能：返回成功  success
      */
-
+    @Override
     public boolean isSucceed() {
         return code == SUCCEED;
     }
@@ -351,7 +379,11 @@ public class HttpResponse {
         return sb.toString();
     }
 
-    public Gson parseGson() {
-        return null;
+    /**
+     * 会先实例化一个空的本对象然后调用这个方法
+     */
+    @Override
+    public <T> T parseData(Gson gson, String json, Type type) {
+        return gson.fromJson(json, type);
     }
 }
