@@ -158,6 +158,9 @@ public class HttpResponse implements IHttpResponse {
         Object res = getJSONObject();
         if (key != null) {
             for (int i = 0; i < key.length; i++) {
+                if (res == null) {
+                    return null;
+                }
                 res = getCacheJSON(key[i], res);
             }
         }
@@ -165,8 +168,6 @@ public class HttpResponse implements IHttpResponse {
     }
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/5/19 17:04
      * 方法功能：根据key获取对象,多个key代表多个等级,不能获取数组
      */
     public <T> T getValue(Type type, String... key) throws JsonParseException, JSONException {

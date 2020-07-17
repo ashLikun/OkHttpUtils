@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 .execute(new AbsCallback<GoodListData>() {
                     @Override
                     public void onSuccess(GoodListData responseBody) {
+                        Log.e("onSuccess", responseBody.getStringValue2("", "aaa", "bbb"));
                         Log.e("onSuccess", GsonHelper.getGson().toJson(responseBody));
                     }
 
@@ -153,5 +154,6 @@ public class MainActivity extends AppCompatActivity {
         String ccc = "222";
         String ddd = "333";
     }
+
     String aa = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 }
