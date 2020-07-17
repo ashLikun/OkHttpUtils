@@ -162,6 +162,9 @@ public class HttpResponse implements IHttpResponse {
                     return null;
                 }
                 res = getCacheJSON(key[i], res);
+                if (res == null) {
+                    return null;
+                }
             }
         }
         return res;
@@ -338,16 +341,9 @@ public class HttpResponse implements IHttpResponse {
         }
 
         if (content == null) {
-            return cache;
+            return null;
         }
 
-        if (content == null) {
-            try {
-                return getJSONObject();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
         if (content instanceof JSONObject) {
             return ((JSONObject) content).opt(key);
         } else if (content instanceof JSONArray) {
