@@ -28,7 +28,7 @@ public abstract class AbsCallback<ResultType> implements Callback<ResultType> {
     /**
      * 指定数据类型，不使用Callback的泛型
      */
-    private Type resultType = null;
+    public Type resultType = null;
 
     @Override
     public ResultType convertResponse(Response response, Gson gosn) throws Exception {
