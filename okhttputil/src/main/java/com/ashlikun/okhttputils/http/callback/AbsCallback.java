@@ -5,6 +5,8 @@ import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.google.gson.Gson;
 
+import java.lang.reflect.Type;
+
 import okhttp3.Response;
 
 /**
@@ -23,11 +25,23 @@ import okhttp3.Response;
  * @Link 其他实体类。注意json的键
  */
 public abstract class AbsCallback<ResultType> implements Callback<ResultType> {
+    /**
+     * 指定数据类型，不使用Callback的泛型
+     */
+    private Type resultType = null;
+
     @Override
     public ResultType convertResponse(Response response, Gson gosn) throws Exception {
+        if (resultType != null) {
+            return HttpUtils.handerResult(resultType, response, gosn);
+        }
         return HttpUtils.handerResult(HttpUtils.getType(getClass()), response, gosn);
     }
 
+    @Override
+    public Type getResultType() {
+        return resultType;
+    }
 
     @Override
     public void onStart() {

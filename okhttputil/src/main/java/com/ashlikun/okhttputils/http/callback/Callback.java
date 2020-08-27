@@ -4,6 +4,8 @@ import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.cache.CacheEntity;
 import com.ashlikun.okhttputils.http.convert.Converter;
 
+import java.lang.reflect.Type;
+
 /**
  * 作者　　: 李坤
  * 创建时间:2016/12/30　17:31
@@ -21,6 +23,10 @@ import com.ashlikun.okhttputils.http.convert.Converter;
  * @Link 其他实体类。注意json的键
  */
 public interface Callback<ResultType> extends Converter<ResultType> {
+    /**
+     * 指定数据类型，不使用Callback的泛型
+     */
+    Type getResultType();
 
     void onStart();
 

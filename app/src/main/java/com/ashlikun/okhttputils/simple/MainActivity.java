@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
         OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend")
                 .addHeader("action", "recommend")
-                .setCacheMode(CacheMode.NO_CACHE)
+                .setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
                 .setCacheTime(3600000)
                 .buildCall()
                 .progressCallback(new AbsProgressCallback() {

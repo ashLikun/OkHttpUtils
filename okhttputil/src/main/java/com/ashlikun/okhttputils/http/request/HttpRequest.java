@@ -56,6 +56,7 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     protected MediaType contentType;//请求类型
     protected List<FileInput> files;//上传文件
     protected Gson gson;
+    protected Request request;
     protected boolean isJson = false;
     //标识这个请求，会传递到Request里面
     protected Object tag;
@@ -448,12 +449,13 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
                 header.add(entry.getKey(), entry.getValue());
             }
         }
-        return builder
+        request = builder
                 .url(url.toString())
                 .headers(header.build())
                 .method(method, requestBody)
                 .tag(tag)
                 .build();
+        return request;
     }
 
     /**
@@ -551,5 +553,9 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     @Override
     public int compare(String o1, String o2) {
         return o1.compareTo(o2);
+    }
+
+    public Request getRequest() {
+        return request;
     }
 }

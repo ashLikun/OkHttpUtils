@@ -33,6 +33,9 @@ public class CacheEntity {
      * 缓存的时间
      */
     public long cacheTime;
+    public String contentType;
+    public long contentLength;
+    public String protocol;
     /**
      * 缓存的头部json
      */
@@ -71,6 +74,13 @@ public class CacheEntity {
         CacheEntity cacheEntity = new CacheEntity();
         cacheEntity.key = CacheManage.getCacheKey(request);
         cacheEntity.cacheTime = System.currentTimeMillis();
+        if (response.body() != null) {
+            if (response.body().contentType() != null) {
+                cacheEntity.contentType = response.body().contentType().toString();
+            }
+            cacheEntity.contentLength = response.body().contentLength();
+        }
+        cacheEntity.protocol = response.protocol().toString();
         Map<String, String> headMap = new HashMap<>();
         for (String headerName : response.headers().names()) {
             headMap.put(headerName, response.headers().get(headerName));
