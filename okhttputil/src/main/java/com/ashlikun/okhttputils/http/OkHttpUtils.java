@@ -159,13 +159,15 @@ public final class OkHttpUtils {
         if (tag == null) {
             return;
         }
-        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
-            if (call != null && tag.equals(call.request().tag())) {
+        List<Call> queuedCalls = mOkHttpClient.dispatcher().queuedCalls();
+        for (Call call : queuedCalls) {
+            if (call != null && tag == call.request().tag()) {
                 call.cancel();
             }
         }
-        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
-            if (call != null && tag.equals(call.request().tag())) {
+        List<Call> runningCalls = mOkHttpClient.dispatcher().runningCalls();
+        for (Call call : runningCalls) {
+            if (call != null && tag == call.request().tag()) {
                 call.cancel();
             }
         }
@@ -180,23 +182,23 @@ public final class OkHttpUtils {
         }
 
         long count = 0;
-        List<Call> calls1 = mOkHttpClient.dispatcher().queuedCalls();
-        List<Call> calls2 = mOkHttpClient.dispatcher().runningCalls();
+        List<Call> queuedCalls = mOkHttpClient.dispatcher().queuedCalls();
+        List<Call> runningCalls = mOkHttpClient.dispatcher().runningCalls();
 
         if (tag.length == 0) {
-            return (calls1 == null ? 0 : calls1.size()) + (calls2 == null ? 0 : calls2.size());
+            return (queuedCalls == null ? 0 : queuedCalls.size()) + (runningCalls == null ? 0 : runningCalls.size());
         }
-        for (Call call : calls1) {
+        for (Call call : queuedCalls) {
             for (Object one : tag) {
-                if (one != null && one.equals(call.request().tag())) {
+                if (one != null && one == call.request().tag()) {
                     count++;
                 }
             }
 
         }
-        for (Call call : calls2) {
+        for (Call call : runningCalls) {
             for (Object one : tag) {
-                if (one != null && one.equals(call.request().tag())) {
+                if (one != null && one == call.request().tag()) {
                     count++;
                 }
             }
@@ -208,12 +210,14 @@ public final class OkHttpUtils {
      * 取消所有请求请求
      */
     public void cancelAll() {
-        for (Call call : mOkHttpClient.dispatcher().queuedCalls()) {
+        List<Call> queuedCalls = mOkHttpClient.dispatcher().queuedCalls();
+        for (Call call : queuedCalls) {
             if (call != null) {
                 call.cancel();
             }
         }
-        for (Call call : mOkHttpClient.dispatcher().runningCalls()) {
+        List<Call> runningCalls = mOkHttpClient.dispatcher().runningCalls();
+        for (Call call : runningCalls) {
             if (call != null) {
                 call.cancel();
             }

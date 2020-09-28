@@ -72,6 +72,12 @@ public class HttpUtils {
         getMainHandle().post(runnable);
     }
 
+    /**
+     * 是否是主线程
+     */
+    public static boolean isMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
 
     /**
      * 运行到子线程

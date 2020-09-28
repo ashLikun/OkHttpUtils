@@ -49,13 +49,31 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         }
     }
 
+    public boolean checkCanceled() {
+        if (exc.getCall().isCanceled()) {
+            exc.setCompleted(true);
+            if (!HttpUtils.isMainThread()) {
+                HttpUtils.runmainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCompleted();
+                    }
+                });
+            } else {
+                callback.onCompleted();
+            }
+            return true;
+        }
+        return false;
+    }
+
     public void setParseGson(Gson gson) {
         this.gson = gson;
     }
 
     @Override
     public void onFailure(Call call, final IOException e) {
-        if (exc.getCall().isCanceled()) {
+        if (checkCanceled()) {
             return;
         }
         HttpException res;
@@ -78,6 +96,9 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         postFailure(res);
         //网络失败，回掉缓存
         if (cachePolicy.getCacheMode() == CacheMode.REQUEST_FAILED_READ_CACHE) {
+            if (exc.getCall().isCanceled()) {
+                return;
+            }
             cachePolicy.callback(callback);
         }
     }
@@ -89,6 +110,9 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         HttpUtils.runmainThread(new Runnable() {
             @Override
             public void run() {
+                if (checkCanceled()) {
+                    return;
+                }
                 callback.onError(throwable);
                 exc.setCompleted(true);
                 callback.onCompleted();
@@ -98,7 +122,7 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
 
 
     private void postResponse(final Response response, final ResultType resultType) {
-        if (exc.getCall().isCanceled()) {
+        if (checkCanceled()) {
             response.close();
             return;
         }
@@ -106,6 +130,10 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         HttpUtils.runmainThread(new Runnable() {
             @Override
             public void run() {
+                if (checkCanceled()) {
+                    response.close();
+                    return;
+                }
                 if (callback.onSuccessHandelCode(resultType)) {
                     callback.onSuccess(resultType);
                 }
@@ -118,7 +146,7 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
 
     @Override
     public void onResponse(final Call call, final Response response) throws IOException {
-        if (call.isCanceled()) {
+        if (checkCanceled()) {
             response.close();
             return;
         }
