@@ -39,6 +39,11 @@ public abstract class AbsCallback<ResultType> implements Callback<ResultType> {
     }
 
     @Override
+    public Object getTag() {
+        return null;
+    }
+
+    @Override
     public Type getResultType() {
         return resultType;
     }

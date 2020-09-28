@@ -201,6 +201,16 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     }
 
     /**
+     * 添加map参数
+     */
+    public HttpRequest addParams(Map<String, Object> map) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            addParam(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    /**
      * 添加文件参数
      */
     public HttpRequest addParam(String key, File file) {
@@ -410,6 +420,9 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
      */
     @Override
     public <T> ExecuteCall execute(Callback<T> callback) {
+        if (tag == null) {
+            tag(callback.getTag());
+        }
         return buildCall().execute(callback);
     }
 

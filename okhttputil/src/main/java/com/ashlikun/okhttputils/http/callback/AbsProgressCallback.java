@@ -20,4 +20,5 @@ public class AbsProgressCallback implements ProgressCallBack {
     public long getRate() {
         return DownloadManager.DEFAULT_RATE;
     }
+
 }

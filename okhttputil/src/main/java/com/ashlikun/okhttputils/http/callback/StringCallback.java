@@ -17,4 +17,5 @@ public abstract class StringCallback extends AbsCallback<String> {
     public String convertResponse(Response response, Gson gosn) throws Exception {
         return HttpUtils.handerResult(String.class, response, gosn);
     }
+
 }
