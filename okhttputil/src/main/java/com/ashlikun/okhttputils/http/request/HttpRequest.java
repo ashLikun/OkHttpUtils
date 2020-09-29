@@ -420,9 +420,6 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
      */
     @Override
     public <T> ExecuteCall execute(Callback<T> callback) {
-        if (tag == null) {
-            tag(callback.getTag());
-        }
         return buildCall().execute(callback);
     }
 

@@ -37,10 +37,5 @@ public abstract class BitmapCallback extends AbsCallback<Bitmap> {
         response.close();
         return bitmap;
     }
-
-    @Override
-    public Object getTag() {
-        return null;
-    }
 }
 

@@ -57,6 +57,4 @@ public interface Callback<ResultType> extends Converter<ResultType> {
      * false:有问题
      */
     boolean onSuccessHandelCode(ResultType responseBody);
-
-    Object getTag();
 }
