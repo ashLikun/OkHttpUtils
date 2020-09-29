@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http.cache;
 import com.ashlikun.okhttputils.http.callback.Callback;
 import com.ashlikun.okhttputils.http.request.HttpRequest;
 
+import okhttp3.Call;
 import okhttp3.Response;
 
 /**
@@ -29,11 +30,13 @@ public interface CachePolicy {
 
     /**
      * 回调缓存数据
+     * 这个方法调用在子线程
      *
+     * @param call     可能为null
      * @param callback
      * @param <T>
      */
-    <T> void callback(final Callback<T> callback);
+    <T> void callback(Call call, final Callback<T> callback);
 
 
 }

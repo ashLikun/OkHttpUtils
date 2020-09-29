@@ -132,8 +132,9 @@ public class RequestCall implements SuperHttp {
         //如果缓存 不存在才请求网络，否则使用缓存
         if (cachePolicy.getCacheMode() == CacheMode.IF_NONE_CACHE_REQUEST) {
             if (cachePolicy.getCache() != null) {
-                //有缓存
-                cachePolicy.callback(callback);
+                HttpUtils.runNewThread(() -> {
+                    cachePolicy.callback(call, callback);
+                });
                 return exc;
             }
         }

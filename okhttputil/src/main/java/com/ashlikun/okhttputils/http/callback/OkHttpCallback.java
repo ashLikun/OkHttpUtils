@@ -45,7 +45,9 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         this.cachePolicy = cachePolicy;
         //回掉缓存
         if (cachePolicy.getCacheMode() == CacheMode.FIRST_CACHE_THEN_REQUEST) {
-            cachePolicy.callback(callback);
+            HttpUtils.runNewThread(() -> {
+                cachePolicy.callback(exc.getCall(), callback);
+            });
         }
     }
 
@@ -76,6 +78,13 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         if (checkCanceled()) {
             return;
         }
+        //网络失败，回掉缓存
+        if (cachePolicy.getCacheMode() == CacheMode.REQUEST_FAILED_READ_CACHE) {
+            if (checkCanceled()) {
+                return;
+            }
+            cachePolicy.callback(call, callback);
+        }
         HttpException res;
         if (e instanceof ConnectException) {
             res = new HttpException(HttpErrorCode.HTTP_NO_CONNECT, HttpErrorCode.MSG_NO_CONNECT);
@@ -94,30 +103,44 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         }
         res.setOriginalException(e);
         postFailure(res);
-        //网络失败，回掉缓存
-        if (cachePolicy.getCacheMode() == CacheMode.REQUEST_FAILED_READ_CACHE) {
-            if (exc.getCall().isCanceled()) {
-                return;
-            }
-            cachePolicy.callback(callback);
-        }
     }
 
     private void postFailure(final HttpException throwable) {
         if (exc.getCall().isCanceled()) {
             return;
         }
+        final Object lock = new Object();
         HttpUtils.runmainThread(new Runnable() {
             @Override
             public void run() {
-                if (checkCanceled()) {
-                    return;
+                try {
+                    if (checkCanceled()) {
+                        return;
+                    }
+                    callback.onError(throwable);
+                    exc.setCompleted(true);
+                    callback.onCompleted();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    //唤醒子线程
+                    synchronized (lock) {//获取对象锁
+                        lock.notify();
+                    }
                 }
-                callback.onError(throwable);
-                exc.setCompleted(true);
-                callback.onCompleted();
+
             }
         });
+        //让子线程等待主线程结果
+        try {
+            //获取对象锁
+            synchronized (lock) {
+                lock.wait();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -127,21 +150,44 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
             return;
         }
         callback.onSuccessSubThread(resultType);
-        HttpUtils.runmainThread(new Runnable() {
-            @Override
-            public void run() {
+        final Object lock = new Object();
+
+        HttpUtils.runmainThread(() -> {
+            try {
                 if (checkCanceled()) {
                     response.close();
                     return;
                 }
                 if (callback.onSuccessHandelCode(resultType)) {
+                    if (checkCanceled()) {
+                        response.close();
+                        return;
+                    }
                     callback.onSuccess(resultType);
                 }
                 exc.setCompleted(true);
                 callback.onCompleted();
                 response.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                //唤醒子线程//获取对象锁
+                synchronized (lock) {
+                    lock.notify();
+                }
             }
         });
+
+        //让子线程等待主线程结果
+        try {
+            //获取对象锁
+            synchronized (lock) {
+                lock.wait();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

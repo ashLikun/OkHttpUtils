@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.Protocol;
 import okhttp3.Response;
@@ -32,36 +33,52 @@ public class ImlCachePolicy extends BaseCachePolicy {
     }
 
     @Override
-    public <T> void callback(final Callback<T> callback) {
-        final CacheEntity[] entity = {null};
-        HttpUtils.runNewThread(new Runnable() {
-            @Override
-            public void run() {
-                entity[0] = getCache();
-                //有缓存
-                if (entity[0] != null) {
-                    HttpUtils.runmainThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Response response = new Response.Builder()
-                                        .code(entity[0].code)
-                                        .message(entity[0].message)
-                                        .protocol(Protocol.get(entity[0].protocol))
-                                        .request(request.getRequest())
-                                        .body(new CacheResponseBody(entity[0]))
-                                        .build();
-                                callback.onCacheSuccess(entity[0], callback.convertResponse(response, request.getParseGson()));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+    public <T> void callback(Call call, final Callback<T> callback) {
+        final Object lock = new Object();
+
+        try {
+            final CacheEntity cacheEntity = getCache();
+            Response response = new Response.Builder()
+                    .code(cacheEntity.code)
+                    .message(cacheEntity.message)
+                    .protocol(Protocol.get(cacheEntity.protocol))
+                    .request(request.getRequest())
+                    .body(new CacheResponseBody(cacheEntity))
+                    .build();
+            T result = callback.convertResponse(response, request.getParseGson());
+            //有缓存
+            if (cacheEntity != null) {
+                HttpUtils.runmainThread(() -> {
+                    try {
+                        if (call != null && call.isCanceled()) {
+                            return;
                         }
-                    });
-                }
+                        callback.onCacheSuccess(cacheEntity, result);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        //唤醒子线程
+                        synchronized (lock) {//获取对象锁
+                            lock.notify();
+                        }
+                    }
+
+                });
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            //让子线程等待主线程结果
+            try {
+                //获取对象锁
+                synchronized (lock) {
+                    lock.wait();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 
