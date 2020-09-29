@@ -56,6 +56,7 @@ public class ImlCachePolicy extends BaseCachePolicy {
                         callback.onCacheSuccess(cacheEntity, result);
                     } catch (Exception e) {
                         e.printStackTrace();
+                        throw e;
                     } finally {
                         //唤醒子线程
                         synchronized (lock) {//获取对象锁

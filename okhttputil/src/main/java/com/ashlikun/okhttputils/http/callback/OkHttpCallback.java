@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.logging.Logger;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -122,6 +123,7 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
                     callback.onCompleted();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    throw e;
                 } finally {
                     //唤醒子线程
                     synchronized (lock) {//获取对象锁
@@ -170,6 +172,7 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
                 response.close();
             } catch (Exception e) {
                 e.printStackTrace();
+                throw e;
             } finally {
                 //唤醒子线程//获取对象锁
                 synchronized (lock) {
@@ -187,7 +190,7 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+        Logger.getAnonymousLogger();
     }
 
     @Override
