@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 //        Log.e("aaa", "" + "");
-        onButt2Click(null);
     }
 
     public void onButt0Click(View view) {
