@@ -1,7 +1,6 @@
 package com.ashlikun.okhttputils.http;
 
 import android.net.Uri;
-import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
@@ -55,21 +54,10 @@ import okio.BufferedSource;
  */
 public class HttpUtils {
     public static Charset UTF_8 = Charset.forName("UTF-8");
-    static Handler mainHandle;
 
-    public static Handler getMainHandle() {
-        if (mainHandle == null) {
-            synchronized (HttpUtils.class) {
-                if (mainHandle == null) {
-                    mainHandle = new Handler(Looper.getMainLooper());
-                }
-            }
-        }
-        return mainHandle;
-    }
 
     public static void runmainThread(Runnable runnable) {
-        getMainHandle().post(runnable);
+        MainHandle.post(runnable);
     }
 
     /**
@@ -87,10 +75,7 @@ public class HttpUtils {
     }
 
     /**
-     * 作者　　: 李坤
-     * 创建时间: 2017/3/21 9:56
-     * <p>
-     * 方法功能：获取文件的mime类型  Content-type
+     * 获取文件的mime类型  Content-type
      */
     public static String getMimeType(String path) {
         FileNameMap fileNameMap = URLConnection.getFileNameMap();

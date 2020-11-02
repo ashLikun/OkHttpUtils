@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -35,6 +36,11 @@ dependencies {
     implementation 'com.github.ashLikun:MultiTypeGson:2.0.0'
     implementation 'com.squareup.okhttp3:okhttp:3+'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
+}
+repositories {
+    mavenCentral()
 }

@@ -1,6 +1,6 @@
 package com.ashlikun.okhttputils.http.request;
 
-import com.ashlikun.okhttputils.http.HttpUtils;
+import com.ashlikun.okhttputils.http.MainHandle;
 import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
 
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class ProgressRequestBody extends RequestBody implements Runnable {
     private Sink sink(Sink sink) {
         if (progressCallBack != null && !isRun) {
             isRun = true;
-            HttpUtils.getMainHandle().postDelayed(this, progressCallBack.getRate());
+            MainHandle.postDelayed(this, progressCallBack.getRate());
         }
 
         return new ForwardingSink(sink) {
@@ -122,7 +122,7 @@ public class ProgressRequestBody extends RequestBody implements Runnable {
             }
         }
         if (!isCancel) {
-            HttpUtils.getMainHandle().postDelayed(this, progressCallBack.getRate());
+            MainHandle.postDelayed(this, progressCallBack.getRate());
         }
 
     }
