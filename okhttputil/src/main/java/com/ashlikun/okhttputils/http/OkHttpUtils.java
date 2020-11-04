@@ -242,9 +242,6 @@ public final class OkHttpUtils {
     /**
      * 开始请求
      * 设置参数
-     *
-     * @param requestParam
-     * @return
      */
     public static RequestCall request(HttpRequest requestParam) {
         return new RequestCall(requestParam);

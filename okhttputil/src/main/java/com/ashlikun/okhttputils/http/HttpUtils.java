@@ -1,6 +1,7 @@
 package com.ashlikun.okhttputils.http;
 
 import android.net.Uri;
+import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
@@ -54,10 +55,25 @@ import okio.BufferedSource;
  */
 public class HttpUtils {
     public static Charset UTF_8 = Charset.forName("UTF-8");
+    public static volatile Handler handler;
 
+    public static Handler getMainHandler() {
+        //双重校验DCL单例模式
+        if (handler == null) {
+            //同步代码块
+            synchronized (HttpUtils.class) {
+                if (handler == null) {
+                    //创建一个新的实例
+                    handler = new Handler(Looper.getMainLooper());
+                }
+            }
+        }
+        //返回一个实例
+        return handler;
+    }
 
     public static void runmainThread(Runnable runnable) {
-        MainHandle.post(runnable);
+        getMainHandler().post(runnable);
     }
 
     /**
