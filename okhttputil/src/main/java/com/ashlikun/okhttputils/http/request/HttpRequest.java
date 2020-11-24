@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.ashlikun.gson.GsonHelper;
 import com.ashlikun.okhttputils.http.ExecuteCall;
+import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.SuperHttp;
@@ -15,7 +16,6 @@ import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
 import com.google.gson.Gson;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -428,7 +428,7 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
      * 同步执行
      */
     @Override
-    public <ResultType> ResultType syncExecute(Type rawType, Type... typeArguments) throws IOException {
+    public <ResultType> ResultType syncExecute(Type rawType, Type... typeArguments) throws HttpException {
         return buildCall().syncExecute(rawType, typeArguments);
     }
 

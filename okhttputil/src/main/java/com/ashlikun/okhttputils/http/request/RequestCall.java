@@ -1,6 +1,7 @@
 package com.ashlikun.okhttputils.http.request;
 
 import com.ashlikun.okhttputils.http.ExecuteCall;
+import com.ashlikun.okhttputils.http.HttpException;
 import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.SuperHttp;
@@ -11,6 +12,7 @@ import com.ashlikun.okhttputils.http.cache.ImlCachePolicy;
 import com.ashlikun.okhttputils.http.callback.Callback;
 import com.ashlikun.okhttputils.http.callback.OkHttpCallback;
 import com.ashlikun.okhttputils.http.callback.ProgressCallBack;
+import com.ashlikun.okhttputils.http.response.HttpErrorCode;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -149,7 +151,8 @@ public class RequestCall implements SuperHttp {
      * 同步执行
      */
     @Override
-    public <ResultType> ResultType syncExecute(Type raw, Type... args) throws IOException {
+    public <ResultType> ResultType syncExecute(Type raw, Type... args) throws HttpException {
+        //获取返回值类型
         Type type = null;
         if (args == null || args.length == 0) {
             type = raw;
@@ -158,25 +161,61 @@ public class RequestCall implements SuperHttp {
         } else {
             type = type(raw, args);
         }
-        Call call = buildCall(null);
-        //如果缓存 不存在才请求网络，否则使用缓存
-        if (cachePolicy.getCacheMode() != CacheMode.NO_CACHE) {
-            CacheEntity cacheEntity = cachePolicy.getCache();
-            if (cacheEntity != null) {
-                //有缓存
-                return HttpUtils.handerResult(type,
-                        cacheEntity, getHttpRequest().getParseGson());
+        try {
+            Call call = buildCall(null);
+
+            //如果缓存 不存在才请求网络，否则使用缓存
+            if (cachePolicy.getCacheMode() != CacheMode.NO_CACHE) {
+                CacheEntity cacheEntity = cachePolicy.getCache();
+                if (cacheEntity != null) {
+                    //有缓存
+                    return HttpUtils.handerResult(type,
+                            cacheEntity, getHttpRequest().getParseGson());
+                }
+            }
+            Response response = call.execute();
+            //接口成功
+            if (response.isSuccessful()) {
+                try {
+                    ResultType data = HttpUtils.handerResult(type, response, getHttpRequest().getParseGson());
+                    if (data == null) {
+                        throw new HttpException(HttpErrorCode.HTTP_DATA_ERROR, HttpErrorCode.MSG_DATA_ERROR);
+                    }
+                    //保存缓存
+                    cachePolicy.save(response,
+                            CacheEntity.getHanderResult(data));
+                    return data;
+                } catch (Exception e) {
+                    response.close();
+                    HttpException res = new HttpException(HttpErrorCode.HTTP_DATA_ERROR, HttpErrorCode.MSG_DATA_ERROR);
+                    res.setOriginalException(e);
+                    throw res;
+                }
+            } else {
+                response.close();
+                //接口成功，返回错误，抛出异常
+                throw HttpException.getOnResponseHttpException(response.code(), response.message());
+            }
+
+        } catch (IOException e) {
+            //网络失败，回掉缓存
+            if (cachePolicy.getCacheMode() == CacheMode.REQUEST_FAILED_READ_CACHE) {
+                CacheEntity cacheEntity = cachePolicy.getCache();
+                if (cacheEntity != null) {
+                    //有缓存
+                    try {
+                        return HttpUtils.handerResult(type,
+                                cacheEntity, getHttpRequest().getParseGson());
+                    } catch (IOException ioException) {
+                        throw HttpException.handleFailureHttpException(call, ioException);
+                    }
+                } else {
+                    throw HttpException.handleFailureHttpException(call, e);
+                }
+            } else {
+                throw HttpException.handleFailureHttpException(call, e);
             }
         }
-        Response response = call.execute();
-
-        ResultType data = HttpUtils.handerResult(type, response, getHttpRequest().getParseGson());
-        //保存缓存
-        if (cachePolicy != null) {
-            cachePolicy.save(response,
-                    CacheEntity.getHanderResult(data));
-        }
-        return data;
     }
 
     public RequestCall httpRequest(HttpRequest httpRequest) {

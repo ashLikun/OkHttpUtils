@@ -2,7 +2,6 @@ package com.ashlikun.okhttputils.http;
 
 import com.ashlikun.okhttputils.http.callback.Callback;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -21,7 +20,7 @@ public interface SuperHttp {
 
 
     //同步执行
-    <ResultType> ResultType syncExecute(Type rawType, Type... typeArguments) throws IOException;
+    <ResultType> ResultType syncExecute(Type rawType, Type... typeArguments) throws HttpException;
 
 
 }
