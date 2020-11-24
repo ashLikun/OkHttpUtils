@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http;
 import com.ashlikun.okhttputils.http.callback.Callback;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * 作者　　: 李坤
@@ -20,7 +21,7 @@ public interface SuperHttp {
 
 
     //同步执行
-    <ResultType> ResultType syncExecute(Class raw, final Class... args) throws IOException;
+    <ResultType> ResultType syncExecute(Type rawType, Type... typeArguments) throws IOException;
 
 
 }

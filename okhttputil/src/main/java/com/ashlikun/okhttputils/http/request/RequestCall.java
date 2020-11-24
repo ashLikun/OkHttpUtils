@@ -149,7 +149,7 @@ public class RequestCall implements SuperHttp {
      * 同步执行
      */
     @Override
-    public <ResultType> ResultType syncExecute(Class raw, Class... args) throws IOException {
+    public <ResultType> ResultType syncExecute(Type raw, Type... args) throws IOException {
         Type type = null;
         if (args == null || args.length == 0) {
             type = raw;
@@ -218,7 +218,7 @@ public class RequestCall implements SuperHttp {
 
 
     //同步请求的 构建Type   args是泛型数据
-    private ParameterizedType type(final Class raw, final Type... args) {
+    private ParameterizedType type(final Type raw, final Type... args) {
         return new ParameterizedType() {
             @Override
             public Type getRawType() {

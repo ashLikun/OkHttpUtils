@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -427,8 +428,8 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
      * 同步执行
      */
     @Override
-    public <ResultType> ResultType syncExecute(Class raw, Class... args) throws IOException {
-        return buildCall().syncExecute(raw, args);
+    public <ResultType> ResultType syncExecute(Type rawType, Type... typeArguments) throws IOException {
+        return buildCall().syncExecute(rawType, typeArguments);
     }
 
     /********************************************************************************************

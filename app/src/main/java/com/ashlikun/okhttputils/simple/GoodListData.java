@@ -11,6 +11,7 @@ import java.util.List;
  * <p>
  * 功能介绍：
  */
+
 public class GoodListData extends HttpResponse {
 
     public int currentPage;

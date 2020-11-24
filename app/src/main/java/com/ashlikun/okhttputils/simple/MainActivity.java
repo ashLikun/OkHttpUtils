@@ -121,7 +121,30 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 300; i++) {
             stringBuilder.append(aa);
         }
-
+//        HttpUtils.runNewThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                TypeToken a =new TypeToken<HttpListResult<List<GoodListData.ListBean>>>(){};
+//                HttpListResult<List<GoodListData.ListBean>> aa = null;
+//                try {
+//                    aa = OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend")
+//                            .addHeader("action", "recommend")
+//                            .setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
+//                            .setCacheTime(3600000)
+//                            .buildCall()
+//                            .progressCallback(new AbsProgressCallback() {
+//                                @Override
+//                                public void onLoading(long progress, long total, boolean done, boolean isUpdate) {
+//                                    Log.e("aaa", "progress = " + progress + "   total = " + total + "    done = " + done + "   isUpdate = " + isUpdate);
+//                                }
+//                            })
+//                            .syncExecute(a.getType());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                Log.e("aaa", aa.toString());
+//            }
+//        });
         OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend")
                 .addHeader("action", "recommend")
                 .setCacheMode(CacheMode.FIRST_CACHE_THEN_REQUEST)
