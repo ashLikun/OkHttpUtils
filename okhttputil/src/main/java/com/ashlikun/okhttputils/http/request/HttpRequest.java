@@ -435,8 +435,6 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     /********************************************************************************************
      *                                           私有方法
      ********************************************************************************************/
-
-
     /**
      * 构建一个Request
      */
@@ -483,6 +481,7 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
         if (isEmpty(postContent)) {
             addCommonParams();
         }
+        onBuildRequestBodyHasCommonParams();
         if (method.equals("GET")) {
             //get请求把参数放在url里面, 没有请求实体
             url = HttpUtils.createUrlFromParams(url, params);
@@ -539,8 +538,18 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     /**
      * 可以添加签名，在全部参数添加完毕后,如果调用toJson方法那么params没有值，content有值
      * 实现者可以继承从写
+     * 这里是添加公共参数之前
      */
     public void onBuildRequestBody() {
+
+    }
+
+    /**
+     * 可以添加签名，在全部参数添加完毕后,如果调用toJson方法那么params没有值，content有值
+     * 实现者可以继承从写
+     * 这里是添加公共参数之后
+     */
+    public void onBuildRequestBodyHasCommonParams() {
 
     }
 
