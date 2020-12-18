@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * 功能介绍：仿造Retrofit ，这里的接口方法只能是协程suspend
  */
-typealias ServiceMethodInvoke<T> = (result: HttpServiceMethod<T>) -> T
+typealias ServiceMethodInvoke<T> = (result: HttpServiceMethod<T>, args: Array<Any?>?) -> T
 
 class Retrofit private constructor() {
     private val serviceMethodCache: ConcurrentHashMap<Method, ServiceMethod<*>> = ConcurrentHashMap()
