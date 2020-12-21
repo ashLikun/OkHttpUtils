@@ -4,6 +4,7 @@ import com.ashlikun.okhttputils.http.request.HttpRequest
 import java.lang.reflect.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.Continuation
 
 /**
  * 作者　　: 李坤
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * 功能介绍：仿造Retrofit ，这里的接口方法只能是协程suspend
  */
-typealias ServiceMethodInvoke<T> = (suspend result: HttpServiceMethod<T>, args: Array<Any?>?) -> T
+typealias ServiceMethodInvoke<T> = suspend (result: HttpServiceMethod<T>, args: Array<Any?>?) -> T
 
 class Retrofit private constructor() {
     private val serviceMethodCache: ConcurrentHashMap<Method, ServiceMethod<*>> = ConcurrentHashMap()
