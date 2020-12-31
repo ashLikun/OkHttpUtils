@@ -30,11 +30,7 @@ class MyInvocationHandler implements InvocationHandler {
         if (args != null && args.length > 1) {
             Object continuation = args[args.length - 1];
             if (continuation instanceof Continuation) {
-                try {
-                    return retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
-                } catch (Exception e) {
-                    return null;
-                }
+                return retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
             }
         }
         throw new IllegalArgumentException("必须是协程方法suspend");

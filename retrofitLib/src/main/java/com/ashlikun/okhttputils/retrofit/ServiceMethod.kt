@@ -11,7 +11,7 @@ import java.lang.reflect.*
 
 
 abstract class ServiceMethod<T> {
-    abstract suspend fun invoke(args: Array<Any?>?): T?
+    abstract suspend fun invoke(args: Array<Any?>?): T
 
 
     companion object {

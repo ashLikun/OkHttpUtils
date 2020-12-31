@@ -16,8 +16,8 @@ class HttpServiceMethod<ReturnT>(
         var resultType: Type,
         var params: List<ParameterHandler>
 ) : ServiceMethod<ReturnT>() {
-    override suspend fun invoke(args: Array<Any?>?): ReturnT? {
-        return Retrofit.get().methodInvoke?.invoke(this,args) as ReturnT?
+    override suspend fun invoke(args: Array<Any?>?): ReturnT {
+        return Retrofit.get().methodInvoke?.invoke(this,args) as ReturnT
     }
 
 
