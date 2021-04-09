@@ -18,38 +18,41 @@ class ParameterHandler(var index: Int,
                        var isHeader: Boolean = false,
         //如果是多个文件是否用同一个key变成数组
                        var isFileArray: Boolean = false) {
-    fun apply(requestParam: HttpRequest, args: Array<Any?>?) {
+
+
+    //吧这个注解信息填入到HttpRequest里面
+    internal fun apply(request: HttpRequest, args: Array<Any?>?) {
         val value = if (index == -1) valueDefault else args?.getOrNull(index)
         if (isHeader) {
-            requestParam.addHeader(key, value?.toString())
+            request.addHeader(key, value?.toString())
         } else if (isFile) {//如果是文件
             if (value is List<*>) {
                 if (isFileArray) {
                     value.forEachIndexed { nIndex, s ->
                         if (s is String) {
                             if (isFileArray) {
-                                requestParam.addParamFilePath("${key}[${nIndex}]", s)
+                                request.addParamFilePath("${key}[${nIndex}]", s)
                             } else {
-                                requestParam.addParamFilePath(key, s)
+                                request.addParamFilePath(key, s)
                             }
                         } else if (s is File) {
                             if (isFileArray) {
-                                requestParam.addParam("${key}[${nIndex}]", s)
+                                request.addParam("${key}[${nIndex}]", s)
                             } else {
-                                requestParam.addParam(key, s)
+                                request.addParam(key, s)
                             }
                         }
                     }
                 }
             } else {
                 if (value is String) {
-                    requestParam.addParamFilePath(key, value)
+                    request.addParamFilePath(key, value)
                 } else if (value is File) {
-                    requestParam.addParam(key, value)
+                    request.addParam(key, value)
                 }
             }
         } else {
-            requestParam.addParam(key, value)
+            request.addParam(key, value)
         }
 
     }

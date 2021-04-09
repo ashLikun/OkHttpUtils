@@ -20,6 +20,7 @@ class MyInvocationHandler implements InvocationHandler {
         this.retrofit = retrofit;
     }
 
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // If the method is a method from Object then defer to normal invocation.

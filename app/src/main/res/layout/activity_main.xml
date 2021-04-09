@@ -12,6 +12,13 @@
         android:layout_weight="1" />
 
     <Button
+        android:id="@+id/button00"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onButt00Click"
+        android:text="Retrofit测试" />
+
+    <Button
         android:id="@+id/button0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

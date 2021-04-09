@@ -2,7 +2,6 @@ package com.ashlikun.okhttputils.simple;
 
 import android.app.Application;
 
-import com.ashlikun.okhttputils.http.HttpUtils;
 import com.ashlikun.okhttputils.http.OkHttpUtils;
 import com.ashlikun.okhttputils.http.cookie.CookieJarImpl;
 import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore;
@@ -68,5 +67,6 @@ public class MyApp extends Application {
         OkHttpUtils.getInstance()
                 .setCommonParams(params)
                 .setCommonHeaders(head);
+        Init.INSTANCE.init();
     }
 }

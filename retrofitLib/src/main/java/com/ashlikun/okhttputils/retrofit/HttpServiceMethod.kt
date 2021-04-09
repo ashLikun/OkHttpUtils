@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.retrofit
 
+import com.ashlikun.okhttputils.http.request.HttpRequest
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
@@ -14,14 +15,28 @@ class HttpServiceMethod<ReturnT>(
         var url: String,
         var method: String,
         var resultType: Type,
-        var params: List<ParameterHandler>
+        var params: List<ParameterHandler>,
+        var urlParams: List<ParameterHandler>
 ) : ServiceMethod<ReturnT>() {
     override suspend fun invoke(args: Array<Any?>?): ReturnT {
-        return Retrofit.get().methodInvoke?.invoke(this,args) as ReturnT
+        if (Retrofit.get().createRequest == null || Retrofit.get().execute == null) {
+            throw java.lang.IllegalArgumentException("必须初始化Retrofit.get().init")
+        }
+        //替换url里面的变量
+        urlParams.forEach {
+            url = url.replace("{${it.key}}", args?.getOrNull(it.index).toString())
+        }
+        //创建请求
+        val request = Retrofit.get().createRequest!!.invoke(this).setMethod(method)
+        //添加参数
+        params.forEach { itt ->
+            itt.apply(request, args)
+        }
+        return Retrofit.get().execute!!.invoke(request, this, args) as ReturnT
     }
 
-
     companion object {
+
         fun <ReturnT> parseAnnotations(
                 retrofit: Retrofit, method: Method)
                 : HttpServiceMethod<ReturnT> {
@@ -30,6 +45,8 @@ class HttpServiceMethod<ReturnT>(
             var path = ""
             var url = ""
             var params = mutableListOf<ParameterHandler>()
+            var urlParams = mutableListOf<ParameterHandler>()
+
             //获取方法上面的注解
             method.annotations?.forEach {
                 when (it) {
@@ -66,13 +83,16 @@ class HttpServiceMethod<ReturnT>(
             if (action.isNullOrEmpty() && path.isNullOrEmpty() && url.isNullOrEmpty()) {
                 throw IllegalArgumentException("parseAnnotations no url")
             }
+
             //处理url
             if (url.isNullOrEmpty()) {
-                url = Retrofit.get().createUrl?.invoke(url, action, path) ?: ""
+                url = Retrofit.get().createUrl?.invoke(RetrofitUrl(url, action, path)) ?: ""
             }
+
             if (url.isNullOrEmpty()) {
                 throw IllegalArgumentException("parseAnnotations no url")
             }
+            //处理方法的参数
             method.parameterAnnotations.forEachIndexed { index, annotations ->
                 if (!annotations.isNullOrEmpty()) {
                     annotations.forEach {
@@ -85,10 +105,15 @@ class HttpServiceMethod<ReturnT>(
                                 //请求头
                                 params.add(ParameterHandler(index, it.value, isHeader = true))
                             }
+                            is PathField -> {
+                                //匹配url里面的参数
+                                urlParams.add(ParameterHandler(index, it.key))
+                            }
                         }
                     }
                 }
             }
+            //处理返回值
             val returnType = getParameterLowerBound(method)
             if (hasUnresolvableType(returnType)) {
                 throw methodError(
@@ -97,7 +122,7 @@ class HttpServiceMethod<ReturnT>(
                         "Method return type must not include a type variable or wildcard: %s",
                         returnType)
             }
-            return HttpServiceMethod(url, httpMethod, returnType, params)
+            return HttpServiceMethod(url, httpMethod, returnType, params, urlParams)
         }
     }
 }

@@ -13,7 +13,13 @@ import kotlin.coroutines.Continuation
  *
  * 功能介绍：仿造Retrofit ，这里的接口方法只能是协程suspend
  */
-typealias ServiceMethodInvoke<T> = suspend (result: HttpServiceMethod<T>, args: Array<Any?>?) -> T
+typealias ServiceMethodInvoke<T> = suspend (request: HttpRequest, result: HttpServiceMethod<T>, params: Array<Any?>?) -> T
+
+data class RetrofitUrl(var url: String,
+                       var action: String,
+                       var path: String) {
+
+}
 
 class Retrofit private constructor() {
     private val serviceMethodCache: ConcurrentHashMap<Method, ServiceMethod<*>> = ConcurrentHashMap()
@@ -21,13 +27,27 @@ class Retrofit private constructor() {
     /**
      * 创建HttpRequest,必须实现
      */
-    public var methodInvoke: ServiceMethodInvoke<*>? = null
+    public var createRequest: ((it: HttpServiceMethod<*>) -> HttpRequest)? = null
 
     /**
-     * 创建url,必须实现
+     * 执行,必须实现
      */
-    public var createUrl: ((url: String, action: String, path: String) -> String)? = null
+    public var execute: ServiceMethodInvoke<*>? = null
 
+    /**
+     * 创建url,可以不实现
+     */
+    public var createUrl: ((url: RetrofitUrl) -> String)? = null
+
+    fun init(
+            createUrl: ((url: RetrofitUrl) -> String)? = null,
+            createRequest: (it: HttpServiceMethod<*>) -> HttpRequest,
+            execute: ServiceMethodInvoke<*>
+    ) {
+        this.createUrl = createUrl
+        this.createRequest = createRequest
+        this.execute = execute
+    }
 
     fun <T> create(service: Class<T>): T {
         validateServiceInterface(service)
@@ -39,9 +59,9 @@ class Retrofit private constructor() {
         var result: ServiceMethod<T>? = serviceMethodCache[method] as ServiceMethod<T>?
         //同步锁
         return result ?: synchronized(serviceMethodCache) {
-            result = serviceMethodCache.get(method) as ServiceMethod<T>?
+            result = serviceMethodCache[method] as ServiceMethod<T>?
             if (result == null) {
-                result = ServiceMethod.parseAnnotations(this, method)
+                result = ServiceMethod.parse(this, method)
                 serviceMethodCache[method] = result!!
             }
             result!!

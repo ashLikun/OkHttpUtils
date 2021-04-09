@@ -7,6 +7,7 @@ package com.ashlikun.okhttputils.retrofit
  *
  * 功能介绍：
  */
+import com.ashlikun.okhttputils.http.request.HttpRequest
 import java.lang.reflect.*
 
 
@@ -15,12 +16,28 @@ abstract class ServiceMethod<T> {
 
 
     companion object {
+        fun <T> parse(retrofit: Retrofit, method: Method): ServiceMethod<T> {
+            //先解析默认方法
+            var sm = parseDefault<T>(retrofit, method)
+            if (sm == null) {
+                //再解析注解
+                sm = parseAnnotations<T>(retrofit, method)
+            }
+            return sm
+        }
+
+        //解析注解
         fun <T> parseAnnotations(retrofit: Retrofit, method: Method): ServiceMethod<T> {
             val returnType = method.genericReturnType
             if (returnType === Void.TYPE) {
                 throw methodError(method, null, "Service methods cannot return void.")
             }
             return HttpServiceMethod.parseAnnotations(retrofit, method)
+        }
+
+        //解析默认方法实现
+        fun <T> parseDefault(retrofit: Retrofit, method: Method): ServiceMethod<T>? {
+            return ServiceMethodDefault.parseDefault(retrofit, method)
         }
 
 

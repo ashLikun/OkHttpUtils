@@ -15,6 +15,7 @@ import com.ashlikun.okhttputils.http.callback.AbsProgressCallback;
 import com.ashlikun.okhttputils.http.download.DownloadManager;
 import com.ashlikun.okhttputils.http.download.DownloadTask;
 import com.ashlikun.okhttputils.http.download.DownloadTaskListener;
+import com.ashlikun.okhttputils.simple.retrofit.Test;
 
 import java.io.File;
 
@@ -105,6 +106,10 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 //        Log.e("aaa", "" + "");
+    }
+
+    public void onButt00Click(View view) {
+        Test.start();
     }
 
     public void onButt0Click(View view) {
