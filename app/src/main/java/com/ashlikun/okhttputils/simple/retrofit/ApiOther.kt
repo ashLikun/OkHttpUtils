@@ -36,5 +36,42 @@ interface ApiOther {
             @Field(key = "news_id")
             tikit: Int,
     ): HttpResponse
+    @GET("https://tapi-sip.510gow.com/{aaa}?action=recommend")
+    suspend fun test2(
+            @PathField("aaa")
+            aaa:String,
+            @Field(key = "news_id")
+            tikit: Int,
+    ): HttpResponse
 
+    @GET("https://tapi-sip.510gow.com/{aaa}?action=recommend")
+    suspend fun test3(
+            @PathField("aaa")
+            aaa:String,
+            @Field(key = "news_id")
+            tikit: Int,
+    ): HttpResponse
+    @GET("https://tapi-sip.510gow.com/{aaa}?action=recommend")
+    suspend fun test4(
+            @PathField("aaa")
+            aaa:String,
+            @Field(key = "news_id")
+            tikit: Int,
+    ): HttpResponse
+
+    @GET("https://tapi-sip.510gow.com/{aaa}?action=recommend")
+    suspend fun test5(
+            @PathField("aaa")
+            aaa:String,
+            @Field(key = "news_id")
+            tikit: Int,
+    ): HttpResponse
+
+    @GET("https://tapi-sip.510gow.com/{aaa}?action=recommend")
+    suspend fun test6(
+            @PathField("aaa")
+            aaa:String,
+            @Field(key = "news_id")
+            tikit: Int,
+    ): HttpResponse
 }

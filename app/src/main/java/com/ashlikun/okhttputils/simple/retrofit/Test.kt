@@ -16,12 +16,19 @@ class Test {
     companion object {
         @JvmStatic
         fun start() {
+            Log.e("qqq","${System.currentTimeMillis()}")
             val kClass = ApiOther::class
-            kClass.members.forEach {
-                it.parameters.forEach {
-                    Log.e("wwwwwwwww",it?.name?:"11")
-                }
+            Log.e("qqq aaa","${System.currentTimeMillis()}")
+            kClass.members.find { it.name == "test" }?.parameters?.forEach {
+                Log.e("wwwwwwwww",it?.name?:"11")
             }
+//            kClass.members.forEach {
+//                it.parameters.forEach {
+//                    Log.e("wwwwwwwww",it?.name?:"11")
+//                }
+//            }
+
+            Log.e("qqq aaa sss","${System.currentTimeMillis()}")
             GlobalScope.launch {
                 var aaa = ApiOther.api.testx(111)
                 Log.e("aaaa", aaa?.json + "")
