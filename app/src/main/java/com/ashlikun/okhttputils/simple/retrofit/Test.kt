@@ -16,6 +16,12 @@ class Test {
     companion object {
         @JvmStatic
         fun start() {
+            val kClass = ApiOther::class
+            kClass.members.forEach {
+                it.parameters.forEach {
+                    Log.e("wwwwwwwww",it?.name?:"11")
+                }
+            }
             GlobalScope.launch {
                 var aaa = ApiOther.api.testx(111)
                 Log.e("aaaa", aaa?.json + "")

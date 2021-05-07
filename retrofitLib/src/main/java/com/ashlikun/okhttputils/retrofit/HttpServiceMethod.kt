@@ -1,8 +1,10 @@
 package com.ashlikun.okhttputils.retrofit
 
+import android.util.Log
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import java.lang.reflect.Method
 import java.lang.reflect.Type
+import kotlin.math.log
 
 /**
  * 作者　　: 李坤
