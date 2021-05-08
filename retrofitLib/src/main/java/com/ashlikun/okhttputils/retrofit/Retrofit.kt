@@ -25,19 +25,24 @@ class Retrofit private constructor() {
     private val serviceMethodCache: ConcurrentHashMap<Method, ServiceMethod<*>> = ConcurrentHashMap()
 
     /**
+     * 开始动态代理的时候回调,可以不实现
+     */
+    var onProxyStart: ((method: Method, args: Array<Any>) -> HttpRequest)? = null
+
+    /**
      * 创建HttpRequest,必须实现
      */
-    public var createRequest: ((it: HttpServiceMethod<*>) -> HttpRequest)? = null
+    var createRequest: ((it: HttpServiceMethod<*>) -> HttpRequest)? = null
 
     /**
      * 执行,必须实现
      */
-    public var execute: ServiceMethodInvoke<*>? = null
+    var execute: ServiceMethodInvoke<*>? = null
 
     /**
      * 创建url,可以不实现
      */
-    public var createUrl: ((url: RetrofitUrl) -> String)? = null
+    var createUrl: ((url: RetrofitUrl) -> String)? = null
 
     fun init(
             createUrl: ((url: RetrofitUrl) -> String)? = null,
@@ -67,6 +72,13 @@ class Retrofit private constructor() {
             result!!
         }
 
+    }
+
+    /**
+     * 开始代理的回调
+     */
+    fun proxyStart(method: Method, args: Array<Any>) {
+        onProxyStart?.invoke(method, args)
     }
 
 

@@ -31,6 +31,7 @@ class MyInvocationHandler implements InvocationHandler {
         if (args != null && args.length > 1) {
             Object continuation = args[args.length - 1];
             if (continuation instanceof Continuation) {
+                retrofit.start(method, args);
                 return retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
             }
         }

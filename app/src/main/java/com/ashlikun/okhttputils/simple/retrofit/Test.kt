@@ -21,8 +21,8 @@ class Test {
             GlobalScope.launch {
                 var aaa = ApiOther.api.testx(111)
                 Log.e("aaaa", aaa?.json + "")
-//                aaa = ApiOther.api.test( 11111, WeiJinModel())
-//                Log.e("bbb", aaa?.json + "")
+                aaa = ApiOther.api.test( 11111, WeiJinModel())
+                Log.e("bbb", aaa?.json + "")
             }
 
         }
