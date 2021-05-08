@@ -18,6 +18,16 @@ annotation class GET(val url: String = "")
 @Retention(AnnotationRetention.RUNTIME)
 annotation class POST(val url: String = "")
 
+//请求的url，可以有占位符
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class URL(val url: String, val method: String = "POST")
+
+//请求的方法
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class METHOD(val method: String = "POST")
+
 //请求的path 可以有占位符 ：/user/{id}
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
@@ -34,6 +44,11 @@ annotation class Field(val key: String, val encoded: Boolean = false,
                        val isFile: Boolean = false,
         //如果是多个文件是否用同一个key变成数组
                        val isFileArray: Boolean = false)
+
+//这个字段不用提交
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class FieldNo
 
 //path里面的参数  如 /user/{id}
 @Target(AnnotationTarget.VALUE_PARAMETER)

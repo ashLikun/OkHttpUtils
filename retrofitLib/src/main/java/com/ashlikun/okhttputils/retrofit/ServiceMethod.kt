@@ -7,8 +7,10 @@ package com.ashlikun.okhttputils.retrofit
  *
  * 功能介绍：
  */
-import com.ashlikun.okhttputils.http.request.HttpRequest
+import java.lang.NullPointerException
 import java.lang.reflect.*
+import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.jvm.javaMethod
 
 
 abstract class ServiceMethod<T> {
@@ -17,22 +19,32 @@ abstract class ServiceMethod<T> {
 
     companion object {
         fun <T> parse(retrofit: Retrofit, method: Method): ServiceMethod<T> {
-            //先解析默认方法
-            var sm = parseDefault<T>(retrofit, method)
-            if (sm == null) {
-                //再解析注解
-                sm = parseAnnotations<T>(retrofit, method)
-            }
-            return sm
-        }
-
-        //解析注解
-        fun <T> parseAnnotations(retrofit: Retrofit, method: Method): ServiceMethod<T> {
             val returnType = method.genericReturnType
             if (returnType === Void.TYPE) {
                 throw methodError(method, null, "Service methods cannot return void.")
             }
-            return HttpServiceMethod.parseAnnotations(retrofit, method)
+            try {
+                val kClass = method.declaringClass.kotlin
+                val kMethod = kClass.memberFunctions.find { it.javaMethod == method }
+                        ?: //java方式
+                        return HttpServiceMethod.parseAnnotations(retrofit, method)
+                try {
+                    //kotlin方式
+                    return if (kMethod.isAbstract) {
+                        //抽象方法
+                        HttpServiceMethodKotlin.parseAnnotations(retrofit, kClass, kMethod)
+                    } else {
+                        //默认方法
+                        parseDefault(retrofit, method)!!
+                    }
+                } catch (e: Exception) {
+                    throw e;
+                }
+            } catch (e: Exception) {
+                //java方式
+                return parseDefault(retrofit, method)
+                        ?: HttpServiceMethod.parseAnnotations(retrofit, method)
+            }
         }
 
         //解析默认方法实现

@@ -1,13 +1,10 @@
 package com.ashlikun.okhttputils.retrofit
 
-import android.util.Log
-import com.ashlikun.okhttputils.http.request.HttpRequest
-import java.lang.reflect.Method
 import java.lang.reflect.Type
-import kotlin.math.log
-import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.memberFunctions
-import kotlin.reflect.jvm.javaMethod
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.valueParameters
+import kotlin.reflect.jvm.javaType
 
 /**
  * 作者　　: 李坤
@@ -16,37 +13,21 @@ import kotlin.reflect.jvm.javaMethod
  *
  * 功能介绍：解析方法,构建请求,执行请求
  */
-open class HttpServiceMethod<ReturnT>(
-        var url: String,
-        var method: String,
-        var resultType: Type,
-        var params: List<ParameterHandler>,
-        var urlParams: List<ParameterHandler>
-) : ServiceMethod<ReturnT>() {
-    override suspend fun invoke(args: Array<Any?>?): ReturnT {
-        if (Retrofit.get().createRequest == null || Retrofit.get().execute == null) {
-            throw java.lang.IllegalArgumentException("必须初始化Retrofit.get().init")
-        }
-        //替换url里面的变量
-        urlParams.forEach {
-            url = url.replace("{${it.key}}", args?.getOrNull(it.index).toString())
-        }
-        //创建请求
-        val request = Retrofit.get().createRequest!!.invoke(this).setMethod(method)
-        //添加参数
-        params.forEach { itt ->
-            itt.apply(request, args)
-        }
-        return Retrofit.get().execute!!.invoke(request, this, args) as ReturnT
-    }
+class HttpServiceMethodKotlin<ReturnT>(
+        url: String,
+        method: String,
+        resultType: Type,
+        params: List<ParameterHandler>,
+        urlParams: List<ParameterHandler>
+) : HttpServiceMethod<ReturnT>(url, method, resultType, params, urlParams) {
 
     companion object {
-
         fun <ReturnT> parseAnnotations(
-                retrofit: Retrofit, method: Method)
-                : HttpServiceMethod<ReturnT> {
+                retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
+                : HttpServiceMethodKotlin<ReturnT> {
             var httpMethod = "POST"
-            var action = ""
+            //action默认方法名
+            var action = method.name
             var path = ""
             var url = ""
             var params = mutableListOf<ParameterHandler>()
@@ -96,6 +77,7 @@ open class HttpServiceMethod<ReturnT>(
                     }
                 }
             }
+            //处理url
             if (action.isNullOrEmpty() && path.isNullOrEmpty() && url.isNullOrEmpty()) {
                 throw IllegalArgumentException("parseAnnotations no url")
             }
@@ -104,41 +86,69 @@ open class HttpServiceMethod<ReturnT>(
             if (url.isNullOrEmpty()) {
                 url = Retrofit.get().createUrl?.invoke(RetrofitUrl(url, action, path)) ?: ""
             }
-
             if (url.isNullOrEmpty()) {
                 throw IllegalArgumentException("parseAnnotations no url")
             }
             //处理方法的参数
-            method.parameterAnnotations.forEachIndexed { index, annotations ->
-                if (!annotations.isNullOrEmpty()) {
-                    annotations.forEach {
-                        when (it) {
-                            is Field -> {
-                                //字段
-                                params.add(ParameterHandler(index, it.key, isFile = it.isFile, isFileArray = it.isFileArray))
+            val parameters = method?.valueParameters
+            parameters?.forEachIndexed { index, rit ->
+                val annotations = rit.annotations
+                val parameterHandler = ParameterHandler(index, rit.name ?: "")
+                params.add(parameterHandler)
+                //当前字段的全部注解
+                annotations.forEach {
+                    when (it) {
+                        //被过滤的字段
+                        is FieldNo -> {
+                            params.remove(parameterHandler)
+                        }
+                        //字段
+                        is Field -> {
+                            if (!it.key.isNullOrEmpty()) {
+                                parameterHandler.key = it.key
                             }
-                            is Header -> {
-                                //请求头
-                                params.add(ParameterHandler(index, it.value, isHeader = true))
+                            parameterHandler.isFile = it.isFile
+                            parameterHandler.isFileArray = it.isFileArray
+                        }
+                        //请求头
+                        is Header -> {
+                            if (!it.value.isNullOrEmpty()) {
+                                parameterHandler.key = it.value
                             }
-                            is PathField -> {
-                                //匹配url里面的参数
-                                urlParams.add(ParameterHandler(index, it.key))
-                            }
+                            parameterHandler.isHeader = true
+                        }
+                        ////匹配url里面的参数
+                        is PathField -> {
+                            urlParams.add(ParameterHandler(index, it.key))
                         }
                     }
                 }
             }
+
+
             //处理返回值
-            val returnType = getParameterLowerBound(method)
+            val returnType = method.returnType.javaType
             if (hasUnresolvableType(returnType)) {
-                throw methodError(
+                throw methodErrorK(
+                        kClass,
                         method,
                         null,
                         "Method return type must not include a type variable or wildcard: %s",
                         returnType)
             }
-            return HttpServiceMethod(url, httpMethod, returnType, params, urlParams)
+            return HttpServiceMethodKotlin(url, httpMethod, returnType, params, urlParams)
+        }
+
+        fun methodErrorK(kClass: KClass<*>,
+                         method: KFunction<*>, cause: Throwable?, message: String, vararg args: Any?): RuntimeException {
+            var message = message
+            message = String.format(message, *args)
+            return IllegalArgumentException(
+                    """$message
+    for method ${kClass.simpleName}.${method.name}""",
+                    cause)
         }
     }
+
+
 }

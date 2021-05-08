@@ -75,6 +75,22 @@ dependencies {
         HttpResponse  这个对象只是处理了code和msg
         
         如果上面两个对象不能满足需求，调用者也可以自定义返回类型，因为Callback是泛型的
+		
+		//Retrofit初始化
+		Retrofit.get().init(createUrl = {
+            if (it.url.isNullOrEmpty()) {
+                if (it.path.isNullOrEmpty()) {
+                    createUrl(it.action)
+                } else {
+                    createUrl(it.action, it.path)
+                }
+            } else it.url
+        }, createRequest = { HttpRequestParam.create(it.url) }) { request, result, params ->
+            val handle = params?.find { it is HttpUiHandle? } as HttpUiHandle?
+            request.syncExecute<Any>(handle, result.resultType)
+        }
+		
+		
 ### 混肴
 #### Okhttputils
         -dontwarn okio.**
