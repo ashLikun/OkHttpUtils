@@ -27,7 +27,7 @@ class Retrofit private constructor() {
     /**
      * 开始动态代理的时候回调,可以不实现
      */
-    var onProxyStart: ((method: Method, args: Array<Any>) -> HttpRequest)? = null
+    var onProxyStart: ((method: Method, args: Array<Any>) -> Unit)? = null
 
     /**
      * 创建HttpRequest,必须实现
