@@ -19,21 +19,27 @@ annotation class Get(val url: String = "")
 annotation class Post(val url: String = "")
 
 /**
- * 1：在方法上  请求的url，可以有占位符
- * 2：在接口上  当前全部方法基础的url
+ *  请求的url，可以有占位符
+ * 1：在方法上  当前
+ * 2：在接口上  全部
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Url(val url: String, val method: String = "POST")
 
-//请求的方法
-@Target(AnnotationTarget.FUNCTION)
+/**
+ * 请求的方法
+ * 1：在方法上  当前
+ * 2：在接口上  全部
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Mehtod(val method: String = "POST")
 
 /**
- * 1:在方法上：请求的path 可以有占位符 ：/user/{id}
- * 2:在接口上：当前接口的全部方法都会加上这个path
+ * 请求的path 可以有占位符 ：/user/{id}
+ * 1：在方法上  当前
+ * 2：在接口上  全部
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
@@ -47,7 +53,7 @@ annotation class Path(val value: String)
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Param(val value: String)
+annotation class Action(val value: String)
 
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
@@ -82,14 +88,30 @@ annotation class PathField(val key: String)
 annotation class FieldDefault(vararg val value: String)
 
 /**
- * 用户请求的头,用于方法
+ * 用户请求的固定参数
+ * @Params({
+ * "key1:value1"，
+ * "key2:value2"
+ * })
+ *  @Params("key:value")
+ *  1:用在方法上，当前请求
+ *  2:用在接口上，当前接口全部请求
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Params(vararg val value: String)
+
+/**
+ * 用户请求的头
  * @Headers({
  * "key1:value1"，
  * "key2:value2"
  * })
  *  @Headers("key:value")
+ *  1:用在方法上，当前请求
+ *  2:用在接口上，当前接口全部请求
  */
-@Target(AnnotationTarget.VALUE_PARAMETER)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Headers(vararg val value: String)
 

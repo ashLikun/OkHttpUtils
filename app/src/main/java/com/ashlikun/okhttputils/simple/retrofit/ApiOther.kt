@@ -40,19 +40,19 @@ interface ApiOther : BaseApi {
             tikit: Int,
     ): HttpResponse
 
-    @Param("action:recommend")
+    @Action("action:recommend")
     suspend fun test3(
             @Field(key = "news_id")
             tikit: Int,
     ): HttpResponse
 
-    @Param("recommend")
+    @Action("recommend")
     suspend fun test4(
             @Field(key = "news_id")
             tikit: Int,
     ): HttpResponse
 
-    @Param("action:")
+    @Action("action:")
     @Path("/interface?")
     suspend fun test5(
             @Field(key = "news_id")

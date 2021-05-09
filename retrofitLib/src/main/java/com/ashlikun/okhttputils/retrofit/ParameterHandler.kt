@@ -9,7 +9,7 @@ import java.io.File
  * 邮箱　　：496546144@qq.com
  *
  * 功能介绍：对参数的描述
- * @param index  方法里面的第几个参数  -1:代表在方法上面的，就是固定参数,这时候的key就是 "key1:value1"
+ * @param index  方法里面的第几个参数  -1:代表固定参数,这时候的key就是 "key1:value1"
  */
 class ParameterHandler(var index: Int,
                        var key: String,

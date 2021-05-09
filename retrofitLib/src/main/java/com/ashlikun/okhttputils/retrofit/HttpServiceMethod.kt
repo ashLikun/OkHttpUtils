@@ -43,17 +43,32 @@ class HttpServiceMethod<ReturnT>(
                 retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
                 : HttpServiceMethod<ReturnT> {
             var httpMethod = "POST"
-            var urlParam = ""
+            var urlAction = ""
             var path = ""
             var url = ""
             var params = mutableListOf<ParameterHandler>()
             var urlParams = mutableListOf<ParameterHandler>()
             var classAllAnnotations = getClassAllAnnotations(kClass)
-            //处理类上的注解
+            //处理接口上的注解
             classAllAnnotations.forEach {
                 when (it) {
                     is Url -> if (!it.method.isNullOrEmpty()) httpMethod = it.method
+                    is Mehtod -> httpMethod = it.method
                     is Path -> path = it.value
+                    //固定头
+                    is Headers -> {
+                        it.value.forEach { itt ->
+                            val keyAndValue = itt.split(":")
+                            params.add(ParameterHandler(-1, keyAndValue[0], keyAndValue[1], isHeader = true))
+                        }
+                    }
+                    //固定参数
+                    is Params -> {
+                        it.value.forEach { itt ->
+                            val keyAndValue = itt.split(":")
+                            params.add(ParameterHandler(-1, keyAndValue[0], keyAndValue[1]))
+                        }
+                    }
                 }
             }
 
@@ -64,9 +79,7 @@ class HttpServiceMethod<ReturnT>(
                         url = it.url
                         httpMethod = it.method
                     }
-                    is Mehtod -> {
-                        httpMethod = it.method
-                    }
+                    is Mehtod -> httpMethod = it.method
                     is Get -> {
                         if (url.isNullOrEmpty()) {
                             url = it.url
@@ -79,30 +92,33 @@ class HttpServiceMethod<ReturnT>(
                         }
                         httpMethod = "POST"
                     }
-                    is Param -> urlParam = it.value
+                    is Action -> urlAction = it.value
                     is Path -> path = it.value
                     is FieldDefault -> {
                         //默认字段
                         it.value.forEach { itt ->
                             val keyAndValue = itt.split(":")
-                            params.add(ParameterHandler(-1, keyAndValue.getOrNull(0)
-                                    ?: "", keyAndValue.getOrNull(1)
-                                    ?: ""))
+                            params.add(ParameterHandler(-1, keyAndValue[0], keyAndValue[1]))
                         }
                     }
+                    //固定头
                     is Headers -> {
-                        //默认头
                         it.value.forEach { itt ->
                             val keyAndValue = itt.split(":")
-                            params.add(ParameterHandler(-1, keyAndValue.getOrNull(0)
-                                    ?: "", keyAndValue.getOrNull(1)
-                                    ?: "", isHeader = true))
+                            params.add(ParameterHandler(-1, keyAndValue[0], keyAndValue[1], isHeader = true))
+                        }
+                    }
+                    //固定参数
+                    is Params -> {
+                        it.value.forEach { itt ->
+                            val keyAndValue = itt.split(":")
+                            params.add(ParameterHandler(-1, keyAndValue[0], keyAndValue[1]))
                         }
                     }
                 }
             }
             //处理url
-            url = handleUrl(kClass, method, classAllAnnotations, url, urlParam, path)
+            url = handleUrl(kClass, method, classAllAnnotations, url, urlAction, path)
             if (url.isNullOrEmpty()) {
                 throw IllegalArgumentException("parseAnnotations no url")
             }
@@ -134,7 +150,7 @@ class HttpServiceMethod<ReturnT>(
                             }
                             parameterHandler.isHeader = true
                         }
-                        ////匹配url里面的参数
+                        //匹配url里面的参数
                         is PathField -> {
                             urlParams.add(ParameterHandler(index, it.key))
                         }
@@ -169,7 +185,7 @@ class HttpServiceMethod<ReturnT>(
             return ans
         }
 
-        private fun handleUrl(kClass: KClass<*>, method: KFunction<*>, classAllAnnotations: List<Annotation>, url: String, urlParam: String, path: String): String {
+        private fun handleUrl(kClass: KClass<*>, method: KFunction<*>, classAllAnnotations: List<Annotation>, url: String, urlAction: String, path: String): String {
             var allUrl = url
             var cUrl = ""
             //第一个参数的key
@@ -178,14 +194,14 @@ class HttpServiceMethod<ReturnT>(
                 when (it) {
                     //基础url
                     is Url -> cUrl = it.url
-                    is Param -> cUrlParamKey = it.value
+                    is Action -> cUrlParamKey = it.value
                 }
             }
             //如果没有方法url
             if (url.isNullOrEmpty()) {
                 //如果设置了第一个参数
-                if (!urlParam.isNullOrEmpty()) {
-                    val urlParamSplit = urlParam.split(":").toMutableList()
+                if (!urlAction.isNullOrEmpty()) {
+                    val urlParamSplit = urlAction.split(":").toMutableList()
                     if (urlParamSplit.size == 2) {
                         //必须有key或者cUrlParamKey
                         if (urlParamSplit[0].isNotEmpty() || cUrlParamKey.isNotEmpty()) {
