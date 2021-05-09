@@ -23,27 +23,19 @@ abstract class ServiceMethod<T> {
             if (returnType === Void.TYPE) {
                 throw methodError(method, null, "Service methods cannot return void.")
             }
-            try {
-                val kClass = method.declaringClass.kotlin
-                val kMethod = kClass.memberFunctions.find { it.javaMethod == method }
-                        ?: //java方式
-                        return HttpServiceMethod.parseAnnotations(retrofit, method)
-                try {
-                    //kotlin方式
-                    return if (kMethod.isAbstract) {
-                        //抽象方法
-                        HttpServiceMethodKotlin.parseAnnotations(retrofit, kClass, kMethod)
-                    } else {
-                        //默认方法
-                        parseDefault(retrofit, method)!!
-                    }
-                } catch (e: Exception) {
-                    throw e;
-                }
-            } catch (e: Exception) {
-                //java方式
-                return parseDefault(retrofit, method)
-                        ?: HttpServiceMethod.parseAnnotations(retrofit, method)
+            //使用Kotlin反射
+            val kClass = method.declaringClass.kotlin
+            val kMethod = kClass.memberFunctions.find { it.javaMethod == method }
+
+            if (kMethod == null) {
+                throw NullPointerException("无法找到这个Java方法对应的Kotlin方法")
+            }
+            return if (kMethod.isAbstract) {
+                //抽象方法
+                HttpServiceMethod.parseAnnotations(retrofit, kClass, kMethod)
+            } else {
+                //默认方法
+                parseDefault(retrofit, method)!!
             }
         }
 

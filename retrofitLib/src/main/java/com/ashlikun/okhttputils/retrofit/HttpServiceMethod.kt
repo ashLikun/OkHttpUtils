@@ -1,13 +1,11 @@
 package com.ashlikun.okhttputils.retrofit
 
-import android.util.Log
-import com.ashlikun.okhttputils.http.request.HttpRequest
-import java.lang.reflect.Method
 import java.lang.reflect.Type
-import kotlin.math.log
-import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.memberFunctions
-import kotlin.reflect.jvm.javaMethod
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.superclasses
+import kotlin.reflect.full.valueParameters
+import kotlin.reflect.jvm.javaType
 
 /**
  * 作者　　: 李坤
@@ -16,7 +14,7 @@ import kotlin.reflect.jvm.javaMethod
  *
  * 功能介绍：解析方法,构建请求,执行请求
  */
-open class HttpServiceMethod<ReturnT>(
+class HttpServiceMethod<ReturnT>(
         var url: String,
         var method: String,
         var resultType: Type,
@@ -41,41 +39,48 @@ open class HttpServiceMethod<ReturnT>(
     }
 
     companion object {
-
         fun <ReturnT> parseAnnotations(
-                retrofit: Retrofit, method: Method)
+                retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
                 : HttpServiceMethod<ReturnT> {
             var httpMethod = "POST"
-            var action = ""
+            var urlParam = ""
             var path = ""
             var url = ""
             var params = mutableListOf<ParameterHandler>()
             var urlParams = mutableListOf<ParameterHandler>()
+            var classAllAnnotations = getClassAllAnnotations(kClass)
+            //处理类上的注解
+            classAllAnnotations.forEach {
+                when (it) {
+                    is Url -> if (!it.method.isNullOrEmpty()) httpMethod = it.method
+                    is Path -> path = it.value
+                }
+            }
 
             //获取方法上面的注解
             method.annotations?.forEach {
                 when (it) {
-                    is URL -> {
+                    is Url -> {
                         url = it.url
                         httpMethod = it.method
                     }
-                    is METHOD -> {
+                    is Mehtod -> {
                         httpMethod = it.method
                     }
-                    is GET -> {
+                    is Get -> {
                         if (url.isNullOrEmpty()) {
                             url = it.url
                         }
                         httpMethod = "GET"
                     }
-                    is POST -> {
+                    is Post -> {
                         if (url.isNullOrEmpty()) {
                             url = it.url
                         }
                         httpMethod = "POST"
                     }
-                    is ACTION -> action = it.action
-                    is PATH -> path = it.path
+                    is Param -> urlParam = it.value
+                    is Path -> path = it.value
                     is FieldDefault -> {
                         //默认字段
                         it.value.forEach { itt ->
@@ -96,43 +101,53 @@ open class HttpServiceMethod<ReturnT>(
                     }
                 }
             }
-            if (action.isNullOrEmpty() && path.isNullOrEmpty() && url.isNullOrEmpty()) {
-                throw IllegalArgumentException("parseAnnotations no url")
-            }
-
             //处理url
-            if (url.isNullOrEmpty()) {
-                url = Retrofit.get().createUrl?.invoke(RetrofitUrl(url, action, path)) ?: ""
-            }
-
+            url = handleUrl(kClass, method, classAllAnnotations, url, urlParam, path)
             if (url.isNullOrEmpty()) {
                 throw IllegalArgumentException("parseAnnotations no url")
             }
             //处理方法的参数
-            method.parameterAnnotations.forEachIndexed { index, annotations ->
-                if (!annotations.isNullOrEmpty()) {
-                    annotations.forEach {
-                        when (it) {
-                            is Field -> {
-                                //字段
-                                params.add(ParameterHandler(index, it.key, isFile = it.isFile, isFileArray = it.isFileArray))
+            val parameters = method?.valueParameters
+            parameters?.forEachIndexed { index, rit ->
+                val annotations = rit.annotations
+                val parameterHandler = ParameterHandler(index, rit.name ?: "")
+                params.add(parameterHandler)
+                //当前字段的全部注解
+                annotations.forEach {
+                    when (it) {
+                        //被过滤的字段
+                        is FieldNo -> {
+                            params.remove(parameterHandler)
+                        }
+                        //字段
+                        is Field -> {
+                            if (!it.key.isNullOrEmpty()) {
+                                parameterHandler.key = it.key
                             }
-                            is Header -> {
-                                //请求头
-                                params.add(ParameterHandler(index, it.value, isHeader = true))
+                            parameterHandler.isFile = it.isFile
+                            parameterHandler.isFileArray = it.isFileArray
+                        }
+                        //请求头
+                        is Header -> {
+                            if (!it.value.isNullOrEmpty()) {
+                                parameterHandler.key = it.value
                             }
-                            is PathField -> {
-                                //匹配url里面的参数
-                                urlParams.add(ParameterHandler(index, it.key))
-                            }
+                            parameterHandler.isHeader = true
+                        }
+                        ////匹配url里面的参数
+                        is PathField -> {
+                            urlParams.add(ParameterHandler(index, it.key))
                         }
                     }
                 }
             }
+
+
             //处理返回值
-            val returnType = getParameterLowerBound(method)
+            val returnType = method.returnType.javaType
             if (hasUnresolvableType(returnType)) {
-                throw methodError(
+                throw methodErrorK(
+                        kClass,
                         method,
                         null,
                         "Method return type must not include a type variable or wildcard: %s",
@@ -140,5 +155,72 @@ open class HttpServiceMethod<ReturnT>(
             }
             return HttpServiceMethod(url, httpMethod, returnType, params, urlParams)
         }
+
+        fun getClassAllAnnotations(kClass: KClass<*>): List<Annotation> {
+            var ans = mutableListOf<Annotation>()
+            //查找父类的
+            kClass.superclasses.reversed().forEach {
+                if (it != Any::class) {
+                    ans.addAll(it.annotations)
+                }
+            }
+            //添加当前类的
+            ans.addAll(kClass.annotations)
+            return ans
+        }
+
+        private fun handleUrl(kClass: KClass<*>, method: KFunction<*>, classAllAnnotations: List<Annotation>, url: String, urlParam: String, path: String): String {
+            var allUrl = url
+            var cUrl = ""
+            //第一个参数的key
+            var cUrlParamKey = ""
+            classAllAnnotations.forEach {
+                when (it) {
+                    //基础url
+                    is Url -> cUrl = it.url
+                    is Param -> cUrlParamKey = it.value
+                }
+            }
+            //如果没有方法url
+            if (url.isNullOrEmpty()) {
+                //如果设置了第一个参数
+                if (!urlParam.isNullOrEmpty()) {
+                    val urlParamSplit = urlParam.split(":").toMutableList()
+                    if (urlParamSplit.size == 2) {
+                        //必须有key或者cUrlParamKey
+                        if (urlParamSplit[0].isNotEmpty() || cUrlParamKey.isNotEmpty()) {
+                            if (urlParamSplit[1].isEmpty()) {
+                                //如果没有Value，就是方法的名称
+                                urlParamSplit[1] = method.name
+                            }
+                            allUrl = cUrl + path + urlParamSplit[0] + "=" + urlParamSplit[1]
+                        }
+                    } else if (urlParamSplit.size == 1 && cUrlParamKey.isNotEmpty()) {
+                        //寻找类上的
+                        allUrl = cUrl + path + cUrlParamKey + "=" + urlParamSplit[0]
+                    }
+                } else if (cUrlParamKey.isNotEmpty()) {
+                    //如果在接口上设置了key，那么value就是方法名
+                    allUrl = cUrl + path + cUrlParamKey + "=" + method.name
+                }
+                //如果没有url，就用接口上的url加上方法上的path
+                if (allUrl.isEmpty()) {
+                    allUrl = cUrl + path
+                }
+            }
+            return Retrofit.get().createUrl?.invoke(allUrl) ?: allUrl
+        }
+
+        fun methodErrorK(kClass: KClass<*>,
+                         method: KFunction<*>, cause: Throwable?, message: String, vararg args: Any?): RuntimeException {
+            var message = message
+            message = String.format(message, *args)
+            return IllegalArgumentException(
+                    """$message
+    for method ${kClass.simpleName}.${method.name}""",
+                    cause)
+        }
     }
+
+
 }

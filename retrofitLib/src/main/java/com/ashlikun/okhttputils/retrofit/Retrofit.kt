@@ -2,9 +2,7 @@ package com.ashlikun.okhttputils.retrofit
 
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import java.lang.reflect.*
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.Continuation
 
 /**
  * 作者　　: 李坤
@@ -30,26 +28,23 @@ class Retrofit private constructor() {
     var onProxyStart: ((method: Method, args: Array<Any>) -> Unit)? = null
 
     /**
-     * 创建HttpRequest,必须实现
-     */
-    var createRequest: ((it: HttpServiceMethod<*>) -> HttpRequest)? = null
-
-    /**
      * 执行,必须实现
      */
     var execute: ServiceMethodInvoke<*>? = null
 
     /**
+     * 创建HttpRequest,必须实现
+     */
+    var createRequest: ((it: HttpServiceMethod<*>) -> HttpRequest)? = null
+
+    /**
      * 创建url,可以不实现
      */
-    var createUrl: ((url: RetrofitUrl) -> String)? = null
+    var createUrl: ((url: String) -> String)? = null
 
-    fun init(
-            createUrl: ((url: RetrofitUrl) -> String)? = null,
-            createRequest: (it: HttpServiceMethod<*>) -> HttpRequest,
-            execute: ServiceMethodInvoke<*>
+    fun init(createRequest: (it: HttpServiceMethod<*>) -> HttpRequest,
+             execute: ServiceMethodInvoke<*>
     ) {
-        this.createUrl = createUrl
         this.createRequest = createRequest
         this.execute = execute
     }

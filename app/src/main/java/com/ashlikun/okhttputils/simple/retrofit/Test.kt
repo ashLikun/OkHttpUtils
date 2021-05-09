@@ -17,11 +17,13 @@ class Test {
     companion object {
         @JvmStatic
         fun start() {
-            Log.e("qqq aaa sss","${System.currentTimeMillis()}")
+            Log.e("qqq aaa sss", "${System.currentTimeMillis()}")
             GlobalScope.launch {
-                var aaa = ApiOther.api.testx(111)
-                Log.e("aaaa", aaa?.json + "")
-                aaa = ApiOther.api.test( 11111, WeiJinModel())
+//                var aaa = ApiOther.api.testx(111)
+//                Log.e("aaaa", aaa?.json + "")
+//                aaa = ApiOther.api.test( 11111, WeiJinModel())
+//                Log.e("bbb", aaa?.json + "")
+                var aaa = ApiOther.api.test6()
                 Log.e("bbb", aaa?.json + "")
             }
 

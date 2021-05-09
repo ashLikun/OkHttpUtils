@@ -28,7 +28,7 @@ class MyInvocationHandler implements InvocationHandler {
             return method.invoke(this, args);
         }
         args = args != null ? args : emptyArgs;
-        if (args != null && args.length > 1) {
+        if (args != null && args.length >= 1) {
             Object continuation = args[args.length - 1];
             if (continuation instanceof Continuation) {
                 retrofit.proxyStart(method, args);

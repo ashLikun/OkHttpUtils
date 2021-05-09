@@ -11,41 +11,55 @@ package com.ashlikun.okhttputils.retrofit
 //请求的url，可以有占位符
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class GET(val url: String = "")
+annotation class Get(val url: String = "")
 
 //请求的url，可以有占位符
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class POST(val url: String = "")
+annotation class Post(val url: String = "")
 
-//请求的url，可以有占位符
-@Target(AnnotationTarget.FUNCTION)
+/**
+ * 1：在方法上  请求的url，可以有占位符
+ * 2：在接口上  当前全部方法基础的url
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class URL(val url: String, val method: String = "POST")
+annotation class Url(val url: String, val method: String = "POST")
 
 //请求的方法
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class METHOD(val method: String = "POST")
+annotation class Mehtod(val method: String = "POST")
 
-//请求的path 可以有占位符 ：/user/{id}
-@Target(AnnotationTarget.FUNCTION)
+/**
+ * 1:在方法上：请求的path 可以有占位符 ：/user/{id}
+ * 2:在接口上：当前接口的全部方法都会加上这个path
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class PATH(val path: String)
+annotation class Path(val value: String)
 
-
-@Target(AnnotationTarget.FUNCTION)
+/**
+ * 1：在方法上，当前请求会加上一个参数，格式可以是（ key:valye）或者（value）
+ *            当格式是value的时候他的key就是在当前类的@Param
+ *            如果只设置了一个如（key:)那么另一个就是方法名,如果（:value）另一个就是接口上的@Param
+ * 2：在接口上，表示当前全部方法的第一个参数的key
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ACTION(val action: String)
+annotation class Param(val value: String)
+
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Field(val key: String, val encoded: Boolean = false,
+annotation class Field(val key: String,
+                       val encoded: Boolean = false,
+        //是否是文件
                        val isFile: Boolean = false,
         //如果是多个文件是否用同一个key变成数组
                        val isFileArray: Boolean = false)
 
-//这个字段不用提交
+//这个字段不用提交,用于回调的时候处理
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FieldNo
