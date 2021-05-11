@@ -59,6 +59,16 @@ interface ApiOther : BaseApi {
             tikit: Int,
     ): HttpResponse
 
-    @Path("/interface?")
+    @PathReplace("/interface?")
     suspend fun test6(): HttpResponse
+
+    @Path("/{id}/user/me/{sid}?")
+    @Action("")
+    suspend fun test7(
+            @PathField(key = "id")
+            id: Int,
+            @PathField(key = "sid")
+            sid: String,
+    ): HttpResponse
+
 }
