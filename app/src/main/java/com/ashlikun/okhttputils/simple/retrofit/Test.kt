@@ -23,7 +23,7 @@ class Test {
 //                Log.e("aaaa", aaa?.json + "")
 //                aaa = ApiOther.api.test( 11111, WeiJinModel())
 //                Log.e("bbb", aaa?.json + "")
-                var aaa = ApiOther.api.test6()
+                var aaa = ApiOther.api.test7(111, "asdasdsad")
                 Log.e("bbb", aaa?.json + "")
             }
 

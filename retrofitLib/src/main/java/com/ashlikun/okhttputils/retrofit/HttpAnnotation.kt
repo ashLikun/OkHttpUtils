@@ -38,7 +38,8 @@ annotation class Mehtod(val method: String = "POST")
 
 /**
  * 请求的path 可以有占位符 ：/user/{id}
- * 1：在方法上  当前
+ * 如果接口上也有配置，那么会相加
+ * 1：在方法上  当前,
  * 2：在接口上  全部
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
@@ -46,9 +47,20 @@ annotation class Mehtod(val method: String = "POST")
 annotation class Path(val value: String)
 
 /**
+ * 替换接口的配置
+ * 请求的path 可以有占位符 ：/user/{id}
+ * 1：在方法上  当前,
+ * 2：在接口上  全部
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class PathReplace(val value: String)
+
+/**
  * 1：在方法上，当前请求会加上一个参数，格式可以是（ key:valye）或者（value）
  *            当格式是value的时候他的key就是在当前类的@Param
  *            如果只设置了一个如（key:)那么另一个就是方法名,如果（:value）另一个就是接口上的@Param
+ *            如果为value ="" 就清空
  * 2：在接口上，表示当前全部方法的第一个参数的key
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)

@@ -50,12 +50,7 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
         if (exc.getCall().isCanceled()) {
             exc.setCompleted(true);
             if (!HttpUtils.isMainThread()) {
-                HttpUtils.runmainThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onCompleted();
-                    }
-                });
+                HttpUtils.runmainThread(() -> callback.onCompleted());
             } else {
                 callback.onCompleted();
             }
@@ -91,27 +86,24 @@ public class OkHttpCallback<ResultType> implements okhttp3.Callback {
             return;
         }
         final Object lock = new Object();
-        HttpUtils.runmainThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (checkCanceled()) {
-                        return;
-                    }
-                    callback.onError(throwable);
-                    exc.setCompleted(true);
-                    callback.onCompleted();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw e;
-                } finally {
-                    //唤醒子线程
-                    synchronized (lock) {//获取对象锁
-                        lock.notify();
-                    }
+        HttpUtils.runmainThread(() -> {
+            try {
+                if (checkCanceled()) {
+                    return;
                 }
-
+                callback.onError(throwable);
+                exc.setCompleted(true);
+                callback.onCompleted();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            } finally {
+                //唤醒子线程
+                synchronized (lock) {//获取对象锁
+                    lock.notify();
+                }
             }
+
         });
         //让子线程等待主线程结果
         try {

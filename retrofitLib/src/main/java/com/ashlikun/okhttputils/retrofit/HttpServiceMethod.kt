@@ -43,7 +43,7 @@ class HttpServiceMethod<ReturnT>(
                 retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
                 : HttpServiceMethod<ReturnT> {
             var httpMethod = "POST"
-            var urlAction = ""
+            var urlAction: String? = null
             var path = ""
             var url = ""
             var params = mutableListOf<ParameterHandler>()
@@ -93,7 +93,8 @@ class HttpServiceMethod<ReturnT>(
                         httpMethod = "POST"
                     }
                     is Action -> urlAction = it.value
-                    is Path -> path = it.value
+                    is Path -> path += it.value
+                    is PathReplace -> path = it.value
                     is FieldDefault -> {
                         //默认字段
                         it.value.forEach { itt ->
@@ -185,16 +186,17 @@ class HttpServiceMethod<ReturnT>(
             return ans
         }
 
-        private fun handleUrl(kClass: KClass<*>, method: KFunction<*>, classAllAnnotations: List<Annotation>, url: String, urlAction: String, path: String): String {
+        private fun handleUrl(kClass: KClass<*>, method: KFunction<*>, classAllAnnotations: List<Annotation>, url: String, urlAction: String?, path: String): String {
             var allUrl = url
             var cUrl = ""
-            //第一个参数的key
-            var cUrlParamKey = ""
+            //类上的第一个参数的key，表面当前请求添加一个参数
+            var cUrlAction = ""
             classAllAnnotations.forEach {
                 when (it) {
                     //基础url
                     is Url -> cUrl = it.url
-                    is Action -> cUrlParamKey = it.value
+                    //表面当前请求添加一个参数
+                    is Action -> cUrlAction = it.value
                 }
             }
             //如果没有方法url
@@ -204,20 +206,20 @@ class HttpServiceMethod<ReturnT>(
                     val urlParamSplit = urlAction.split(":").toMutableList()
                     if (urlParamSplit.size == 2) {
                         //必须有key或者cUrlParamKey
-                        if (urlParamSplit[0].isNotEmpty() || cUrlParamKey.isNotEmpty()) {
+                        if (urlParamSplit[0].isNotEmpty() || cUrlAction.isNotEmpty()) {
                             if (urlParamSplit[1].isEmpty()) {
                                 //如果没有Value，就是方法的名称
                                 urlParamSplit[1] = method.name
                             }
                             allUrl = cUrl + path + urlParamSplit[0] + "=" + urlParamSplit[1]
                         }
-                    } else if (urlParamSplit.size == 1 && cUrlParamKey.isNotEmpty()) {
+                    } else if (urlParamSplit.size == 1 && cUrlAction.isNotEmpty()) {
                         //寻找类上的
-                        allUrl = cUrl + path + cUrlParamKey + "=" + urlParamSplit[0]
+                        allUrl = cUrl + path + cUrlAction + "=" + urlParamSplit[0]
                     }
-                } else if (cUrlParamKey.isNotEmpty()) {
+                } else if (urlAction == null && cUrlAction.isNotEmpty()) {
                     //如果在接口上设置了key，那么value就是方法名
-                    allUrl = cUrl + path + cUrlParamKey + "=" + method.name
+                    allUrl = cUrl + path + cUrlAction + "=" + method.name
                 }
                 //如果没有url，就用接口上的url加上方法上的path
                 if (allUrl.isEmpty()) {
