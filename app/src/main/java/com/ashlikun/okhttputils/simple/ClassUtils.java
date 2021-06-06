@@ -156,7 +156,7 @@ public class ClassUtils {
      * @param methodNames 要反射的方法名称
      */
     public static Object getMethod(Object object, String methodNames) {
-        return getMethod(object, methodNames, null, null);
+        return getMethod(object, methodNames, null);
     }
 
     public static Object getMethod(Object object, String methodName, Class<?>[] parameterTypes, Object... args) {

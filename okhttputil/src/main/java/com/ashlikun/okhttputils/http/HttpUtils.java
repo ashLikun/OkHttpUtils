@@ -34,6 +34,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -56,6 +58,7 @@ import okio.BufferedSource;
 public class HttpUtils {
     public static Charset UTF_8 = Charset.forName("UTF-8");
     public static volatile Handler handler;
+    static final Pattern reUnicode = Pattern.compile("\\\\u([0-9a-zA-Z]{2,4})");
 
     public static Handler getMainHandler() {
         //双重校验DCL单例模式
@@ -580,6 +583,9 @@ public class HttpUtils {
     }
 
     public static Boolean toBoolean(Object value) {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof Boolean) {
             return (Boolean) value;
         } else if (value instanceof String) {
@@ -594,6 +600,9 @@ public class HttpUtils {
     }
 
     public static Double toDouble(Object value) {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof Double) {
             return (Double) value;
         } else if (value instanceof Number) {
@@ -608,6 +617,9 @@ public class HttpUtils {
     }
 
     public static Float toFloat(Object value) {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof Float) {
             return (Float) value;
         } else if (value instanceof Number) {
@@ -622,6 +634,9 @@ public class HttpUtils {
     }
 
     public static Integer toInteger(Object value) {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof Integer) {
             return (Integer) value;
         } else if (value instanceof Number) {
@@ -636,6 +651,9 @@ public class HttpUtils {
     }
 
     public static Long toLong(Object value) {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof Long) {
             return (Long) value;
         } else if (value instanceof Number) {
@@ -650,11 +668,33 @@ public class HttpUtils {
     }
 
     public static String toString(Object value) {
+        if (value == null) {
+            return null;
+        }
         if (value instanceof String) {
             return (String) value;
         } else if (value != null) {
             return String.valueOf(value);
         }
         return null;
+    }
+
+
+    /**
+     * unicode 转字符串
+     */
+    public static String unicode2String(String unicode) {
+
+        if (TextUtils.isEmpty(unicode)) {
+            return null;
+        }
+        Matcher m = reUnicode.matcher(unicode);
+        StringBuffer sb = new StringBuffer(unicode.length());
+        while (m.find()) {
+            m.appendReplacement(sb,
+                    Character.toString((char) Integer.parseInt(m.group(1), 16)));
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 }

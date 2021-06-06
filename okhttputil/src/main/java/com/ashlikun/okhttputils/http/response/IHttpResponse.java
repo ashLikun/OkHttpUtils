@@ -14,11 +14,14 @@ import okhttp3.Response;
  * 功能介绍：
  */
 public interface IHttpResponse {
+
     public int getCode();
 
     public void setCode(int code);
 
     public String getMessage();
+
+    public void setMessage(String message);
 
     public void setJson(String json);
 
@@ -44,8 +47,11 @@ public interface IHttpResponse {
 
     /**
      * 解析Json的Json
+     * 会先实例化一个空的本对象然后调用这个方法
      *
      * @return
      */
-    public <T> T parseData(Gson gson, String json, Type type);
+    default public <T> T parseData(Gson gson, String json, Type type) {
+        return gson.fromJson(json, type);
+    }
 }
