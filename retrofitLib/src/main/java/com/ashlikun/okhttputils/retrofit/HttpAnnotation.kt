@@ -77,8 +77,11 @@ annotation class Field(val key: String,
         //如果是多个文件是否用同一个key变成数组
                        val isFileArray: Boolean = false)
 
-//这个字段不用提交,用于回调的时候处理
-@Target(AnnotationTarget.VALUE_PARAMETER)
+/**
+ * 这个字段不用提交,用于回调的时候处理
+ * 可以作用在类上
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FieldNo
 

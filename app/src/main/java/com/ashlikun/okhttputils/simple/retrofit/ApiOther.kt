@@ -28,10 +28,9 @@ interface ApiOther : BaseApi {
         return HttpResponse("{}")
     }
 
-    @Get("https://tapi-sip.510gow.com/interface?action=recommend")
+    @Get("https://api-sip.510gow.com/interface?action=recommend")
     suspend fun test(
             news_id: Int,
-            @FieldNo
             ddd: WeiJinModel
     ): HttpResponse
 

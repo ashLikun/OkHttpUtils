@@ -1,5 +1,7 @@
 package com.ashlikun.okhttputils.simple.data;
 
+import com.ashlikun.okhttputils.retrofit.FieldNo;
+
 /**
  * 作者　　: 李坤
  * 创建时间: 2017/12/27　13:59
@@ -7,7 +9,7 @@ package com.ashlikun.okhttputils.simple.data;
  * <p>
  * 功能介绍：
  */
-
+@FieldNo
 public class WeiJinModel {
 
 

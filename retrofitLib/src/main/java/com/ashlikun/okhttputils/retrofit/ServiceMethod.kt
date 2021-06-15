@@ -26,10 +26,8 @@ abstract class ServiceMethod<T> {
             //使用Kotlin反射
             val kClass = method.declaringClass.kotlin
             val kMethod = kClass.memberFunctions.find { it.javaMethod == method }
+                    ?: throw NullPointerException("无法找到这个Java方法对应的Kotlin方法")
 
-            if (kMethod == null) {
-                throw NullPointerException("无法找到这个Java方法对应的Kotlin方法")
-            }
             return if (kMethod.isAbstract) {
                 //抽象方法
                 HttpServiceMethod.parseAnnotations(retrofit, kClass, kMethod)

@@ -3,8 +3,11 @@ package com.ashlikun.okhttputils.retrofit
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
+import kotlin.reflect.KType
+import kotlin.reflect.full.isSupertypeOf
 import kotlin.reflect.full.superclasses
 import kotlin.reflect.full.valueParameters
+import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.javaType
 
 /**
@@ -125,35 +128,41 @@ class HttpServiceMethod<ReturnT>(
             }
             //处理方法的参数
             val parameters = method?.valueParameters
+
             parameters?.forEachIndexed { index, rit ->
                 val annotations = rit.annotations
                 val parameterHandler = ParameterHandler(index, rit.name ?: "")
-                params.add(parameterHandler)
-                //当前字段的全部注解
-                annotations.forEach {
-                    when (it) {
-                        //被过滤的字段
-                        is FieldNo -> {
-                            params.remove(parameterHandler)
-                        }
-                        //字段
-                        is Field -> {
-                            if (!it.key.isNullOrEmpty()) {
-                                parameterHandler.key = it.key
+                val paramsType = rit.type.javaType
+                //这个参数类型对应的类上面没有添加FieldNo注解的
+                var isBreak = paramsType is Class<*> && paramsType.annotations.find { it is FieldNo } != null
+                if (!isBreak) {
+                    params.add(parameterHandler)
+                    //当前字段的全部注解
+                    annotations.forEach {
+                        when (it) {
+                            //被过滤的字段
+                            is FieldNo -> {
+                                params.remove(parameterHandler)
                             }
-                            parameterHandler.isFile = it.isFile
-                            parameterHandler.isFileArray = it.isFileArray
-                        }
-                        //请求头
-                        is Header -> {
-                            if (!it.value.isNullOrEmpty()) {
-                                parameterHandler.key = it.value
+                            //字段
+                            is Field -> {
+                                if (!it.key.isNullOrEmpty()) {
+                                    parameterHandler.key = it.key
+                                }
+                                parameterHandler.isFile = it.isFile
+                                parameterHandler.isFileArray = it.isFileArray
                             }
-                            parameterHandler.isHeader = true
-                        }
-                        //匹配url里面的参数
-                        is PathField -> {
-                            urlParams.add(ParameterHandler(index, it.key))
+                            //请求头
+                            is Header -> {
+                                if (!it.value.isNullOrEmpty()) {
+                                    parameterHandler.key = it.value
+                                }
+                                parameterHandler.isHeader = true
+                            }
+                            //匹配url里面的参数
+                            is PathField -> {
+                                urlParams.add(ParameterHandler(index, it.key))
+                            }
                         }
                     }
                 }
