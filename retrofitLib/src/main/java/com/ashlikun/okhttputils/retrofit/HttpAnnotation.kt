@@ -1,5 +1,7 @@
 package com.ashlikun.okhttputils.retrofit
 
+import com.google.gson.Gson
+
 /**
  * 作者　　: 李坤
  * 创建时间: 2020/12/15　14:02
@@ -38,23 +40,14 @@ annotation class Mehtod(val method: String = "POST")
 
 /**
  * 请求的path 可以有占位符 ：/user/{id}
- * 如果接口上也有配置，那么会相加
+ * @param replace 是否替换父类的
+ * 如果接口上也有配置，那么默认会相加，如果replace=true那么就替换
  * 1：在方法上  当前,
  * 2：在接口上  全部
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Path(val value: String)
-
-/**
- * 替换接口的配置
- * 请求的path 可以有占位符 ：/user/{id}
- * 1：在方法上  当前,
- * 2：在接口上  全部
- */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class PathReplace(val value: String)
+annotation class Path(val value: String, val replace: Boolean = false)
 
 /**
  * 1：在方法上，当前请求会加上一个参数，格式可以是（ key:valye）或者（value）
@@ -67,6 +60,14 @@ annotation class PathReplace(val value: String)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Action(val value: String)
 
+/**
+ * 数据解析的区别
+ * 1：在方法上  当前
+ * 2：在接口上  全部
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Parse(val parse: String)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)

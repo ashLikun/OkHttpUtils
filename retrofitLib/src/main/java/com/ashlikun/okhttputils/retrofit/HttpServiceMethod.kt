@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.retrofit
 
+import com.google.gson.Gson
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -22,7 +23,9 @@ class HttpServiceMethod<ReturnT>(
         var method: String,
         var resultType: Type,
         var params: List<ParameterHandler>,
-        var urlParams: List<ParameterHandler>
+        var urlParams: List<ParameterHandler>,
+        //解析Json的类型区别
+        var parseType: String
 ) : ServiceMethod<ReturnT>() {
     override suspend fun invoke(args: Array<Any?>?): ReturnT {
         if (Retrofit.get().createRequest == null || Retrofit.get().execute == null) {
@@ -46,6 +49,8 @@ class HttpServiceMethod<ReturnT>(
                 retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
                 : HttpServiceMethod<ReturnT> {
             var httpMethod = "POST"
+            //解析json的类型区别
+            var parseType = ""
             var urlAction: String? = null
             var path = ""
             var url = ""
@@ -57,7 +62,8 @@ class HttpServiceMethod<ReturnT>(
                 when (it) {
                     is Url -> if (!it.method.isNullOrEmpty()) httpMethod = it.method
                     is Mehtod -> httpMethod = it.method
-                    is Path -> path = it.value
+                    is Path -> path += it.value
+                    is Parse -> parseType = it.parse
                     //固定头
                     is Headers -> {
                         it.value.forEach { itt ->
@@ -83,6 +89,7 @@ class HttpServiceMethod<ReturnT>(
                         httpMethod = it.method
                     }
                     is Mehtod -> httpMethod = it.method
+                    is Parse -> parseType = it.parse
                     is Get -> {
                         if (url.isNullOrEmpty()) {
                             url = it.url
@@ -96,8 +103,7 @@ class HttpServiceMethod<ReturnT>(
                         httpMethod = "POST"
                     }
                     is Action -> urlAction = it.value
-                    is Path -> path += it.value
-                    is PathReplace -> path = it.value
+                    is Path -> if (it.replace) path = it.value else path += it.value
                     is FieldDefault -> {
                         //默认字段
                         it.value.forEach { itt ->
@@ -179,7 +185,7 @@ class HttpServiceMethod<ReturnT>(
                         "Method return type must not include a type variable or wildcard: %s",
                         returnType)
             }
-            return HttpServiceMethod(url, httpMethod, returnType, params, urlParams)
+            return HttpServiceMethod(url, httpMethod, returnType, params, urlParams, parseType)
         }
 
         fun getClassAllAnnotations(kClass: KClass<*>): List<Annotation> {

@@ -300,10 +300,13 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
         //添加公共参数
         if (OkHttpUtils.getInstance().isCommonParams()) {
             try {
-                Gson gson = new Gson();
-                params = gson.fromJson(content, Map.class);
+                Gson contentGson = gson;
+                if (contentGson == null) {
+                    contentGson = GsonHelper.getGsonNotNull();
+                }
+                params = contentGson.fromJson(content, Map.class);
                 addCommonParams();
-                content = gson.toJson(params);
+                content = contentGson.toJson(params);
             } catch (Exception e) {
                 e.printStackTrace();
             }

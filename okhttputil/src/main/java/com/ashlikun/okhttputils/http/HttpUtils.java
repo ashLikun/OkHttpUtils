@@ -552,7 +552,7 @@ public class HttpUtils {
             }
         }
         if (parentypes == null || parentypes.length == 0) {
-            new Throwable("HttpSubscription  ->>>  callBack回调 不能没有泛型，请查看HttpCallBack是否有泛型");
+            new Throwable("HttpSubscription  ->>>  ，请查看 " + mClass + "是否有泛型");
         } else {
             return parentypes[0];
         }
