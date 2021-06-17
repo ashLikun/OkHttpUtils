@@ -32,15 +32,12 @@ class MyInvocationHandler implements InvocationHandler {
             Object continuation = args[args.length - 1];
             if (continuation instanceof Continuation) {
                 retrofit.proxyStart(method, args);
-                if (retrofit.getOnProxyError() == null) {
-                    return retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
-                } else {
-                    try {
-                        Object o = retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
-                        return o;
-                    } catch (Exception e) {
-                        retrofit.proxyError(method, args, e);
-                    }
+                try {
+                    Object o = retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
+                    return o;
+                } catch (Exception e) {
+                    retrofit.proxyError(method, args, e);
+                    throw e;
                 }
             }
         }

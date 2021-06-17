@@ -135,7 +135,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
     }
 
     //处理url
-    fun handleUrl(): String {
+    fun handleUrl() {
         var allUrl = url
         var cUrl = ""
         //类上的第一个参数的key，表面当前请求添加一个参数
@@ -184,7 +184,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
                 allUrl = cUrl + path
             }
         }
-        return Retrofit.get().createUrl?.invoke(allUrl) ?: allUrl
+        url = Retrofit.get().createUrl?.invoke(allUrl) ?: allUrl
     }
 
     //处理方法的参数
