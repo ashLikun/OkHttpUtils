@@ -1,7 +1,8 @@
 package com.ashlikun.okhttputils.retrofit
 
 import com.ashlikun.okhttputils.http.request.HttpRequest
-import java.lang.reflect.*
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -26,6 +27,11 @@ class Retrofit private constructor() {
      * 开始动态代理的时候回调,可以不实现
      */
     var onProxyStart: ((method: Method, args: Array<Any>) -> Unit)? = null
+
+    /**
+     * 动态代理的错误回调,可以不实现
+     */
+    var onProxyError: ((method: Method, args: Array<Any>, error: Throwable) -> Unit)? = null
 
     /**
      * 执行,必须实现
@@ -74,6 +80,13 @@ class Retrofit private constructor() {
      */
     fun proxyStart(method: Method, args: Array<Any>) {
         onProxyStart?.invoke(method, args)
+    }
+
+    /**
+     * 代理错误的回调
+     */
+    fun proxyError(method: Method, args: Array<Any>, error: Throwable) {
+        onProxyError?.invoke(method, args, error)
     }
 
 

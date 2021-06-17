@@ -1,6 +1,7 @@
 package com.ashlikun.okhttputils.retrofit
 
 import com.google.gson.Gson
+import java.lang.annotation.Inherited
 
 /**
  * 作者　　: 李坤
@@ -65,11 +66,13 @@ annotation class Action(val value: String)
  * 1：在方法上  当前
  * 2：在接口上  全部
  */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS,AnnotationTarget.ANNOTATION_CLASS)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Parse(val parse: String)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Field(val key: String,
                        val encoded: Boolean = false,
@@ -83,11 +86,13 @@ annotation class Field(val key: String,
  * 可以作用在类上
  */
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.CLASS)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FieldNo
 
 //path里面的参数  如 /user/{id}
 @Target(AnnotationTarget.VALUE_PARAMETER)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class PathField(val key: String)
 
@@ -100,6 +105,7 @@ annotation class PathField(val key: String)
  *  @FieldDefault("key:value")
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FieldDefault(vararg val value: String)
 
@@ -114,6 +120,7 @@ annotation class FieldDefault(vararg val value: String)
  *  2:用在接口上，当前接口全部请求
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Params(vararg val value: String)
 
@@ -128,6 +135,7 @@ annotation class Params(vararg val value: String)
  *  2:用在接口上，当前接口全部请求
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Headers(vararg val value: String)
 
@@ -135,5 +143,6 @@ annotation class Headers(vararg val value: String)
  * 用户请求的头,用于参数
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
+@Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Header(val value: String)

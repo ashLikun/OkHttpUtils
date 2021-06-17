@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.simple.retrofit
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.http.response.HttpResponse
 import com.ashlikun.okhttputils.retrofit.*
+import com.ashlikun.okhttputils.simple.ParseMulti
 import com.ashlikun.okhttputils.simple.data.WeiJinModel
 
 
@@ -29,6 +30,7 @@ interface ApiOther : BaseApi {
     }
 
     @Get("https://api-sip.510gow.com/interface?action=recommend")
+    @ParseMulti
     suspend fun test(
             news_id: Int,
             ddd: WeiJinModel
@@ -58,7 +60,7 @@ interface ApiOther : BaseApi {
             tikit: Int,
     ): HttpResponse
 
-    @Path("/interface?",replace = true)
+    @Path("/interface?", replace = true)
     suspend fun test6(): HttpResponse
 
     @Path("/{id}/user/me/{sid}?")

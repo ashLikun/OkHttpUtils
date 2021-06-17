@@ -32,7 +32,16 @@ class MyInvocationHandler implements InvocationHandler {
             Object continuation = args[args.length - 1];
             if (continuation instanceof Continuation) {
                 retrofit.proxyStart(method, args);
-                return retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
+                if (retrofit.getOnProxyError() == null) {
+                    return retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
+                } else {
+                    try {
+                        Object o = retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
+                        return o;
+                    } catch (Exception e) {
+                        retrofit.proxyError(method, args, e);
+                    }
+                }
             }
         }
         throw new IllegalArgumentException("必须是协程方法suspend");
