@@ -52,6 +52,7 @@ class ParameterHandler(var index: Int,
                 }
             }
         } else {
+            //普通的键值对
             request.addParam(key, value)
         }
 

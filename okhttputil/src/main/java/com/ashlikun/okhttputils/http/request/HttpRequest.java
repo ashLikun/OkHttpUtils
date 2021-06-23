@@ -137,40 +137,57 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
         return files != null && !files.isEmpty();
     }
 
-    //添加对象参数
+    /**
+     * 添加对象参数
+     */
     private HttpRequest addParamObject(String key, Object valuse) {
         if (!isEmpty(key) && valuse != null) {
             checkParamMap();
-            params.put(key, valuse);
+            //如果参数是Map类型，就直接释放
+            if (valuse instanceof Map) {
+                addParams((Map) valuse);
+            } else {
+                params.put(key, valuse);
+            }
         }
         return this;
     }
 
-    //添加参数
+    /**
+     * 添加参数
+     */
     public HttpRequest addParam(String key, Object valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
-    //添加参数
+    /**
+     * 添加参数
+     */
     public HttpRequest addParam(String key, String valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
-    //添加参数
+    /*
+     *添加参数
+     */
     public HttpRequest addParam(String key, int valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
-    //添加参数
+    /**
+     * 添加参数
+     */
     public HttpRequest addParam(String key, double valuse) {
         addParamObject(key, valuse);
         return this;
     }
 
-    //添加头部
+    /**
+     * 添加头部
+     */
     public HttpRequest addHeader(String key, String valuse) {
         if (!isEmpty(key) && !isEmpty(valuse)) {
             if (headers == null) {
@@ -204,9 +221,11 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     /**
      * 添加map参数
      */
-    public HttpRequest addParams(Map<String, Object> map) {
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            addParam(entry.getKey(), entry.getValue());
+    public HttpRequest addParams(Map<Object, Object> map) {
+        for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            if (entry.getKey() != null) {
+                addParam(entry.getKey().toString(), entry.getValue());
+            }
         }
         return this;
     }
