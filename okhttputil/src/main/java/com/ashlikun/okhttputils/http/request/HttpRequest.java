@@ -221,8 +221,8 @@ public class HttpRequest implements Comparator<String>, SuperHttp {
     /**
      * 添加map参数
      */
-    public HttpRequest addParams(Map<Object, Object> map) {
-        for (Map.Entry<Object, Object> entry : map.entrySet()) {
+    public HttpRequest addParams(Map<?, ?> map) {
+        for (Map.Entry entry : map.entrySet()) {
             if (entry.getKey() != null) {
                 addParam(entry.getKey().toString(), entry.getValue());
             }
