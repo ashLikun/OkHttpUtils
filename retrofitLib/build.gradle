@@ -32,7 +32,7 @@ dependencies {
     compileOnly 'com.google.code.gson:gson:2.8.5'
     implementation project(':okhttputil')
     compileOnly "androidx.core:core-ktx:1.6.0"
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
