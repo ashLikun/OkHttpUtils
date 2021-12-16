@@ -14,6 +14,7 @@ import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.callback.Callback
+import com.ashlikun.okhttputils.http.download.DownloadManager
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.*
 import okhttp3.Call
 import okhttp3.Interceptor
@@ -43,10 +44,6 @@ class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
     var interceptors: MutableList<Interceptor>? = null
     var networkInterceptors: MutableList<Interceptor>? = null
 
-    /**
-     * 添加进度回调,页可以在普通回调的时候实现[ProgressCallBack]接口
-     */
-    var progressCallBack: ProgressCallBack? = null
 
     /**
      * 缓存代理
@@ -67,7 +64,7 @@ class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
      */
     private fun buildCall(callback: Callback<*>?): Call {
         //获得请求实体
-        request = httpRequest.bulidRequest(callback, progressCallBack)
+        request = httpRequest.bulidRequest(callback)
         //如果超时时间大于0,就重新构建OkHttpClient
         if (isNewBuilder) {
             readTimeOut = if (readTimeOut > 0) readTimeOut else OkHttpUtils.DEFAULT_MILLISECONDS

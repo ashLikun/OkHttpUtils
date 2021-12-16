@@ -435,9 +435,9 @@ object HttpUtils {
                 throw IOException("${HttpErrorCode.MSG_DATA_ERROR2} \n  原异常：$e  \n json = $json")
             }
             if (res is IHttpResponse) {
-                (res as IHttpResponse).json = json
-                (res as IHttpResponse).httpCode = response.code
-                (res as IHttpResponse).setResponse(response)
+                res.json = json
+                res.httpCode = response.code
+                res.response = response
             }
             if (res == null) {
                 throw IOException("${HttpErrorCode.MSG_DATA_ERROR2}  \n json = $json")

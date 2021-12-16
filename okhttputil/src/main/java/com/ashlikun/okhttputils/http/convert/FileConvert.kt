@@ -4,6 +4,7 @@ import android.os.Environment
 import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.IOUtils
 import com.ashlikun.okhttputils.http.callback.ProgressCallBack
+import com.ashlikun.okhttputils.http.download.DownloadManager
 import com.ashlikun.okhttputils.http.response.HttpErrorCode
 import com.google.gson.Gson
 import okhttp3.Response
@@ -24,13 +25,16 @@ class FileConvert(//目标文件存储的文件夹路径
     var folder: String = Environment.getExternalStorageDirectory()
         .toString() + DM_TARGET_FOLDER,
     //目标文件存储的文件名
-    var fileName: String = ""
-) : Converter<File?> {
-    var callBack: ProgressCallBack? = null
+    var fileName: String = "",
+    //速度
+    var progressRate: Long = DownloadManager.DEFAULT_RATE,
+    //进度
+    var progressCallBack: ProgressCallBack? = null
+) : Converter<File> {
 
 
     @Throws(Exception::class)
-    override fun convertResponse(response: Response, gosn: Gson?): File {
+    override fun convertResponse(response: Response, gosn: Gson): File {
         val url = response.request.url.toString()
         if (fileName.isEmpty()) {
             fileName = HttpUtils.getNetFileName(response, url)
@@ -56,7 +60,7 @@ class FileConvert(//目标文件存储的文件夹路径
                 fileOutputStream.write(buffer, 0, len)
                 completedSize += len.toLong()
                 //计算是否要回调
-                if (Math.abs(System.currentTimeMillis() - timeOld) > callBack!!.rate) {
+                if (Math.abs(System.currentTimeMillis() - timeOld) > progressRate) {
                     timeOld = System.currentTimeMillis()
                     //回调
                     onProgress(completedSize, totalSize, completedSize == totalSize)
@@ -73,12 +77,9 @@ class FileConvert(//目标文件存储的文件夹路径
     }
 
     private fun onProgress(progress: Long, total: Long, done: Boolean) {
-        HttpUtils.launchMain { callBack!!.onLoading(progress, total, done, false) }
+        HttpUtils.launchMain { progressCallBack?.invoke(progress, total, done, false) }
     }
 
-    fun progressCallback(callBack: ProgressCallBack?) {
-        this.callBack = callBack
-    }
 
     companion object {
         //下载目标文件夹

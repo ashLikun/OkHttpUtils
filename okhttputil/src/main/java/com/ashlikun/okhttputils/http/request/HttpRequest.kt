@@ -329,12 +329,11 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 构建一个Request
      */
     fun bulidRequest(
-        callback: Callback<*>?,
-        progressCallBack: ProgressCallBack?
+        callback: Callback<*>?
     ): Request {
         val builder = Request.Builder()
         if (method.isEmpty()) method = methods[0]
-        val requestBody = buildRequestBody(callback, progressCallBack)
+        val requestBody = buildRequestBody(callback)
         val header = Headers.Builder()
         //添加公共请求头
         OkHttpUtils.get().commonHeaders.forEach {
@@ -359,12 +358,9 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 存在文件 multipart/form-data
      * 私有
      */
-    protected fun buildRequestBody(
-        callback: Callback<*>?,
-        progressCallBack: ProgressCallBack?
-    ): RequestBody? {
-        var progressCallBack = progressCallBack
-        var body: RequestBody? = null
+    protected fun buildRequestBody(callback: Callback<*>?): RequestBody? {
+
+        var body: RequestBody?
         onBuildRequestBody()
         //添加公共参数,只提交content的时候已经处理好了公共参数
         if (postContent.isEmpty()) {
@@ -404,13 +400,8 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
             }
         }
         //是否添加进度回调
-        if (body != null && callback != null) {
-            if (callback is ProgressCallBack) {
-                progressCallBack = callback
-            }
-            if (progressCallBack != null) {
-                body = ProgressRequestBody(body, progressCallBack)
-            }
+        if (body != null && callback?.progressCallBack != null) {
+            body = ProgressRequestBody(body, callback.progressRate, callback.progressCallBack)
         }
         return body
     }

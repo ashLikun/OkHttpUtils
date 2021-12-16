@@ -15,7 +15,7 @@ import java.nio.charset.Charset
  *
  * 功能介绍：data方式的提交，如json
  */
-class ContentRequestBody private constructor(
+open class ContentRequestBody private constructor(
     private val mediaType: MediaType?,
     private val content: ByteArray
 ) : RequestBody() {

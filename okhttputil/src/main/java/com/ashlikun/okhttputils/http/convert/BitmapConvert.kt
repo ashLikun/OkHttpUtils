@@ -22,7 +22,7 @@ class BitmapConvert constructor(
     val scaleType: ScaleType = ScaleType.CENTER_INSIDE
 ) : Converter<Bitmap> {
     @Throws(Exception::class)
-    override fun convertResponse(response: Response, gson: Gson?): Bitmap {
+    override fun convertResponse(response: Response, gson: Gson): Bitmap {
         val body = response.body
             ?: throw IOException("${HttpErrorCode.MSG_DATA_ERROR2}  \n bitmap create error")
         return parse(body.bytes())

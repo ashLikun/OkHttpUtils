@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http.callback
 import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.convert.Converter
+import com.ashlikun.okhttputils.http.download.DownloadManager
 import java.lang.reflect.Type
 
 /**
@@ -22,11 +23,26 @@ import java.lang.reflect.Type
  * @Link [com.ashlikun.okhttputils.http.response.HttpResult] 直接序列化的javabean,也可以自定义HttpResult。注意json的键
  * @Link 其他实体类。注意json的键
  */
+typealias ProgressCallBack = (progress: Long, total: Long, done: Boolean, isUpdate: Boolean) -> Unit
+
 interface Callback<ResultType> : Converter<ResultType> {
     /**
      * 指定数据类型，不使用Callback的泛型
      */
     val resultType: Type?
+
+    /**
+     * 进度回调，默认没有
+     */
+    val progressCallBack: ProgressCallBack?
+        get() = null
+
+    /**
+     * 进度回调速度，默认DownloadManager.DEFAULT_RATE
+     */
+    val progressRate: Long
+        get() = DownloadManager.DEFAULT_RATE
+
     fun onStart()
     fun onCompleted()
     fun onError(e: HttpException)

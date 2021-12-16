@@ -16,21 +16,17 @@ import java.io.File
  */
 
 abstract class FileCallback(
-    var folder: String = Environment.getExternalStorageDirectory()
+    folder: String = Environment.getExternalStorageDirectory()
         .toString() + FileConvert.DM_TARGET_FOLDER,
     //目标文件存储的文件名
     var fileName: String = ""
-) : AbsCallback<File>(), ProgressCallBack {
-    //文件转换类
-    private val convert: FileConvert = FileConvert(folder, fileName).apply {
-        progressCallback(this@FileCallback)
-    }
+) : AbsCallback<File>() {
 
-    override val rate: Long
-        get() = DownloadManager.DEFAULT_RATE
+    //文件转换类
+    private val convert: FileConvert = FileConvert(folder, fileName, progressRate, progressCallBack)
 
     @Throws(Exception::class)
-    override fun convertResponse(response: Response, gosn: Gson?): File {
+    override fun convertResponse(response: Response, gosn: Gson): File {
         val file = convert.convertResponse(response, gosn)
         response.close()
         return file

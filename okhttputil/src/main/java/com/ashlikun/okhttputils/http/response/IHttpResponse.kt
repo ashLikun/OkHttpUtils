@@ -10,16 +10,16 @@ import java.lang.reflect.Type
  * 邮箱　　：496546144@qq.com
  *
  *
- * 功能介绍：
+ * 功能介绍：Response 的接口
  */
 interface IHttpResponse {
     var code: Int
     var message: String
     var json: String
-    fun setResponse(response: Response)
+    var response: Response?
 
     /**
-     * 获取头部code
+     * 获取http 的 code
      */
     var httpCode: Int
 

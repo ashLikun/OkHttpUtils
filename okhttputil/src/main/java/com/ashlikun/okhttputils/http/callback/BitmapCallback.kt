@@ -24,7 +24,7 @@ abstract class BitmapCallback(
         BitmapConvert(maxWidth, maxHeight, decodeConfig, scaleType)
 
     @Throws(Exception::class)
-    override fun convertResponse(response: Response, gosn: Gson?): Bitmap {
+    override fun convertResponse(response: Response, gosn: Gson): Bitmap {
         val bitmap = convert.convertResponse(response, gosn)
         response.close()
         return bitmap!!
