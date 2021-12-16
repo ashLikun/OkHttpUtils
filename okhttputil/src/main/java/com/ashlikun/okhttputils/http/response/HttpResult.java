@@ -27,7 +27,7 @@ public class HttpResult<T> extends HttpResponse {
     public String toString() {
         return "HttpResult{" +
                 "json='" + json + '\'' +
-                ", httpcode=" + httpcode +
+                ", httpcode=" + httpCode +
                 ", code=" + code +
                 ", message='" + message + '\'' +
                 '}';

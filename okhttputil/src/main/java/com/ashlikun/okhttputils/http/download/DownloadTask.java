@@ -109,7 +109,7 @@ public class DownloadTask implements Runnable {
      * 分发回调事件到ui层
      */
     private void onCallBack(int downloadStatus) {
-        HttpUtils.runmainThread(new Runnable() {
+        HttpUtils.launchMain(new Runnable() {
             @Override
             public void run() {
                 switch (downloadStatus) {

@@ -25,7 +25,7 @@ dependencies {
      implementation 'com.google.code.gson:gson:2.8.5'
      implementation 'com.github.ashLikun:MultiTypeGson:1.0.6'
      //如果使用下载，或者自定义缓存（不是http默认的）就要用到数据库
-     implementation 'com.github.ashLikun:LiteOrm:1.0.3'
+     implementation 'com.github.ashLikun:LiteOrm:2.0.2'
 }
 ```
         RequestParam p =  RequestParam.get();//get请求,可以是post--->RequestParam.post();

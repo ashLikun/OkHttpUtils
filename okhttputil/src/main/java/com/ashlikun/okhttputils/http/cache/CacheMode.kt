@@ -1,14 +1,14 @@
-package com.ashlikun.okhttputils.http.cache;
+package com.ashlikun.okhttputils.http.cache
 
 /**
- * 作者　　: 李坤
- * 创建时间: 2019/4/4　17:45
+ * @author　　: 李坤
+ * 创建时间: 2021.12.16 13:57
  * 邮箱　　：496546144@qq.com
- * <p>
+ *
  * 功能介绍：缓存模式
  */
-public enum CacheMode {
 
+enum class CacheMode {
     /**
      * 不使用缓存
      */
@@ -27,5 +27,5 @@ public enum CacheMode {
     /**
      * 先使用缓存，不管是否存在，仍然请求网络
      */
-    FIRST_CACHE_THEN_REQUEST,
+    FIRST_CACHE_THEN_REQUEST
 }

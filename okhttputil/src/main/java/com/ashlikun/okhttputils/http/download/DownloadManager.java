@@ -117,7 +117,7 @@ public class DownloadManager {
             downloadTask.setDownloadStatus(DownloadStatus.DOWNLOAD_STATUS_INIT);
             // 保存下载task列表
             mCurrentTaskList.put(downloadTask.getId(), downloadTask);
-            HttpUtils.runNewThread(downloadTask);
+            HttpUtils.launch(downloadTask);
         }
     }
 

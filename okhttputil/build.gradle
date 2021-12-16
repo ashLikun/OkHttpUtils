@@ -1,15 +1,23 @@
 apply plugin: 'com.android.library'
+// 使用Kotlin插件
+apply plugin: 'kotlin-android'
+apply plugin: 'com.github.dcendents.android-maven'
+// GitHub账户名
+group = 'com.github.ashLikun'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
     }
+    buildFeatures {
+        buildConfig = false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -19,18 +27,23 @@ android {
     //java8
     compileOptions {
         //定义生成的META-INF/library_release文件名 More than one file was found with OS independent path 'META-INF/library_release.kotlin_module'
-//        kotlinOptions.freeCompilerArgs += ['-module-name', 'com.ashlikun.utils']
+        kotlinOptions.freeCompilerArgs += ['-module-name', 'com.ashlikun.okhttputils.retrofit']
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    compileOnly 'com.squareup.okhttp3:okhttp:3+'
+    compileOnly 'com.squareup.okhttp3:okhttp:4.9.3'
     compileOnly 'com.google.code.gson:gson:2.8.5'
     compileOnly 'com.github.ashLikun:MultiTypeGson:2.0.0'
-    compileOnly 'com.github.ashLikun:LiteOrm:2.0.1'
+    compileOnly 'com.github.ashLikun:LiteOrm:2.0.2'
+    //kotlin 协程
+    compileOnly "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
 }
 
 apply from: '../maven.gradle'
