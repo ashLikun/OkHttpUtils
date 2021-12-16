@@ -10,11 +10,7 @@ import com.google.gson.annotations.SerializedName
  * 功能介绍：http的基本类
  */
 
-open class HttpResponse(
-    //原始数据
-    @Transient
-    override var json: String,
-) : AbsHttpResponse(json) {
+open class HttpResponse : AbsHttpResponse() {
     @SerializedName(value = CODE_KEY)
     override var code = ERROR
 

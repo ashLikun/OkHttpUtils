@@ -15,6 +15,8 @@
  */
 package com.ashlikun.okhttputils.http.download;
 
+import static com.ashlikun.okhttputils.http.download.DownloadManager.defaultFilePath;
+
 import android.text.TextUtils;
 
 import com.ashlikun.okhttputils.http.HttpUtils;
@@ -31,8 +33,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-
-import static com.ashlikun.okhttputils.http.download.DownloadManager.defaultFilePath;
 
 
 /**

@@ -6,7 +6,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okio.BufferedSink
 import java.io.IOException
-import java.nio.charset.Charset
 
 /**
  * @author　　: 李坤

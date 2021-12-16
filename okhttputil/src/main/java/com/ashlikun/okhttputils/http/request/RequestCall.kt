@@ -1,29 +1,25 @@
 package com.ashlikun.okhttputils.http.request
 
-import com.ashlikun.okhttputils.http.HttpUtils.launch
-import com.ashlikun.okhttputils.http.HttpUtils.handerResult
-import com.ashlikun.okhttputils.http.SuperHttp
-import com.ashlikun.okhttputils.http.callback.ProgressCallBack
-import com.ashlikun.okhttputils.http.cache.CachePolicy
-import com.ashlikun.okhttputils.http.OkHttpUtils
-import com.ashlikun.okhttputils.http.cache.ImlCachePolicy
 import com.ashlikun.okhttputils.http.ExecuteCall
-import com.ashlikun.okhttputils.http.callback.OkHttpCallback
-import kotlin.Throws
 import com.ashlikun.okhttputils.http.HttpException
+import com.ashlikun.okhttputils.http.HttpUtils.handerResult
+import com.ashlikun.okhttputils.http.HttpUtils.launch
+import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.SuperHttp
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
+import com.ashlikun.okhttputils.http.cache.CachePolicy
+import com.ashlikun.okhttputils.http.cache.ImlCachePolicy
 import com.ashlikun.okhttputils.http.callback.Callback
-import com.ashlikun.okhttputils.http.download.DownloadManager
+import com.ashlikun.okhttputils.http.callback.OkHttpCallback
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.*
 import okhttp3.Call
 import okhttp3.Interceptor
 import okhttp3.Request
 import java.io.IOException
-import java.lang.Exception
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**

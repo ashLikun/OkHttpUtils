@@ -1,7 +1,6 @@
 package com.ashlikun.okhttputils.retrofit
 
 import java.lang.reflect.Method
-import kotlin.coroutines.Continuation
 
 /**
  * 作者　　: 李坤

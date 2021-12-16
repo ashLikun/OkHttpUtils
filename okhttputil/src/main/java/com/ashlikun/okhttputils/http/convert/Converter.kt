@@ -1,9 +1,7 @@
 package com.ashlikun.okhttputils.http.convert
 
-import kotlin.Throws
 import com.google.gson.Gson
 import okhttp3.Response
-import java.lang.Exception
 
 /**
  * @author　　: 李坤

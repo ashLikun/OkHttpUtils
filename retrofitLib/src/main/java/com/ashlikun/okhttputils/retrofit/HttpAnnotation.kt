@@ -1,6 +1,5 @@
 package com.ashlikun.okhttputils.retrofit
 
-import com.google.gson.Gson
 import java.lang.annotation.Inherited
 
 /**

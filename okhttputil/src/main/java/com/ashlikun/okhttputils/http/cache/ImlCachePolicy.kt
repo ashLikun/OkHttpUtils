@@ -10,7 +10,6 @@ import okhttp3.internal.wait
 import okio.*
 import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.lang.Exception
 import java.nio.charset.Charset
 
 /**

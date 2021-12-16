@@ -14,12 +14,11 @@ import java.lang.reflect.Type
  *
  * 功能介绍：IHttpResponse的基础实现类
  */
-abstract class AbsHttpResponse(
+abstract class AbsHttpResponse : IHttpResponse {
     //原始数据
     @Transient
-    override var json: String,
+    override var json: String = ""
 
-    ) : IHttpResponse {
     /**
      * 获取头部code
      */

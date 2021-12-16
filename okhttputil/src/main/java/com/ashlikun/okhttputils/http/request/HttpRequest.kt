@@ -1,7 +1,6 @@
 package com.ashlikun.okhttputils.http.request
 
 import android.net.Uri
-import android.text.TextUtils
 import android.util.Log
 import com.ashlikun.gson.GsonHelper
 import com.ashlikun.okhttputils.http.ExecuteCall
@@ -11,7 +10,6 @@ import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.SuperHttp
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.callback.Callback
-import com.ashlikun.okhttputils.http.callback.ProgressCallBack
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType

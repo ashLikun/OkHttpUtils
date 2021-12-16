@@ -1,10 +1,8 @@
 package com.ashlikun.okhttputils.http
 
-import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.response.HttpErrorCode
 import okhttp3.Call
 import java.io.IOException
-import java.lang.Exception
 import java.net.*
 
 /**

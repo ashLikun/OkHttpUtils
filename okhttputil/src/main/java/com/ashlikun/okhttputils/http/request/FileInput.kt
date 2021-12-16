@@ -2,10 +2,8 @@ package com.ashlikun.okhttputils.http.request
 
 import com.ashlikun.okhttputils.http.HttpUtils.getMimeType
 import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.File
-import java.lang.Exception
 
 /**
  * 作者　　: 李坤

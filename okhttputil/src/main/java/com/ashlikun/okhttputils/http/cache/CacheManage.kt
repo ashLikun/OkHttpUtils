@@ -2,11 +2,9 @@ package com.ashlikun.okhttputils.http.cache
 
 import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
-import com.ashlikun.okhttputils.http.cache.CacheManage
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.orm.LiteOrmUtil
 import com.ashlikun.orm.db.assit.WhereBuilder
-import java.lang.Exception
 
 /**
  * @author　　: 李坤

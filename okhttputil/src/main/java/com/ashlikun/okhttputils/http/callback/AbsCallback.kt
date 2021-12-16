@@ -1,12 +1,10 @@
 package com.ashlikun.okhttputils.http.callback
 
-import kotlin.Throws
-import com.google.gson.Gson
 import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
+import com.google.gson.Gson
 import okhttp3.Response
-import java.lang.Exception
 import java.lang.reflect.Type
 
 /**

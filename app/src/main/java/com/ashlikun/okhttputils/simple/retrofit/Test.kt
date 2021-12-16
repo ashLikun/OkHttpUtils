@@ -1,7 +1,6 @@
 package com.ashlikun.okhttputils.simple.retrofit
 
 import android.util.Log
-import com.ashlikun.okhttputils.http.response.HttpResponse
 import com.ashlikun.okhttputils.simple.data.WeiJinModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

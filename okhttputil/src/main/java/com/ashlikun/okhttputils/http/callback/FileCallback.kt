@@ -2,7 +2,6 @@ package com.ashlikun.okhttputils.http.callback
 
 import android.os.Environment
 import com.ashlikun.okhttputils.http.convert.FileConvert
-import com.ashlikun.okhttputils.http.download.DownloadManager
 import com.google.gson.Gson
 import okhttp3.Response
 import java.io.File

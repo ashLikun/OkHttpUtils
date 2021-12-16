@@ -1,8 +1,9 @@
 package com.ashlikun.okhttputils.simple;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.ashlikun.okhttputils.http.request.HttpRequest;
 

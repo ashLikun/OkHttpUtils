@@ -1,7 +1,6 @@
 package com.ashlikun.okhttputils.simple
 
 import com.ashlikun.okhttputils.retrofit.Parse
-import org.jetbrains.annotations.TestOnly
 
 /**
  * 作者　　: 李坤

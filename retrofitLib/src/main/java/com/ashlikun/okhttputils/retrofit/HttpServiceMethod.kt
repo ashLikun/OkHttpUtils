@@ -1,6 +1,5 @@
 package com.ashlikun.okhttputils.retrofit
 
-import android.util.Log
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

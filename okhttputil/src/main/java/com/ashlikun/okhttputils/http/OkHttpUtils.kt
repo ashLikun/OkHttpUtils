@@ -7,7 +7,6 @@ import com.ashlikun.okhttputils.http.cookie.CookieJarImpl
 import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.http.request.RequestCall
-import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import java.util.*
