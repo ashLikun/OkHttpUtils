@@ -7,10 +7,9 @@ import org.json.JSONException
 import java.lang.reflect.Type
 
 /**
- * 作者　　: 李坤
- * 创建时间: 2021/6/6　14:24
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 9:34
  * 邮箱　　：496546144@qq.com
- *
  *
  * 功能介绍：IHttpResponse的基础实现类
  */

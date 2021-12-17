@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http.cache
 import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.ashlikun.okhttputils.http.request.HttpRequest
+import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.internal.notify
@@ -20,8 +21,7 @@ import java.nio.charset.Charset
  * 功能介绍：缓存的实现
  */
 open class ImlCachePolicy(request: HttpRequest) : BaseCachePolicy(request) {
-    override fun <T> callback(call: Call, callback: Callback<T>) {
-        val lock = Any()
+    override suspend fun <T> callback(call: Call?, callback: Callback<T>) {
         try {
             val cacheEntity = cache
             val response: Response = Response.Builder()
@@ -34,33 +34,17 @@ open class ImlCachePolicy(request: HttpRequest) : BaseCachePolicy(request) {
             val result = callback.convertResponse(response, request.parseGson)
             //有缓存
             if (cacheEntity != null) {
-                HttpUtils.launchMain {
-                    try {
-                        if (call != null && call.isCanceled()) {
-                            return@launchMain
-                        }
-                        callback.onCacheSuccess(cacheEntity, result)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        throw e
-                    } finally {
-                        //唤醒子线程
-                        synchronized(lock) { //获取对象锁
-                            lock.notify()
-                        }
+                GlobalScope.async(CoroutineExceptionHandler { _, t ->
+
+                }) {
+                    if (call != null && call.isCanceled()) {
+                        return@async
                     }
-                }
+                    callback.onCacheSuccess(cacheEntity, result)
+                }.await()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            //让子线程等待主线程结果
-            try {
-                //获取对象锁
-                synchronized(lock) { lock.wait() }
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-            }
         }
     }
 

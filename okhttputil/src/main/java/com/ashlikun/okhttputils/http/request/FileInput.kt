@@ -6,13 +6,13 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.File
 
 /**
- * 作者　　: 李坤
- * 创建时间:2017/3/17　15:56
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 10:09
  * 邮箱　　：496546144@qq.com
  *
- *
- * 功能介绍：
+ * 功能介绍：文件的封装类
  */
+
 class FileInput(
     var key: String,
     var file: File,

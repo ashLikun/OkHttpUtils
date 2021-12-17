@@ -1,20 +1,21 @@
-package com.ashlikun.okhttputils.simple;
+package com.ashlikun.okhttputils.simple.interceptor
 
-import java.io.IOException;
-
-import okhttp3.Interceptor;
-import okhttp3.Response;
+import okhttp3.Interceptor
+import okhttp3.Response
+import java.io.IOException
+import kotlin.Throws
 
 /**
  * 作者　　: 李坤
  * 创建时间: 2019/5/7　16:12
  * 邮箱　　：496546144@qq.com
- * <p>
+ *
+ *
  * 功能介绍：
  */
-public class MarvelSigningInterceptor implements Interceptor {
-    @Override
-    public Response intercept(Chain chain) throws IOException {
+class MarvelSigningInterceptor : Interceptor {
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
 
 //        Request.Builder request = null;
 //        chain.proceed(chain.request());
@@ -25,6 +26,6 @@ public class MarvelSigningInterceptor implements Interceptor {
 //            e.printStackTrace();
 //        }
 //        Response response = chain.proceed(request.build());
-        return  chain.proceed(chain.request());
+        return chain.proceed(chain.request())
     }
 }

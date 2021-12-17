@@ -12,7 +12,8 @@ import com.ashlikun.okhttputils.http.cache.CachePolicy
 import com.ashlikun.okhttputils.http.cache.ImlCachePolicy
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.ashlikun.okhttputils.http.callback.OkHttpCallback
-import com.ashlikun.okhttputils.http.response.HttpErrorCode.*
+import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_DATA_ERROR
+import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_DATA_ERROR
 import okhttp3.Call
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -23,11 +24,11 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * 作者　　: 李坤
- * 创建时间: 2017/3/17 16:20
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 9:38
+ * 邮箱　　：496546144@qq.com
  *
- *
- * 方法功能：根据请求参数封装Okhttp的Request和Call，对外提供更多的接口：cancel(),3个超时时间
+ * 功能介绍：根据请求参数封装Okhttp的Request和Call，对外提供更多的接口：cancel(),3个超时时间
  */
 class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
     private val TIME_OUT = -1
@@ -101,8 +102,7 @@ class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
      */
     override fun <T> execute(callback: Callback<T>): ExecuteCall {
         val call = buildCall(callback)
-        val exc = ExecuteCall()
-        exc.call = call
+        val exc = ExecuteCall(call)
         //如果缓存 不存在才请求网络，否则使用缓存
         if (cachePolicy?.cacheMode === CacheMode.IF_NONE_CACHE_REQUEST) {
             if (cachePolicy?.cache != null) {

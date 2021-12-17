@@ -11,31 +11,38 @@
         android:layout_weight="1" />
 
     <Button
-        android:id="@+id/button00"
+        android:id="@+id/buttonRetrofit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onButt00Click"
-        android:text="Retrofit测试" />
+        android:text="Retrofit测试"
+        android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/button0"
+        android:id="@+id/buttonStartDown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onButt0Click"
-        android:text="取消下载" />
+        android:text="开始下载"
+        android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/buttonCancelDown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onButt1Click"
-        android:text="请求图片" />
+        android:text="取消下载"
+        android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/buttonImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onButt2Click"
-        android:text="一般请求" />
+        android:text="请求图片"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/buttonDefault"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="一般请求"
+        android:textAllCaps="false" />
 
 </LinearLayout>

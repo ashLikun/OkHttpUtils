@@ -6,11 +6,13 @@ import java.io.IOException
 import java.net.*
 
 /**
- * 作者　　: 李坤
- * 创建时间: 2016/10/9 13:22
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 9:30
  * 邮箱　　：496546144@qq.com
- * 方法功能：
+ *
+ * 功能介绍：异常的封装
  */
+
 class HttpException(
     val code: Int,
     override val message: String,

@@ -11,7 +11,7 @@ import java.io.IOException
 
 /**
  * @author　　: 李坤
- * 创建时间: 2021/12/16 22:46
+ * 创建时间: 2021.12.17 9:39
  * 邮箱　　：496546144@qq.com
  *
  * 功能介绍：上传进度封装
@@ -63,7 +63,7 @@ open class ProgressRequestBody(
         //写入
         requestBody.writeTo(bufferedSink!!)
         //必须调用flush，否则最后一部分数据可能不会被写入
-        bufferedSink!!.flush()
+        bufferedSink?.flush()
     }
 
     /**
@@ -94,10 +94,7 @@ open class ProgressRequestBody(
     fun run() {
         if (contentLength != 0L) {
             progressCallBack?.invoke(
-                bytesWritten,
-                contentLength,
-                bytesWritten == contentLength,
-                true
+                bytesWritten, contentLength, bytesWritten == contentLength, true
             )
             if (bytesWritten == contentLength) {
                 isCancel = true

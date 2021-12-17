@@ -8,10 +8,9 @@ import okhttp3.Response
 import java.lang.reflect.Type
 
 /**
- * 作者　　: 李坤
- * 创建时间:2016/12/30　17:31
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 17:20
  * 邮箱　　：496546144@qq.com
- *
  *
  * 功能介绍：http返回值的回调接口
  * 泛型可以是
@@ -23,6 +22,7 @@ import java.lang.reflect.Type
  * @Link [com.ashlikun.okhttputils.http.response.HttpResult] 直接序列化的javabean,也可以自定义HttpResult。注意json的键
  * @Link 其他实体类。注意json的键
  */
+
 abstract class AbsCallback<ResultType> : Callback<ResultType> {
     /**
      * 指定数据类型，不使用Callback的泛型

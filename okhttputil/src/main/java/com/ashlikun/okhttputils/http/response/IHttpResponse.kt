@@ -5,10 +5,9 @@ import okhttp3.Response
 import java.lang.reflect.Type
 
 /**
- * 作者　　: 李坤
- * 创建时间: 2020/6/5　14:15
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 9:33
  * 邮箱　　：496546144@qq.com
- *
  *
  * 功能介绍：Response 的接口
  */

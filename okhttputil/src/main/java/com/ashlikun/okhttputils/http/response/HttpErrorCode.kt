@@ -1,12 +1,11 @@
 package com.ashlikun.okhttputils.http.response
 
 /**
- * 作者　　: 李坤
- * 创建时间: 2017/8/9　11:07
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 9:34
  * 邮箱　　：496546144@qq.com
  *
- *
- * 功能介绍：
+ * 功能介绍：Http 错误的Code
  */
 object HttpErrorCode {
     //200以上的用HttpURLConnection里面的变量
@@ -14,7 +13,7 @@ object HttpErrorCode {
     const val HTTP_TIME_OUT = 100101 //网络超时
     const val HTTP_UNKNOWN = 100100 //未知错误
     const val HTTP_UNKNOWN_HOST = 10098 //域名错误
-    const val HTTP_DATA_ERROR = 10097 //数据解析错误
+    const val HTTP_DATA_ERROR: Int = 10097 //数据解析错误
     const val HTTP_SOCKET_ERROR = 10096 //请求过于频繁,请稍后再试
     const val HTTP_CANCELED = 10095 //请求被取消
     const val MSG_NO_CONNECT = "请检查网络设置" //网络未连接

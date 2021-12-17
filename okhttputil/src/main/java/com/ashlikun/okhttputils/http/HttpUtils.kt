@@ -33,13 +33,13 @@ import java.util.*
 import java.util.regex.Pattern
 
 /**
- * 作者　　: 李坤
- * 创建时间: 2018/5/10 0010　下午 4:16
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 9:30
  * 邮箱　　：496546144@qq.com
- *
  *
  * 功能介绍：用到的工具方法
  */
+
 object HttpUtils {
     var UTF_8 = Charset.forName("UTF-8")
 
@@ -94,12 +94,12 @@ object HttpUtils {
     /**
      * 根据响应头或者url获取文件名
      */
-    fun getNetFileName(response: Response, url: String): String {
-        var fileName = getHeaderFileName(response)
-        if (fileName.isNullOrEmpty()) {
+    fun getNetFileName(response: Response?, url: String): String {
+        var fileName = if (response != null) getHeaderFileName(response) else ""
+        if (fileName.isEmpty()) {
             fileName = getUrlFileName(url)
         }
-        if (fileName.isNullOrEmpty()) {
+        if (fileName.isEmpty()) {
             fileName = "unknownfile_" + System.currentTimeMillis()
         }
         try {
@@ -114,10 +114,7 @@ object HttpUtils {
      * Content-Disposition:attachment;filename=FileName.txt
      * Content-Disposition: attachment; filename*="UTF-8''%E6%9B%BF%E6%8D%A2%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A.pdf"
      */
-    private fun getHeaderFileName(response: Response?): String? {
-        if (response == null) {
-            return null
-        }
+    private fun getHeaderFileName(response: Response): String {
         var dispositionHeader = response.header("Content-Disposition")
         if (dispositionHeader != null) {
             //文件名可能包含双引号，需要去除
@@ -139,15 +136,15 @@ object HttpUtils {
                 return fileName
             }
         }
-        return null
+        return ""
     }
 
     /**
      * 通过 ‘？’ 和 ‘/’ 判断文件名
      * http://mavin-manzhan.oss-cn-hangzhou.aliyuncs.com/1486631099150286149.jpg?x-oss-process=image/watermark,image_d2F0ZXJtYXJrXzIwMF81MC5wbmc
      */
-    private fun getUrlFileName(url: String): String? {
-        var filename: String? = null
+    private fun getUrlFileName(url: String): String {
+        var filename = ""
         val strings = url.split("/").toTypedArray()
         for (string in strings) {
             if (string.contains("?")) {
@@ -158,7 +155,7 @@ object HttpUtils {
                 }
             }
         }
-        if (strings.size > 0) {
+        if (strings.isNotEmpty()) {
             filename = strings[strings.size - 1]
         }
         return filename

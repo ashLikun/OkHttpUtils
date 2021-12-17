@@ -18,14 +18,13 @@ import java.lang.reflect.Type
 import java.util.*
 
 /**
- * 作者　　: 李坤
- * 创建时间:2016/10/14　15:03
+ * @author　　: 李坤
+ * 创建时间: 2021.12.17 10:08
  * 邮箱　　：496546144@qq.com
  *
- *
- * 功能介绍： 请求参数封装
- * 注意：一定要调用请求方法指定请求的方法，默认时get
- * 可以继承，从写方法
+ * 功能介绍：请求参数封装
+ *          注意：一定要调用请求方法指定请求的方法，默认时get
+ *          可以继承，从写方法
  */
 open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     //请求地址
@@ -69,10 +68,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
 
 
     fun appendPath(path: String): HttpRequest {
-        if (url == null) {
-            Exception("先调用url方法")
-        }
-        val builder = url!!.buildUpon()
+        val builder = url.buildUpon()
         if (path.isNotEmpty()) {
             url = builder.appendPath(path).build()
         }

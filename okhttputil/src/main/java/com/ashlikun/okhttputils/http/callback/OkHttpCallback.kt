@@ -7,7 +7,10 @@ import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.cache.CachePolicy
-import com.ashlikun.okhttputils.http.response.HttpErrorCode.*
+import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_DATA_ERROR
+import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_DATA_ERROR
+import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_UNKNOWN
+import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_UNKNOWN
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.Call
@@ -45,7 +48,7 @@ class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callback<Re
     }
 
     fun checkCanceled(response: Response? = null): Boolean {
-        if (exc.call.isCanceled()) {
+        if (exc.isCanceled) {
             exc.isCompleted = true
             if (!HttpUtils.isMainThread) {
                 HttpUtils.launchMain { callback.onCompleted() }
@@ -67,7 +70,9 @@ class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callback<Re
         //失败，回掉缓存
         if (cachePolicy?.cacheMode === CacheMode.REQUEST_FAILED_READ_CACHE) {
             if (checkCanceled()) return
-            cachePolicy?.callback(call, callback)
+            GlobalScope.launch {
+                cachePolicy?.callback(call, callback)
+            }
             return
         }
         postFailure(HttpException.handleFailureHttpException(call, e))
@@ -77,7 +82,7 @@ class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callback<Re
      * 本框架封装失败
      */
     private fun postFailure(throwable: HttpException) {
-        if (exc.call.isCanceled()) return
+        if (exc.isCanceled) return
         GlobalScope.async(Dispatchers.Main + CoroutineExceptionHandler { _, t ->
             t.printStackTrace()
         }) {

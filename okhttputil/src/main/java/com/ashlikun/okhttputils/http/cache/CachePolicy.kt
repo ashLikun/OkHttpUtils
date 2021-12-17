@@ -27,5 +27,5 @@ interface CachePolicy {
      * @param callback
      * @param <T>
     </T> */
-    fun <T> callback(call: Call, callback: Callback<T>)
+    suspend fun <T> callback(call: Call?, callback: Callback<T>)
 }
