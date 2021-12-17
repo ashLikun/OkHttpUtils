@@ -12,6 +12,7 @@ import com.ashlikun.orm.db.assit.WhereBuilder
  * 邮箱　　：496546144@qq.com
  *
  * 功能介绍：Cookie 管理器
+ * .cookieJar(CookieJarImpl(DBCookieStore()))
  */
 
 class CookieManager private constructor() {
@@ -37,7 +38,7 @@ class CookieManager private constructor() {
         )
     }
 
-    fun delete(whereClause: String?, whereArgs: Array<String>) {
+    fun delete(whereClause: String, whereArgs: Array<String>) {
         LiteOrmUtil.get().delete(
             WhereBuilder.create(SerializableCookie::class.java)
                 .where(whereClause, *whereArgs)

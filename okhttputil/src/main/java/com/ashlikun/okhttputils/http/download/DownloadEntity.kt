@@ -32,7 +32,7 @@ class DownloadEntity(
     }
 
     companion object {
-        fun queryById(id: String): DownloadEntity {
+        fun queryById(id: String): DownloadEntity? {
             return LiteOrmUtil.get().queryById(id, DownloadEntity::class.java)
         }
 

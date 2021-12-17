@@ -24,16 +24,16 @@ open class ImlCachePolicy(request: HttpRequest) : BaseCachePolicy(request) {
     override suspend fun <T> callback(call: Call?, callback: Callback<T>) {
         try {
             val cacheEntity = cache
-            val response: Response = Response.Builder()
-                .code(cacheEntity!!.code)
-                .message(cacheEntity.message)
-                .protocol(Protocol.get(cacheEntity.protocol))
-                .request(request.request)
-                .body(CacheResponseBody(cacheEntity))
-                .build()
-            val result = callback.convertResponse(response, request.parseGson)
             //有缓存
             if (cacheEntity != null) {
+                val response: Response = Response.Builder()
+                    .code(cacheEntity!!.code)
+                    .message(cacheEntity.message)
+                    .protocol(Protocol.get(cacheEntity.protocol))
+                    .request(request.request)
+                    .body(CacheResponseBody(cacheEntity))
+                    .build()
+                val result = callback.convertResponse(response, request.parseGson)
                 GlobalScope.async(CoroutineExceptionHandler { _, t ->
 
                 }) {

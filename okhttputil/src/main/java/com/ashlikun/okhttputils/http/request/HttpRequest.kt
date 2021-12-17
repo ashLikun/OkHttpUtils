@@ -3,16 +3,14 @@ package com.ashlikun.okhttputils.http.request
 import android.net.Uri
 import android.util.Log
 import com.ashlikun.gson.GsonHelper
-import com.ashlikun.okhttputils.http.ExecuteCall
-import com.ashlikun.okhttputils.http.HttpException
+import com.ashlikun.okhttputils.http.*
 import com.ashlikun.okhttputils.http.HttpUtils.createUrlFromParams
-import com.ashlikun.okhttputils.http.OkHttpUtils
-import com.ashlikun.okhttputils.http.SuperHttp
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*
@@ -61,11 +59,19 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         protected set
 
     //缓存模式
-    open var cacheMode: CacheMode = OkHttpUtils.get().cacheMode
+    open var cacheMode: CacheMode? = null
 
     //缓存超时时间
     open var cacheTime: Long = OkHttpUtils.get().cacheTime
 
+    //缓存的key，默认内部自动获取url，但是如果参数里面有动态的参数，那么可能失效，如时间戳,所以开放自己设置
+    open var cacheKey: String = ""
+        get() {
+            if (field.isNullOrEmpty()) {
+                return if (request.method == "GET") request.url.toString()
+                else return createUrlFromParams(url, paramsNotCommonParams).toString()
+            } else return field
+        }
 
     fun appendPath(path: String): HttpRequest {
         val builder = url.buildUpon()
@@ -95,6 +101,26 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         return this
     }
 
+    /**
+     * 获取去除公共参数
+     */
+    val paramsNotCommonParams: Map<String, Any>
+        get() {
+            var value: Map<String, Any>
+            if (isJson) {
+                value = parseGson.fromJson(
+                    postContent,
+                    Map::class.java
+                ) as Map<String, Any>
+            } else {
+                value = params.toMap()
+            }
+            //去除公共参数
+            if (OkHttpUtils.get().isCommonParams)
+                value = value.filter { !OkHttpUtils.get().commonParams.containsKey(it.key) }
+            return value
+        }
+
 
     val isHavaHeader: Boolean
         get() = headers.isNotEmpty()
@@ -106,8 +132,8 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加对象参数
      */
-    open fun addParamObject(key: String, valuse: Any): HttpRequest {
-        if (key.isNotEmpty()) {
+    open fun addParamObject(key: String, valuse: Any?): HttpRequest {
+        if (key.isNotEmpty() && valuse != null) {
             //如果参数是Map类型，就直接释放
             if (valuse is Map<*, *>) {
                 addParams(valuse)
@@ -121,7 +147,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加参数
      */
-    open fun addParam(key: String, valuse: Any): HttpRequest {
+    open fun addParam(key: String, valuse: Any?): HttpRequest {
         addParamObject(key, valuse)
         return this
     }
@@ -129,8 +155,8 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加头部
      */
-    open fun addHeader(key: String, valuse: String): HttpRequest {
-        if (key.isNotEmpty() && valuse.isNotEmpty()) {
+    open fun addHeader(key: String, valuse: String?): HttpRequest {
+        if (key.isNotEmpty() && !valuse.isNullOrEmpty()) {
             headers[key] = valuse
         }
         return this
@@ -296,7 +322,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
             builder.addFormDataPart(
                 fileInput.key,
                 fileInput.filename,
-                RequestBody.create(fileInput.contentType, fileInput.file)
+                fileInput.file.asRequestBody(fileInput.contentType)
             )
         }
     }

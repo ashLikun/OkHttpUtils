@@ -1,6 +1,8 @@
 package com.ashlikun.okhttputils.http.download
 
 import android.text.TextUtils
+import android.util.Log
+import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.HttpUtils.getNetFileName
 import com.ashlikun.okhttputils.http.HttpUtils.launchMain
 import com.ashlikun.okhttputils.http.IOUtils.closeQuietly
@@ -9,6 +11,8 @@ import com.ashlikun.okhttputils.http.IOUtils.createNewFile
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.*
+import kotlin.math.abs
+import kotlin.math.log
 
 /**
  * @author　　: 李坤
@@ -63,7 +67,7 @@ class DownloadTask(
 
 
     //是否下载结束
-    val isDownloadFinish: Boolean
+    private val isDownloadFinish: Boolean
         get() {
             if (totalSize > 0 && completedSize > 0 && totalSize == completedSize) {
                 downloadStatus = DownloadStatus.DOWNLOAD_STATUS_COMPLETED
@@ -102,6 +106,9 @@ class DownloadTask(
         if (rate <= 0) {
             rate = DownloadManager.DEFAULT_RATE
         }
+        if (id.isNullOrEmpty()) {
+            id = url
+        }
     }
 
     /**
@@ -109,16 +116,22 @@ class DownloadTask(
      */
     fun cancel() {
         totalSize = 0
-        listener?.onCancel(this)
-        if (dbEntity != null) {
-            DownloadEntity.delete(dbEntity!!)
-            val temp = File(filePath)
-            if (temp.exists()) temp.delete()
+        if (!isDownloading) {
+            downloadStatus = DownloadStatus.DOWNLOAD_STATUS_CANCEL
+            onCallBack(downloadStatus)
+            if (dbEntity != null) {
+                DownloadEntity.delete(dbEntity!!)
+                val temp = File(filePath)
+                if (temp.exists()) temp.delete()
+            }
         }
+        downloadStatus = DownloadStatus.DOWNLOAD_STATUS_CANCEL
+        isCancel = true
     }
 
     /**
      * 分发回调事件到ui层
+     * @param downloadStatus 必须传递参数的形式，不然状态中由于异步可能不对
      */
     private fun onCallBack(downloadStatus: Int) {
         launchMain {
@@ -153,22 +166,13 @@ class DownloadTask(
         }
 
 
-    fun onComplete() {
-        //下载完成取消订阅
-        if (downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {
-            isCancel = true
-        }
-    }
-
-    fun setCancel() {
-        downloadStatus = DownloadStatus.DOWNLOAD_STATUS_CANCEL
-        isCancel = true
-    }
-
     /**
      * 真正的下载
      */
     fun run() {
+        //正在下载
+        if (isDownloading) return
+        isCancel = false
         var inputStream: InputStream? = null
         var bis: BufferedInputStream? = null
         var downLoadFile: RandomAccessFile? = null
@@ -219,6 +223,9 @@ class DownloadTask(
             }
             // 文件跳转到指定位置开始写入
             downLoadFile.seek(completedSize)
+            if (!response.isSuccessful) {
+                throw HttpException(response.code, "http error")
+            }
             if (responseBody != null) {
                 downloadStatus = DownloadStatus.DOWNLOAD_STATUS_DOWNLOADING
                 if (totalSize < completedSize + responseBody.contentLength()) {
@@ -229,7 +236,7 @@ class DownloadTask(
                 inputStream = responseBody.byteStream()
                 bis = BufferedInputStream(inputStream, BUFFER_SIZE)
                 val buffer = ByteArray(BUFFER_SIZE)
-                var length = 0
+                var length: Int
                 // 开始下载数据库中插入下载信息
                 if (dbEntity == null) {
                     dbEntity = DownloadEntity(
@@ -242,11 +249,12 @@ class DownloadTask(
                 var timeOld = System.currentTimeMillis()
                 while (bis.read(buffer).also {
                         length = it
-                    } > 0 && downloadStatus != DownloadStatus.DOWNLOAD_STATUS_CANCEL && downloadStatus != DownloadStatus.DOWNLOAD_STATUS_PAUSE) {
+                    } > 0 && downloadStatus != DownloadStatus.DOWNLOAD_STATUS_CANCEL
+                    && downloadStatus != DownloadStatus.DOWNLOAD_STATUS_PAUSE) {
                     downLoadFile.write(buffer, 0, length)
                     completedSize += length.toLong()
                     //计算是否要回调
-                    if (Math.abs(System.currentTimeMillis() - timeOld) > rate) {
+                    if (abs(System.currentTimeMillis() - timeOld) > rate) {
                         timeOld = System.currentTimeMillis()
                         //写入数据库
                         dbEntity!!.completedSize = completedSize
@@ -259,20 +267,30 @@ class DownloadTask(
                     }
                 }
                 // 防止最后一次不足rate时间，导致percent无法达到100%
-                onCallBack(downloadStatus)
+                if (!isCancel) {
+                    onCallBack(downloadStatus)
+                }
             }
         } catch (e: FileNotFoundException) {
             // file not found
             e.printStackTrace()
             downloadStatus = DownloadStatus.DOWNLOAD_STATUS_ERROR
             errorCode = DownloadStatus.DOWNLOAD_ERROR_FILE_NOT_FOUND
+            onCallBack(downloadStatus)
         } catch (e: IOException) {
             // io exception
             e.printStackTrace()
             downloadStatus = DownloadStatus.DOWNLOAD_STATUS_ERROR
             errorCode = DownloadStatus.DOWNLOAD_ERROR_IO_ERROR
+            onCallBack(downloadStatus)
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            downloadStatus = DownloadStatus.DOWNLOAD_STATUS_ERROR
+            errorCode = e.code
+            onCallBack(downloadStatus)
         } finally {
             if (!isCancel) {
+                //改变状态
                 if (isDownloadFinish) {
                     onCallBack(downloadStatus)
                 }
@@ -281,6 +299,14 @@ class DownloadTask(
                     dbEntity!!.completedSize = completedSize
                     dbEntity!!.downloadStatus = downloadStatus
                     DownloadEntity.update(dbEntity!!)
+                }
+            } else {
+                onCallBack(downloadStatus)
+                //取消删除
+                if (dbEntity != null) {
+                    DownloadEntity.delete(dbEntity!!)
+                    val temp = File(filePath)
+                    if (temp.exists()) temp.delete()
                 }
             }
             // 回收资源

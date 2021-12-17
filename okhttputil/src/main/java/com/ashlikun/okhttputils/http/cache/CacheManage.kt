@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.http.cache
 
+import android.util.Log
 import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.request.HttpRequest
@@ -56,7 +57,8 @@ object CacheManage {
         }
     }
 
-    fun queryById(id: String?): CacheEntity? {
+    fun queryById(id: String): CacheEntity? {
+        Log.e("dddddddddd", id)
         return LiteOrmUtil.get().queryById(id, CacheEntity::class.java)
     }
 
@@ -69,11 +71,6 @@ object CacheManage {
     }
 
     fun getCacheKey(request: HttpRequest): String {
-        return if (request.method == "GET") {
-            request.url.toString()
-        } else {
-            HttpUtils.createUrlFromParams(request.url, request.params)
-                .toString()
-        }
+        return request.cacheKey
     }
 }

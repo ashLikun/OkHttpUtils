@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
  *
  * 功能介绍：
  */
-class Test {
+class RetrofitTest {
     companion object {
         @JvmStatic
         fun start() {

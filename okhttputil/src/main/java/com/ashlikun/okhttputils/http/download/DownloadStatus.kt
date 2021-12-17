@@ -48,4 +48,5 @@ object DownloadStatus {
      * 文件io错误
      */
     const val DOWNLOAD_ERROR_IO_ERROR = 8
+
 }

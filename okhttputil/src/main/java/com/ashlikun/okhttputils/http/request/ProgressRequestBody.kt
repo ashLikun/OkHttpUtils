@@ -72,10 +72,7 @@ open class ProgressRequestBody(
     private fun sink(sink: Sink): Sink {
         if (progressCallBack != null && !isRun) {
             isRun = true
-            HttpUtils.launchMain {
-                delay(rate)
-                run()
-            }
+
         }
         return object : ForwardingSink(sink) {
             @Throws(IOException::class)
@@ -86,6 +83,7 @@ open class ProgressRequestBody(
                 }
                 //增加当前写入的字节数
                 bytesWritten += byteCount
+                HttpUtils.launchMain { run() }
                 super.write(source, byteCount)
             }
         }

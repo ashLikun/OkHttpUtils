@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 jeasonlzy(廖子尧)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.ashlikun.okhttputils.http.cookie
 
 import android.content.ContentValues
@@ -14,14 +29,14 @@ import java.util.*
 
 /**
  * @author　　: 李坤
- * 创建时间: 2021.12.17 16:42
+ * 创建时间: 2019/2/27 11:26
  * 邮箱　　：496546144@qq.com
+ *
  *
  * 功能介绍：cookie实体存储
  */
 @Table("HttpCookie")
-class SerializableCookie @JvmOverloads constructor(host: String = "", cookie: Cookie? = null) :
-    Serializable {
+class SerializableCookie : Serializable {
     @PrimaryKey(AssignType.BY_MYSELF)
     var id: String = ""
     var cookieString: String = ""
@@ -31,50 +46,97 @@ class SerializableCookie @JvmOverloads constructor(host: String = "", cookie: Co
 
     @Ignore
     @Transient
-    var cookie: Cookie
+    var cookieCache: Cookie? = null
 
+    @Ignore
+    @Transient
+    var clientCookie: Cookie? = null
 
-    init {
-        if (cookie != null) {
-            this.cookie = cookie
-            this.host = host
-            name = cookie.name
-            domain = cookie.domain
-            if (cookie != null) {
-                cookieString = encodeCookie(host, cookie)
-            }
-        } else {
-            this.cookie = decodeCookie(cookieString)
-        }
-        id = "$name@$domain"
+    constructor() {}
+    constructor(host: String, cookie: Cookie) {
+        this.cookieCache = cookie
+        this.host = host
+        name = cookie.name
+        domain = cookie.domain
+        cookieString = encodeCookie(host, cookie)
+        id = cookieToken
     }
 
+    /**
+     * 这里有概率不能序列化成功
+     */
+    fun getCookie(): Cookie? {
+        if (cookieCache == null) {
+            cookieCache = decodeCookie(cookieString)
+        }
+        var bestCookie = cookieCache
+        if (clientCookie != null) {
+            bestCookie = clientCookie
+        }
+        return bestCookie
+    }
+
+    private val cookieToken: String
+        private get() = "$name@$domain"
 
     fun save() {
         LiteOrmUtil.get().save(this)
     }
 
+    @Throws(IOException::class)
+    private fun writeObject(out: ObjectOutputStream) {
+        cookieCache?.run {
+            out.defaultWriteObject()
+            out.writeObject(name)
+            out.writeObject(value)
+            out.writeLong(expiresAt)
+            out.writeObject(domain)
+            out.writeObject(path)
+            out.writeBoolean(secure)
+            out.writeBoolean(httpOnly)
+            out.writeBoolean(hostOnly)
+            out.writeBoolean(persistent)
+        }
+    }
+
+    @Throws(IOException::class, ClassNotFoundException::class)
+    private fun readObject(ois: ObjectInputStream) {
+        ois.defaultReadObject()
+        val name = ois.readObject() as String? ?: ""
+        val value = ois.readObject() as String? ?: ""
+        val expiresAt = ois.readLong()
+        val domain = ois.readObject() as String? ?: ""
+        val path = ois.readObject() as String? ?: ""
+        val secure = ois.readBoolean()
+        val httpOnly = ois.readBoolean()
+        val hostOnly = ois.readBoolean()
+        val persistent = ois.readBoolean()
+        clientCookie = Cookie.Builder().let {
+            it.name(name).value(value).expiresAt(expiresAt)
+            if (hostOnly) it.hostOnlyDomain(domain) else it.domain(domain)
+            it.path(path)
+            if (secure) it.secure()
+            if (httpOnly) it.httpOnly()
+            it
+        }.build()
+    }
 
     /**
      * host, name, domain 标识一个cookie是否唯一
      */
     override fun equals(o: Any?): Boolean {
-        if (this === o) {
-            return true
-        }
-        if (o == null || javaClass != o.javaClass) {
-            return false
-        }
-        val that = o as SerializableCookie?
-        if (host != that?.host) return false
-        if (name != that?.name) return false
-        return domain == that?.domain
+        if (this === o) return true
+        if (o == null || javaClass != o.javaClass) return false
+        val that = o as SerializableCookie
+        if (host != that.host) return false
+        if (name != that.name) return false
+        return domain == that.domain
     }
 
     override fun hashCode(): Int {
-        var result = host.hashCode()
-        result = 31 * result + name.hashCode()
-        result = 31 * result + domain.hashCode()
+        var result = if (host != null) host.hashCode() else 0
+        result = 31 * result + if (name != null) name.hashCode() else 0
+        result = 31 * result + if (domain != null) domain.hashCode() else 0
         return result
     }
 
@@ -84,11 +146,11 @@ class SerializableCookie @JvmOverloads constructor(host: String = "", cookie: Co
         const val NAME = "name"
         const val DOMAIN = "domain"
         const val COOKIE = "cookie"
-        fun parseCursorToBean(cursor: Cursor): SerializableCookie? {
+        fun parseCursorToBean(cursor: Cursor): SerializableCookie {
             val host = cursor.getString(cursor.getColumnIndex(HOST))
             val cookieBytes = cursor.getBlob(cursor.getColumnIndex(COOKIE))
-            val cookie = bytesToCookie(cookieBytes) ?: return null
-            return SerializableCookie(host, cookie)
+            val cookie = bytesToCookie(cookieBytes)
+            return SerializableCookie(host, cookie!!)
         }
 
         fun getContentValues(serializableCookie: SerializableCookie): ContentValues {
@@ -97,7 +159,8 @@ class SerializableCookie @JvmOverloads constructor(host: String = "", cookie: Co
             values.put(NAME, serializableCookie.name)
             values.put(DOMAIN, serializableCookie.domain)
             values.put(
-                COOKIE, cookieToBytes(serializableCookie.host, serializableCookie.cookie)
+                COOKIE,
+                cookieToBytes(serializableCookie.host, serializableCookie.getCookie())
             )
             return values
         }
@@ -113,8 +176,10 @@ class SerializableCookie @JvmOverloads constructor(host: String = "", cookie: Co
             return byteArrayToHexString(cookieBytes)
         }
 
-        fun cookieToBytes(host: String, cookie: Cookie): ByteArray? {
-            val serializableCookie = SerializableCookie(host, cookie)
+        fun cookieToBytes(host: String, cookie: Cookie?): ByteArray? {
+            val serializableCookie = SerializableCookie()
+            serializableCookie.host = host
+            serializableCookie.cookieCache = cookie
             val os = ByteArrayOutputStream()
             try {
                 val outputStream = ObjectOutputStream(os)
@@ -132,14 +197,23 @@ class SerializableCookie @JvmOverloads constructor(host: String = "", cookie: Co
          * @param cookieString cookies string
          * @return cookie object
          */
-        fun decodeCookie(cookieString: String): Cookie {
-            return bytesToCookie(hexStringToByteArray(cookieString))
+        fun decodeCookie(cookieString: String?): Cookie? {
+            if (cookieString == null || cookieString.isEmpty()) {
+                return null
+            }
+            val bytes = hexStringToByteArray(cookieString)
+            return bytesToCookie(bytes)
         }
 
-        fun bytesToCookie(bytes: ByteArray): Cookie {
+        fun bytesToCookie(bytes: ByteArray?): Cookie? {
             val byteArrayInputStream = ByteArrayInputStream(bytes)
-            val objectInputStream = ObjectInputStream(byteArrayInputStream)
-            return (objectInputStream.readObject() as SerializableCookie).cookie
+            return try {
+                val objectInputStream = ObjectInputStream(byteArrayInputStream)
+                (objectInputStream.readObject() as SerializableCookie).getCookie()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
 
         /**
@@ -171,10 +245,9 @@ class SerializableCookie @JvmOverloads constructor(host: String = "", cookie: Co
             val data = ByteArray(len / 2)
             var i = 0
             while (i < len) {
-                data[i / 2] = ((Character.digit(
-                    hexString[i],
-                    16
-                ) shl 4) + Character.digit(hexString[i + 1], 16)).toByte()
+                data[i / 2] = ((Character.digit(hexString[i], 16) shl 4) + Character.digit(
+                    hexString[i + 1], 16
+                )).toByte()
                 i += 2
             }
             return data

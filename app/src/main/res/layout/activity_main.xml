@@ -25,6 +25,13 @@
         android:textAllCaps="false" />
 
     <Button
+        android:id="@+id/buttonCancelPaus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="暂停下载"
+        android:textAllCaps="false" />
+
+    <Button
         android:id="@+id/buttonCancelDown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,4 +52,10 @@
         android:text="一般请求"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/buttonCookies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cookies 测试"
+        android:textAllCaps="false" />
 </LinearLayout>

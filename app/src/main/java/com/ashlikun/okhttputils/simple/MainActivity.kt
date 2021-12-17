@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.simple
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,58 +10,104 @@ import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.callback.AbsCallback
+import com.ashlikun.okhttputils.http.callback.BitmapCallback
 import com.ashlikun.okhttputils.http.callback.ProgressCallBack
 import com.ashlikun.okhttputils.http.download.DownloadManager
-import com.ashlikun.okhttputils.http.download.DownloadTask
-import com.ashlikun.okhttputils.http.download.DownloadTaskListener
 import com.ashlikun.okhttputils.simple.data.GoodListData
 import com.ashlikun.okhttputils.simple.data.HuodongData
 import com.ashlikun.okhttputils.simple.databinding.ActivityMainBinding
-import com.ashlikun.okhttputils.simple.retrofit.Test
-import java.io.File
+import com.ashlikun.okhttputils.simple.retrofit.RetrofitTest
 
 class MainActivity : AppCompatActivity() {
     val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    var task: DownloadTask = DownloadTask("resmp;csr=1bbd",
-        url = "http://s.shouji.qihucdn.com/200407/28e9b1ac86444ec466f56ff0df9aa7b9/com.qihoo360.mobilesafe_267.apk?en=curpage%3D%26exp%3D1587610389%26from%3Dopenbox_detail_index%26m2%3D%26ts%3D1587005589%26tok%3D8ac5571c83e9bb8497076a3435f3c90d%26f%3Dz.apk",
-        object : DownloadTaskListener {
-            override fun onDownloading(
-                downloadTask: DownloadTask,
-                completedSize: Long,
-                totalSize: Long,
-                percent: Double
-            ) {
-                Log.e("aaa", "onDownloading percent = $percent")
-            }
-
-            override fun onPause(
-                downloadTask: DownloadTask,
-                completedSize: Long,
-                totalSize: Long,
-                percent: Double
-            ) {
-                Log.e("aaa", "onPause percent = $percent")
-            }
-
-            override fun onCancel(downloadTask: DownloadTask) {
-                Log.e("aaa", "onCancel ")
-            }
-
-            override fun onDownloadSuccess(downloadTask: DownloadTask, file: File) {
-                Log.e("aaa", "onDownloadSuccess  " + file.path)
-            }
-
-            override fun onError(downloadTask: DownloadTask, errorCode: Int) {
-                Log.e("aaa", "onError $errorCode")
-            }
-        })
+    val meinv =
+        "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.jj20.com%2Fup%2Fallimg%2F1114%2F060421091316%2F210604091316-6-1200.jpg&refer=http%3A%2F%2Fimg.jj20.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1642340471&t=fb1cdad91178b19878ffd4db8ed90fd0"
 
     protected override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        DownloadManager.initPath(getApplication().getCacheDir().getPath())
+        binding.buttonRetrofit.setOnClickListener {
+            RetrofitTest.start()
+        }
+        binding.buttonStartDown.setOnClickListener {
+            DownloadManager.get().addDownloadTask(task)
+        }
+        binding.buttonCancelPaus.setOnClickListener {
+            DownloadManager.get().pause(task.id)
+        }
+        binding.buttonCancelDown.setOnClickListener {
+            DownloadManager.get().cancel(task.id)
+        }
+        binding.buttonImage.setOnClickListener {
+            OkHttpUtils.get(meinv)
+                .buildCall()
+                .execute(object : BitmapCallback() {
+                    override fun onSuccess(responseBody: Bitmap) {
+                        super.onSuccess(responseBody)
+                        binding.image.setImageBitmap(responseBody)
+                    }
+                })
+        }
+        binding.buttonCookies.setOnClickListener {
+            OkHttpUtils.get("https://wanandroid.com/article/list/1/json?cid=0")
+                .apply {
+                    addHeader("heeeeee", "adddheeeeee")
+                    addParam("action", "recommend")
+                    addParam("wwwwwwww", "dddddddddddd")
+                    cacheMode = CacheMode.FIRST_CACHE_THEN_REQUEST
+                    cacheTime = 3600000
+                }
+                .buildCall()
+                .execute(object : AbsCallback<GoodListData>() {
+                    override fun onSuccess(responseBody: GoodListData) {
+                        Log.e("onSuccess", responseBody.getStringValueDef("123", "list", "title"))
+                    }
+
+                    override fun onCacheSuccess(entity: CacheEntity, responseBody: GoodListData) {
+                        super.onCacheSuccess(entity, responseBody)
+                        Log.e(
+                            "onCacheSuccess",
+                            GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result
+                        )
+                    }
+                })
+        }
+        binding.buttonDefault.setOnClickListener {
+            OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend")
+                .apply {
+                    addHeader("heeeeee", "adddheeeeee")
+                    addParam("action", "recommend")
+                    addParam("wwwwwwww", "dddddddddddd")
+                    cacheMode = CacheMode.FIRST_CACHE_THEN_REQUEST
+                    cacheTime = 3600000
+                    toJson()
+                }
+                .buildCall()
+                .execute(object : AbsCallback<GoodListData>() {
+                    override val progressCallBack: ProgressCallBack =
+                        { progress, total, done, isUpdate ->
+                            Log.e(
+                                "aaa",
+                                "progress = $progress   total = $total    done = $done   isUpdate = $isUpdate"
+                            )
+                        }
+
+                    override fun onSuccess(responseBody: GoodListData) {
+                        Log.e("onSuccess", responseBody.getStringValueDef("123", "list", "title"))
+                    }
+
+                    override fun onCacheSuccess(entity: CacheEntity, responseBody: GoodListData) {
+                        super.onCacheSuccess(entity, responseBody)
+                        Log.e(
+                            "onCacheSuccess",
+                            GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result
+                        )
+                    }
+                })
+        }
+
         //        LiteOrmUtil.init(new LiteOrmUtil.OnNeedListener() {
 //            @Override
 //            public Application getApplication() {
@@ -114,15 +161,6 @@ class MainActivity : AppCompatActivity() {
 //        Log.e("aaa", "" + "");
     }
 
-    fun onButt00Click(view: View?) {
-        Test.start()
-    }
-
-    fun onButt0Click(view: View?) {
-        task.setCancel()
-    }
-
-    fun onButt1Click(view: View?) {}
     fun onButt2Click(view: View?) {
         val data = HuodongData()
         data.hashCode()
@@ -154,35 +192,7 @@ class MainActivity : AppCompatActivity() {
 //                Log.e("aaa", aa.toString());
 //            }
 //        });
-        OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend")
-            .apply {
-                addHeader("action", "recommend")
-                cacheMode = CacheMode.FIRST_CACHE_THEN_REQUEST
-                cacheTime = 3600000
-            }
-            .buildCall()
-            .execute(object : AbsCallback<GoodListData>() {
-                override val progressCallBack: ProgressCallBack =
-                    { progress, total, done, isUpdate ->
-                        Log.e(
-                            "aaa",
-                            "progress = $progress   total = $total    done = $done   isUpdate = $isUpdate"
-                        )
-                    }
 
-                override fun onSuccess(responseBody: GoodListData) {
-                    Log.e("onSuccess", responseBody.getStringValueDef("", "aaa", "bbb"))
-                    Log.e("onSuccess", GsonHelper.getGson().toJson(responseBody))
-                }
-
-                override fun onCacheSuccess(entity: CacheEntity, responseBody: GoodListData) {
-                    super.onCacheSuccess(entity, responseBody)
-                    Log.e(
-                        "onCacheSuccess",
-                        GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result
-                    )
-                }
-            })
     }
 
 

@@ -87,11 +87,13 @@ class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
         } else {
             call = OkHttpUtils.get().okHttpClient.newCall(request)
         }
-        //设置缓存信息
-        cachePolicy = ImlCachePolicy(httpRequest)
+
         if (httpRequest.cacheMode != null) {
-            cachePolicy?.cacheMode = httpRequest.cacheMode
-            cachePolicy?.cacheTime = httpRequest.cacheTime
+            //设置缓存信息
+            cachePolicy = ImlCachePolicy(httpRequest).apply {
+                cacheMode = httpRequest.cacheMode!!
+                cacheTime = httpRequest.cacheTime
+            }
         }
         return call
     }
@@ -112,7 +114,7 @@ class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
         }
         call.enqueue(OkHttpCallback(exc, callback).apply {
             gson = httpRequest.parseGson
-            cachePolicy = cachePolicy
+            cachePolicy = this@RequestCall.cachePolicy
         })
         return exc
     }

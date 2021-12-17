@@ -4,9 +4,9 @@ import android.app.Application
 import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.cookie.CookieJarImpl
 import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore
+import com.ashlikun.okhttputils.http.download.DownloadManager
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.retrofit.Retrofit
-import com.ashlikun.okhttputils.simple.Init.init
 import com.ashlikun.okhttputils.simple.interceptor.MarvelSigningInterceptor
 import com.ashlikun.orm.LiteOrmUtil
 import okhttp3.OkHttpClient
@@ -49,6 +49,7 @@ class MyApp : Application() {
         OkHttpUtils.init(mOkHttpClient)
         OkHttpUtils.get().commonHeaders = head
         OkHttpUtils.get().commonParams = params
+        DownloadManager.initPath(this.cacheDir.path)
         Retrofit.get().init(
             createRequest = { HttpRequest(it.url) },
             execute = { request, result, params -> request.syncExecute<Any>(result.resultType) }

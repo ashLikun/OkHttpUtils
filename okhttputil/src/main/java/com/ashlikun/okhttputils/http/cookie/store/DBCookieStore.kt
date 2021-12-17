@@ -29,8 +29,10 @@ class DBCookieStore : CookieStore {
             if (!cookies.containsKey(serializableCookie.host)) {
                 cookies[serializableCookie.host] = ConcurrentHashMap()
             }
-            val cookie = serializableCookie.cookie
-            cookies[serializableCookie.host]!![getCookieToken(cookie)] = cookie
+            val cookie = serializableCookie.getCookie()
+            if (cookie != null) {
+                cookies[serializableCookie.host]?.put(getCookieToken(cookie), cookie)
+            }
         }
     }
 
@@ -58,7 +60,7 @@ class DBCookieStore : CookieStore {
             removeCookie(url, cookie)
         } else {
             //内存缓存
-            cookies[url.host]!![getCookieToken(cookie)] = cookie
+            cookies[url.host]?.put(getCookieToken(cookie), cookie)
             //数据库缓存
             SerializableCookie(url.host, cookie).save()
         }
@@ -75,11 +77,13 @@ class DBCookieStore : CookieStore {
         }
         val query = CookieManager.get().query("host=?", arrayOf(url.host))
         for (serializableCookie in query) {
-            val cookie = serializableCookie.cookie
-            if (isCookieExpired(cookie)) {
-                removeCookie(url, cookie)
-            } else {
-                ret.add(cookie)
+            val cookie = serializableCookie.getCookie()
+            if (cookie != null) {
+                if (isCookieExpired(cookie)) {
+                    removeCookie(url, cookie)
+                } else {
+                    ret.add(cookie)
+                }
             }
         }
         return ret
@@ -94,12 +98,12 @@ class DBCookieStore : CookieStore {
             return false
         }
         val cookieToken = getCookieToken(cookie)
-        if (!cookies[url.host]!!.containsKey(cookieToken)) {
+        if (cookies[url.host]?.containsKey(cookieToken) != true) {
             return false
         }
 
         //内存移除
-        cookies[url.host]!!.remove(cookieToken)
+        cookies[url.host]?.remove(cookieToken)
         //数据库移除
         val whereClause = "host=? and name=? and domain=?"
         val whereArgs = arrayOf(url.host, cookie.name, cookie.domain)
@@ -139,7 +143,9 @@ class DBCookieStore : CookieStore {
         get() {
             val ret: MutableList<Cookie> = ArrayList()
             for (key in cookies.keys) {
-                ret.addAll(cookies[key]!!.values)
+                cookies[key]?.values?.let {
+                    ret.addAll(it)
+                }
             }
             return ret
         }

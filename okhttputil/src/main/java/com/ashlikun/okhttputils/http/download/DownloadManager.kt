@@ -20,23 +20,34 @@ class DownloadManager private constructor(var client: OkHttpClient) {
     /**
      * 添加下载任务
      */
-    fun addDownloadTask(downloadTask: DownloadTask) {
-        if (!downloadTask.isDownloading) {
-            val oldTask = currentTaskList[downloadTask.id]
-            if (oldTask != null) {
-                if (oldTask.isDownloading) {
+    fun addDownloadTask(downloadTask: DownloadTask, isStart: Boolean = true) {
+        val oldTask = currentTaskList[downloadTask.id]
+        if (oldTask != null) {
+            when {
+                //正在下载不处理
+                oldTask.isDownloading -> return
+                //完成也不处理
+                oldTask.isCompleted -> currentTaskList.remove(downloadTask.id)
+                oldTask.isCancel -> currentTaskList.remove(downloadTask.id)
+                else -> {
+                    if (isStart) {
+                        launch {
+                            downloadTask.run()
+                        }
+                    }
                     return
-                } else {
-                    oldTask.onComplete()
-                    currentTaskList.remove(downloadTask.id)
                 }
             }
+        }
+        if (!downloadTask.isDownloading) {
             downloadTask.client = client
             downloadTask.downloadStatus = DownloadStatus.DOWNLOAD_STATUS_INIT
             // 保存下载task列表
             currentTaskList[downloadTask.id] = downloadTask
-            launch {
-                downloadTask.run()
+            if (isStart) {
+                launch {
+                    downloadTask.run()
+                }
             }
         }
     }
@@ -66,8 +77,8 @@ class DownloadManager private constructor(var client: OkHttpClient) {
      */
     fun cancel(id: String) {
         getDownloadTask(id)?.apply {
+            currentTaskList.remove(this.id)
             cancel()
-            setCancel()
         }
     }
 
@@ -91,7 +102,7 @@ class DownloadManager private constructor(var client: OkHttpClient) {
     fun getDownloadTask(id: String): DownloadTask? {
         var currTask = currentTaskList[id]
         if (currTask == null) {
-            // 从数据库中取出为完成的task
+            // 从数据库中取出未完成的task
             val entity = DownloadEntity.queryById(id)
             if (entity != null) {
                 if (entity.downloadStatus != DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {
