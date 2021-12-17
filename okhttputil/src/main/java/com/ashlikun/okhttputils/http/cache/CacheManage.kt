@@ -58,7 +58,6 @@ object CacheManage {
     }
 
     fun queryById(id: String): CacheEntity? {
-        Log.e("dddddddddd", id)
         return LiteOrmUtil.get().queryById(id, CacheEntity::class.java)
     }
 
