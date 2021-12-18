@@ -1,7 +1,5 @@
 package com.ashlikun.okhttputils.http.cache
 
-import android.util.Log
-import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.orm.LiteOrmUtil

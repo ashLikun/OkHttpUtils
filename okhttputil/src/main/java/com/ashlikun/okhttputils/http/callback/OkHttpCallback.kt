@@ -8,8 +8,8 @@ import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.cache.CachePolicy
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_DATA_ERROR
-import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_DATA_ERROR
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_UNKNOWN
+import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_DATA_ERROR
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_UNKNOWN
 import com.google.gson.Gson
 import kotlinx.coroutines.*

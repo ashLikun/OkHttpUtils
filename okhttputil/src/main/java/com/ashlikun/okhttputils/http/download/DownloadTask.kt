@@ -1,7 +1,5 @@
 package com.ashlikun.okhttputils.http.download
 
-import android.text.TextUtils
-import android.util.Log
 import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.HttpUtils.getNetFileName
 import com.ashlikun.okhttputils.http.HttpUtils.launchMain
@@ -12,7 +10,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.*
 import kotlin.math.abs
-import kotlin.math.log
 
 /**
  * @author　　: 李坤

@@ -1,11 +1,11 @@
 package com.ashlikun.okhttputils.http.download
 
-import com.ashlikun.orm.db.annotation.PrimaryKey
-import com.ashlikun.orm.db.enums.AssignType
-import com.ashlikun.orm.db.annotation.Column
-import com.ashlikun.orm.LiteOrmUtil
 import com.ashlikun.okhttputils.http.download.DownloadEntity
+import com.ashlikun.orm.LiteOrmUtil
+import com.ashlikun.orm.db.annotation.Column
+import com.ashlikun.orm.db.annotation.PrimaryKey
 import com.ashlikun.orm.db.annotation.Table
+import com.ashlikun.orm.db.enums.AssignType
 
 /**
  * @author　　: 李坤

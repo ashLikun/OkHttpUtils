@@ -1,13 +1,10 @@
 package com.ashlikun.okhttputils.http.cache
 
-import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.internal.notify
-import okhttp3.internal.wait
 import okio.*
 import java.io.ByteArrayInputStream
 import java.io.IOException

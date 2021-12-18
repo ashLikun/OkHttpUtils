@@ -1,11 +1,9 @@
 package com.ashlikun.okhttputils.http
 
-import android.text.TextUtils
 import java.io.Closeable
 import java.io.File
 import java.io.Flushable
 import java.io.IOException
-import java.lang.Exception
 
 /**
  * @author　　: 李坤
