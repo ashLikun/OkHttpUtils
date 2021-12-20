@@ -9,10 +9,10 @@ import com.google.gson.annotations.SerializedName
  *
  * 功能介绍：http返回的基本数据， 用泛型解耦，可以适用于大部分接口
  */
-class HttpResult<T> : HttpResponse() {
+open class HttpResult<T> : HttpResponse() {
     //用来模仿Data
     @SerializedName("data")
-    var data: T? = null
+    open var data: T? = null
 
     override fun toString(): String {
         return "HttpResult{" +
