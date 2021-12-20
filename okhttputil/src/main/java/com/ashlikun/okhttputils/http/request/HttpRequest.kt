@@ -59,7 +59,6 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
 
     //标识这个请求，会传递到Request里面
     open var tag: Any? = null
-        protected set
 
     //缓存模式
     open var cacheMode: CacheMode? = null
@@ -292,7 +291,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         return this
     }
 
-    open fun tag(tag: Any): HttpRequest {
+    open fun tag(tag: Any?): HttpRequest {
         this.tag = tag
         return this
     }
