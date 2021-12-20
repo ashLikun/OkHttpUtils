@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
  * 功能介绍：使用 SharedPreferences 持久化存储 cookie
  */
 
-class SPCookieStore(context: Context) : CookieStore {
+open class SPCookieStore(context: Context) : CookieStore {
     /**
      * 数据结构如下
      * Url.host -> cookieToken1,cookieToken2,cookieToken3

@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
  *
  * 功能介绍：根据请求参数封装Okhttp的Request和Call，对外提供更多的接口：cancel(),3个超时时间
  */
-class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
+open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
     private val TIME_OUT = -1
     lateinit var request: Request
         private set

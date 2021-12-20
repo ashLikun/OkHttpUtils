@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * 功能介绍：使用数据库 持久化存储 cookie
  */
-class DBCookieStore : CookieStore {
+open class DBCookieStore : CookieStore {
     /**
      * 数据结构如下
      * Url.host -> cookie1.name@cookie1.domain,cookie2.name@cookie2.domain,cookie3.name@cookie3.domain

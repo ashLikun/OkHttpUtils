@@ -25,7 +25,7 @@ import java.io.IOException
  * 功能介绍：okhttp的直接回调
  */
 
-class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callback<ResultType>) :
+open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callback<ResultType>) :
     okhttp3.Callback {
     var gson: Gson = OkHttpUtils.get().parseGson
     var cachePolicy: CachePolicy? = null

@@ -18,7 +18,7 @@ import java.util.*
  * 功能介绍：缓存的实体类,只保存数据的String
  */
 @Table("HttpCacheEntity")
-class CacheEntity {
+open class CacheEntity {
     /**
      * 缓存的key
      * */

@@ -16,7 +16,7 @@ import com.ashlikun.orm.db.enums.AssignType
  */
 
 @Table("DownloadEntity")
-class DownloadEntity(
+open class DownloadEntity(
     @PrimaryKey(AssignType.BY_MYSELF)
     @Column("downloadId")
     var downloadId: String = "",

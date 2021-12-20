@@ -15,7 +15,7 @@ import java.io.IOException
  *
  * 功能介绍：Bitmap的回调转换
  */
-class BitmapConvert constructor(
+open class BitmapConvert constructor(
     val maxWidth: Int = 1000,
     val maxHeight: Int = 1000,
     val decodeConfig: Bitmap.Config = Bitmap.Config.ARGB_8888,

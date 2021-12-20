@@ -13,7 +13,7 @@ import java.io.File
  * 功能介绍：文件的封装类
  */
 
-class FileInput(
+open class FileInput(
     var key: String,
     var file: File,
     var filename: String = "",

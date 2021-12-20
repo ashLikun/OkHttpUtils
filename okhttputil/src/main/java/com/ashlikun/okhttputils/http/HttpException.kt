@@ -13,7 +13,7 @@ import java.net.*
  * 功能介绍：异常的封装
  */
 
-class HttpException(
+open class HttpException(
     val code: Int,
     override val message: String,
     //原始错误

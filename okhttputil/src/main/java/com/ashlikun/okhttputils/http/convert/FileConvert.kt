@@ -21,7 +21,7 @@ import java.io.InputStream
  * 功能介绍：文件转换器
  */
 
-class FileConvert(//目标文件存储的文件夹路径
+open class FileConvert(//目标文件存储的文件夹路径
     var folder: String = Environment.getExternalStorageDirectory()
         .toString() + DM_TARGET_FOLDER,
     //目标文件存储的文件名

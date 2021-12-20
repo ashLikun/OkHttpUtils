@@ -11,7 +11,7 @@ import java.util.*
  *
  * 功能介绍：Cookie 的内存管理
  */
-class MemoryCookieStore : CookieStore {
+open class MemoryCookieStore : CookieStore {
     private val memoryCookies: MutableMap<String, MutableList<Cookie>?> = HashMap()
     @Synchronized
     override fun saveCookie(url: HttpUrl, cookies: List<Cookie>) {

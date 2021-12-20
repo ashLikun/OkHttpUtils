@@ -36,7 +36,7 @@ import java.util.*
  * 功能介绍：cookie实体存储
  */
 @Table("HttpCookie")
-class SerializableCookie : Serializable {
+open class SerializableCookie : Serializable {
     @PrimaryKey(AssignType.BY_MYSELF)
     var id: String = ""
     var cookieString: String = ""

@@ -19,7 +19,7 @@ import kotlin.math.abs
  * 功能介绍：下载线程
  */
 
-class DownloadTask(
+open class DownloadTask(
     // 任务id，断点下载
     var id: String = "",
     // 下载url
