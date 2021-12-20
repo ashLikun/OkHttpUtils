@@ -27,7 +27,7 @@ open class DownloadEntity(
     var fileName: String = "",
     var downloadStatus: Int = DownloadStatus.DOWNLOAD_STATUS_INIT
 ) {
-    fun save() {
+    open fun save() {
         LiteOrmUtil.get().save(this)
     }
 

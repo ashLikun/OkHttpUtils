@@ -31,7 +31,7 @@ open class FileInput(
         }
     }
 
-    fun exists(): Boolean {
+    open fun exists(): Boolean {
         try {
             return file.exists()
         } catch (e: Exception) {

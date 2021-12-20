@@ -21,7 +21,7 @@ open class ContentRequestBody private constructor(
 
     private val byteCount: Int = content.size
 
-    fun getContent(): String {
+    open fun getContent(): String {
         return String(content, mediaType?.charset() ?: HttpUtils.UTF_8)
     }
 

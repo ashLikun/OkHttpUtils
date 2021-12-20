@@ -29,12 +29,12 @@ open class ProgressRequestBody(
     private var bufferedSink: BufferedSink? = null
 
     //当前写入字节数
-    var bytesWritten = 0L
+    open var bytesWritten = 0L
 
     //总字节长度，避免多次调用contentLength()方法
-    var contentLength = 0L
-    var isCancel = false
-    var isRun = false
+    open var contentLength = 0L
+    open var isCancel = false
+    open var isRun = false
 
     /**
      * 重写调用实际的响应体的contentType
@@ -89,7 +89,7 @@ open class ProgressRequestBody(
         }
     }
 
-    fun run() {
+    open fun run() {
         if (contentLength != 0L) {
             progressCallBack?.invoke(
                 bytesWritten, contentLength, bytesWritten == contentLength, true

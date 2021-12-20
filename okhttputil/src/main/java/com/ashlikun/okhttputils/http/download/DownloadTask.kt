@@ -33,38 +33,38 @@ open class DownloadTask(
         private const val FILE_MODE = "rwd"
     }
 
-    lateinit var client: OkHttpClient
+    open lateinit var client: OkHttpClient
 
     // 文件保存路径
-    var saveDirPath: String = DownloadManager.defaultFilePath
+    open var saveDirPath: String = DownloadManager.defaultFilePath
         set(value) = if (!value.endsWith("/")) field = "$value/" else field = value
 
     //文件保存的名称,如果正在下载就会被替换掉
-    var fileName: String = ""
+    open var fileName: String = ""
 
     //下载状态
-    var downloadStatus: Int = DownloadStatus.DOWNLOAD_STATUS_INIT
+    open var downloadStatus: Int = DownloadStatus.DOWNLOAD_STATUS_INIT
 
     //下载多少回调一次  默认200，单位毫秒;
-    var rate: Long = DownloadManager.DEFAULT_RATE
+    open var rate: Long = DownloadManager.DEFAULT_RATE
 
     // 总大小
-    var totalSize: Long = 0
+    open var totalSize: Long = 0
 
     //  已经下载的大小
-    var completedSize: Long = 0
+    open var completedSize: Long = 0
 
 
     //错误码
-    var errorCode = 0
+    open var errorCode = 0
 
 
     //是否取消
-    var isCancel = false
+    open var isCancel = false
 
 
     //是否下载结束
-    private val isDownloadFinish: Boolean
+    open protected val isDownloadFinish: Boolean
         get() {
             if (totalSize > 0 && completedSize > 0 && totalSize == completedSize) {
                 downloadStatus = DownloadStatus.DOWNLOAD_STATUS_COMPLETED
@@ -74,7 +74,7 @@ open class DownloadTask(
         }
 
     // 获得文件名
-    val filePath: String
+    open val filePath: String
         get() {
             if (fileName.isEmpty() && dbEntity != null) {
                 fileName = dbEntity!!.fileName
@@ -85,18 +85,18 @@ open class DownloadTask(
             return filepath
         }
 
-    private var dbEntity: DownloadEntity? = null
+    open protected var dbEntity: DownloadEntity? = null
 
     /**
      * 是否正在下载
      */
-    val isDownloading: Boolean
+    open val isDownloading: Boolean
         get() = downloadStatus == DownloadStatus.DOWNLOAD_STATUS_DOWNLOADING
 
     /**
      * 是否下载完成
      */
-    val isCompleted: Boolean
+    open val isCompleted: Boolean
         get() = downloadStatus == DownloadStatus.DOWNLOAD_STATUS_COMPLETED
 
     init {
@@ -111,7 +111,7 @@ open class DownloadTask(
     /**
      * 删除数据库文件和已经下载的文件
      */
-    fun cancel() {
+    open fun cancel() {
         totalSize = 0
         if (!isDownloading) {
             downloadStatus = DownloadStatus.DOWNLOAD_STATUS_CANCEL
@@ -130,7 +130,7 @@ open class DownloadTask(
      * 分发回调事件到ui层
      * @param downloadStatus 必须传递参数的形式，不然状态中由于异步可能不对
      */
-    private fun onCallBack(downloadStatus: Int) {
+    open protected fun onCallBack(downloadStatus: Int) {
         launchMain {
             when (downloadStatus) {
                 DownloadStatus.DOWNLOAD_STATUS_ERROR -> listener?.onError(this, errorCode)
@@ -151,8 +151,8 @@ open class DownloadTask(
     }
 
     // 防止分母为0出现NoN
-    private val downLoadPercent: Double
-        private get() {
+    open protected val downLoadPercent: Double
+        protected get() {
             val baiy = completedSize * 1.0
             val baiz = totalSize * 1.0
             // 防止分母为0出现NoN
@@ -166,7 +166,7 @@ open class DownloadTask(
     /**
      * 真正的下载
      */
-    fun run() {
+    open fun run() {
         //正在下载
         if (isDownloading) return
         isCancel = false

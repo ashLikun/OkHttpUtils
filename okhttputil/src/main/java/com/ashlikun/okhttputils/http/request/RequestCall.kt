@@ -38,8 +38,8 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
     private var readTimeOut = TIME_OUT.toLong()
     private var writeTimeOut = TIME_OUT.toLong()
     private var connTimeOut = TIME_OUT.toLong()
-    var interceptors: MutableList<Interceptor>? = null
-    var networkInterceptors: MutableList<Interceptor>? = null
+    open var interceptors: MutableList<Interceptor>? = null
+    open var networkInterceptors: MutableList<Interceptor>? = null
 
 
     /**
@@ -185,27 +185,27 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
         }
     }
 
-    fun httpRequest(httpRequest: HttpRequest): RequestCall {
+    open fun httpRequest(httpRequest: HttpRequest): RequestCall {
         this.httpRequest = httpRequest
         return this
     }
 
-    fun readTimeOut(readTimeOut: Long): RequestCall {
+    open fun readTimeOut(readTimeOut: Long): RequestCall {
         this.readTimeOut = readTimeOut
         return this
     }
 
-    fun writeTimeOut(writeTimeOut: Long): RequestCall {
+    open fun writeTimeOut(writeTimeOut: Long): RequestCall {
         this.writeTimeOut = writeTimeOut
         return this
     }
 
-    fun connTimeOut(connTimeOut: Long): RequestCall {
+    open fun connTimeOut(connTimeOut: Long): RequestCall {
         this.connTimeOut = connTimeOut
         return this
     }
 
-    fun addNetworkInterceptor(interceptor: Interceptor): RequestCall {
+    open fun addNetworkInterceptor(interceptor: Interceptor): RequestCall {
         if (networkInterceptors == null) {
             networkInterceptors = ArrayList()
         }
@@ -213,7 +213,7 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
         return this
     }
 
-    fun addInterceptor(interceptor: Interceptor): RequestCall {
+    open fun addInterceptor(interceptor: Interceptor): RequestCall {
         if (interceptors == null) {
             interceptors = ArrayList()
         }

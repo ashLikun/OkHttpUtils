@@ -76,7 +76,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
             } else return field
         }
 
-    fun appendPath(path: String): HttpRequest {
+    open fun appendPath(path: String): HttpRequest {
         val builder = url.buildUpon()
         if (path.isNotEmpty()) {
             url = builder.appendPath(path).build()
@@ -84,7 +84,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         return this
     }
 
-    fun setMethod(method: String): HttpRequest {
+    open fun setMethod(method: String): HttpRequest {
         for (i in methods.indices) {
             if (methods[i] == method) {
                 this.method = method
@@ -99,7 +99,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 设置请求类型
      */
-    fun setContentType(contentType: MediaType?): HttpRequest {
+    open fun setContentType(contentType: MediaType?): HttpRequest {
         this.contentType = contentType
         return this
     }
@@ -107,7 +107,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 获取去除公共参数
      */
-    val paramsNotCommonParams: Map<String, Any>
+    open val paramsNotCommonParams: Map<String, Any>
         get() {
             var value: Map<String, Any>
             if (isJson) {
@@ -125,12 +125,12 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         }
 
 
-    val isHavaHeader: Boolean
+    open val isHavaHeader: Boolean
         get() = headers.isNotEmpty()
-    val isHavaparams: Boolean
+    open val isHavaparams: Boolean
         get() = params.isNotEmpty()
-    val isHavafiles: Boolean
-        get() = files != null && !files!!.isEmpty()
+    open val isHavafiles: Boolean
+        get() = files.isNotEmpty()
 
     /**
      * 添加对象参数
@@ -168,7 +168,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加 公共参数
      */
-    protected open fun addCommonParams() {
+    open protected fun addCommonParams() {
         OkHttpUtils.get().commonParams.forEach { t ->
             //如果已经有了就不添加，公共参数优先级低
             if (!params.containsKey(t.key)) {
@@ -192,12 +192,12 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加文件参数
      */
-    fun addParam(key: String, file: File) = addParam(FileInput(key, file))
+    open fun addParam(key: String, file: File) = addParam(FileInput(key, file))
 
     /**
      * 添加文件参数
      */
-    fun addParam(param: FileInput): HttpRequest {
+    open fun addParam(param: FileInput): HttpRequest {
         if (param.exists()) files.add(param)
         return this
     }
@@ -205,7 +205,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加文件参数
      */
-    fun addParamFilePath(key: String, filePath: String): HttpRequest {
+    open fun addParamFilePath(key: String, filePath: String): HttpRequest {
         addParam(key, File(filePath))
         return this
     }
@@ -213,7 +213,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加文件参数
      */
-    fun addParam(key: String, files: List<File>): HttpRequest {
+    open fun addParam(key: String, files: List<File>): HttpRequest {
         files.forEach { addParam(key, it) }
         return this
     }
@@ -221,7 +221,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加文件参数
      */
-    fun addParamFilePath(key: String, filePaths: List<String>): HttpRequest {
+    open fun addParamFilePath(key: String, filePaths: List<String>): HttpRequest {
         filePaths.forEach { addParamFilePath(key, it) }
         return this
     }
@@ -230,7 +230,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 设置直接提交得post
      * 不会添加公共参数
      */
-    fun setContent(content: String): HttpRequest {
+    open fun setContent(content: String): HttpRequest {
         postContent = content
         return this
     }
@@ -239,7 +239,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 设置直接提交得post 并且是json
      */
-    fun setContentJson(content: String): HttpRequest {
+    open fun setContentJson(content: String): HttpRequest {
         //添加公共参数
         var content = content
         if (OkHttpUtils.get().isCommonParams) {
@@ -263,7 +263,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 注意：在这个方法调用以后添加的参数将无效
      * 2：如果存在文件就不能用content提交
      */
-    fun toJson(): HttpRequest {
+    open fun toJson(): HttpRequest {
         //添加公共参数
         addCommonParams()
         //转换成json
@@ -280,19 +280,19 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 构建请求
      * 这里返回的对象才可以执行请求
      */
-    fun buildCall(): RequestCall {
+    open fun buildCall(): RequestCall {
         return RequestCall(this)
     }
 
     /**
      * 解析结果的gson
      */
-    fun parseGson(gson: Gson): HttpRequest {
+    open fun parseGson(gson: Gson): HttpRequest {
         parseGson = gson
         return this
     }
 
-    fun tag(tag: Any): HttpRequest {
+    open fun tag(tag: Any): HttpRequest {
         this.tag = tag
         return this
     }
@@ -300,7 +300,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 构建请求body    多表单数据  键值对
      */
-    private fun addParams(params: Map<String, Any>, builder: MultipartBody.Builder) {
+    open protected fun addParams(params: Map<String, Any>, builder: MultipartBody.Builder) {
         for ((key, value) in params) {
             //Content-Disposition;form-data; name="aaa"
             builder.addFormDataPart(key, value.toString())
@@ -310,7 +310,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 构建请求body    表单数据  键值对
      */
-    private fun addParams(params: Map<String, Any>, builder: FormBody.Builder) {
+    open protected fun addParams(params: Map<String, Any>, builder: FormBody.Builder) {
         for ((key, value) in params) {
             builder.add(key, value?.toString())
         }
@@ -319,7 +319,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 方法功能：构建请求body    多表单  文件数据
      */
-    private fun addFlieParams(builder: MultipartBody.Builder) {
+    open protected fun addFlieParams(builder: MultipartBody.Builder) {
         //表单数据
         for (fileInput in files) {
             builder.addFormDataPart(
@@ -351,7 +351,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 第一步调用
      * 构建一个Request
      */
-    fun bulidRequest(
+    open fun bulidRequest(
         callback: Callback<*>?
     ): Request {
         val builder = Request.Builder()
@@ -381,7 +381,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 存在文件 multipart/form-data
      * 私有
      */
-    protected fun buildRequestBody(callback: Callback<*>?): RequestBody? {
+    open protected fun buildRequestBody(callback: Callback<*>?): RequestBody? {
 
         var body: RequestBody?
         onBuildRequestBody()
@@ -434,14 +434,14 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 实现者可以继承从写
      * 这里是添加公共参数之前
      */
-    fun onBuildRequestBody() {}
+    open fun onBuildRequestBody() {}
 
     /**
      * 可以添加签名，在全部参数添加完毕后,如果调用toJson方法那么params没有值，content有值
      * 实现者可以继承从写
      * 这里是添加公共参数之后
      */
-    fun onBuildRequestBodyHasCommonParams() {}
+    open fun onBuildRequestBodyHasCommonParams() {}
 
 
     //遍历参数的时候顺序,默认递增，结合 newParamMap 方法
