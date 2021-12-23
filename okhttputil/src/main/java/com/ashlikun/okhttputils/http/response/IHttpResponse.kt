@@ -12,6 +12,7 @@ import java.lang.reflect.Type
  * 功能介绍：Response 的接口
  */
 interface IHttpResponse {
+
     var code: Int
     var message: String
     var json: String
@@ -28,10 +29,17 @@ interface IHttpResponse {
     val isSucceed: Boolean
 
     /**
-     * 解析Json的Json
+     * 解析数据的时候，也是初始化的时候
      * 会先实例化一个空的本对象然后调用这个方法
+     * @param response 网络请求是 Response，缓存是 null
      */
-    fun <T> parseData(gson: Gson, json: String?, type: Type?): T {
-        return gson.fromJson(json, type)
+    fun <T> parseData(gson: Gson, json: String, type: Type, response: Response?): T {
+        return (gson.fromJson(json, type) as T).also {
+            this.json = json
+            if (response != null) {
+                this.httpCode = response.code
+                this.response = response
+            }
+        }
     }
 }

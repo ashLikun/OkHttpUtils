@@ -1,6 +1,10 @@
 package com.ashlikun.okhttputils.http.response
 
+import com.ashlikun.okhttputils.http.ClassUtils
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import okhttp3.Response
+import java.lang.reflect.Type
 
 /**
  * @author　　: 李坤
@@ -13,6 +17,21 @@ open class HttpResult<T> : HttpResponse() {
     //用来模仿Data
     @SerializedName("data")
     open var data: T? = null
+
+    /**
+     * 去除空,只有在success的时候才会强制赋值
+     */
+    open val dataX: T
+        get() = data!!
+
+    override fun <M> parseData(gson: Gson, json: String, type: Type, response: Response?): M {
+        return (super.parseData(gson, json, type, response) as M).also {
+            //防止data是null
+            if (isSucceed) {
+                data = (data ?: ClassUtils.getListOrArrayOrObject(type)) as T
+            }
+        }
+    }
 
     override fun toString(): String {
         return "HttpResult{" +

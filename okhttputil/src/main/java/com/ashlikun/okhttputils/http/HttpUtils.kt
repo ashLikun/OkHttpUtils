@@ -383,46 +383,22 @@ object HttpUtils {
         } else {
             var res: T? = null
             try {
-                if (json.isEmpty()) {
-                    throw JsonSyntaxException("json length = 0")
-                }
-                var cls: Class<*>? = null
+                if (json.isEmpty()) throw JsonSyntaxException("json length = 0")
                 try {
-                    cls = if (type is Class<*>) {
-                        type
-                    } else {
-                        (type as ParameterizedType).rawType as Class<*>
+                    var cls = if (type is Class<*>) type
+                    else (type as ParameterizedType).rawType as Class<*>
+                    if (IHttpResponse::class.java.isAssignableFrom(cls)) {
+                        res = (cls.newInstance() as IHttpResponse).parseData(
+                            gson, json, type, response
+                        )
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                try {
-                    if (cls != null) {
-                        if (IHttpResponse::class.java.isAssignableFrom(cls)) {
-                            try {
-                                val da = cls.newInstance() as IHttpResponse
-                                res = da.parseData(gson!!, json, type)
-                            } catch (e: InstantiationException) {
-                                e.printStackTrace()
-                            } catch (e: IllegalAccessException) {
-                                e.printStackTrace()
-                            }
-                        }
-                    }
-                    if (res == null) {
-                        res = gson.fromJson(json, type)
-                    }
-                } catch (e: JsonSyntaxException) {
-                    e.printStackTrace()
-                    //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
-                    launch {
-                        OkHttpUtils.sendOnDataParseError(
-                            HttpErrorCode.HTTP_DATA_ERROR, e, response, json
-                        )
-                    }
-                    throw IOException("${HttpErrorCode.MSG_DATA_ERROR} \n  原异常：$e  \n json = $json")
+                if (res == null) {
+                    res = gson.fromJson(json, type)
                 }
-            } catch (e: JsonSyntaxException) {
+            } catch (e: Exception) {
                 //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
                 launch {
                     OkHttpUtils.sendOnDataParseError(
@@ -455,35 +431,22 @@ object HttpUtils {
         } else {
             var res: T? = null
             try {
-                if (TextUtils.isEmpty(json)) {
-                    throw JsonSyntaxException("json length = 0")
-                }
-                var cls: Class<*>? = null
+                if (json.isEmpty()) throw JsonSyntaxException("json length = 0")
                 try {
-                    cls = if (type is Class<*>) {
-                        type
-                    } else {
-                        (type as ParameterizedType).rawType as Class<*>
+                    var cls = if (type is Class<*>) type
+                    else (type as ParameterizedType).rawType as Class<*>
+                    if (IHttpResponse::class.java.isAssignableFrom(cls)) {
+                        res = (cls.newInstance() as IHttpResponse).parseData(
+                            gson, json, type, null
+                        )
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-                if (cls != null) {
-                    if (IHttpResponse::class.java.isAssignableFrom(cls)) {
-                        try {
-                            val da = cls.newInstance() as IHttpResponse
-                            res = da.parseData(gson, json, type)
-                        } catch (e: InstantiationException) {
-                            e.printStackTrace()
-                        } catch (e: IllegalAccessException) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
                 if (res == null) {
                     res = gson.fromJson(json, type)
                 }
-            } catch (e: JsonSyntaxException) { //数据解析异常
+            } catch (e: Exception) { //数据解析异常
                 throw IOException("${HttpErrorCode.MSG_DATA_ERROR2} \n  原异常：$e  \n json = $json")
             }
             if (res is IHttpResponse) {

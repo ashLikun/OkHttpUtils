@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.simple.data
 import com.ashlikun.okhttputils.http.response.HttpResponse
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import okhttp3.Response
 import java.lang.reflect.Type
 
 /**
@@ -14,7 +15,7 @@ import java.lang.reflect.Type
  * 功能介绍：
  */
 class HomeHttpResult<T> : HttpResponse() {
-    override fun <T> parseData(gson: Gson, json: String?, type: Type?): T {
+    override fun <T> parseData(gson: Gson, json: String, type: Type, response: Response?): T {
         return GsonBuilder().create().fromJson(json, type)
     }
 }
