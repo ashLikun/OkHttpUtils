@@ -179,8 +179,8 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加map参数
      */
-    open fun addParams(map: Map<*, *>): HttpRequest {
-        map.forEach {
+    open fun addParams(map: Map<*, *>?): HttpRequest {
+        map?.forEach {
             if (it.key != null && it.value != null) {
                 addParam(it.key!!.toString(), it.value!!)
             }
@@ -191,37 +191,36 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 添加文件参数
      */
-    open fun addParam(key: String, file: File) = addParam(FileInput(key, file))
+    open fun addParam(key: String, file: File?) =
+        if (file == null) this else addParam(FileInput(key, file))
 
     /**
      * 添加文件参数
      */
-    open fun addParam(param: FileInput): HttpRequest {
-        if (param.exists()) files.add(param)
+    open fun addParam(param: FileInput?): HttpRequest {
+        if (param?.exists() == true) files.add(param)
         return this
     }
 
     /**
      * 添加文件参数
      */
-    open fun addParamFilePath(key: String, filePath: String): HttpRequest {
-        addParam(key, File(filePath))
+    open fun addParamFilePath(key: String, filePath: String?) =
+        if (filePath.isNullOrEmpty()) this else addParam(key, File(filePath))
+
+    /**
+     * 添加文件参数
+     */
+    open fun addParam(key: String, files: List<File>?): HttpRequest {
+        files?.forEach { addParam(key, it) }
         return this
     }
 
     /**
      * 添加文件参数
      */
-    open fun addParam(key: String, files: List<File>): HttpRequest {
-        files.forEach { addParam(key, it) }
-        return this
-    }
-
-    /**
-     * 添加文件参数
-     */
-    open fun addParamFilePath(key: String, filePaths: List<String>): HttpRequest {
-        filePaths.forEach { addParamFilePath(key, it) }
+    open fun addParamFilePath(key: String, filePaths: List<String>?): HttpRequest {
+        filePaths?.forEach { addParamFilePath(key, it) }
         return this
     }
 
@@ -229,8 +228,8 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 设置直接提交得post
      * 不会添加公共参数
      */
-    open fun setContent(content: String): HttpRequest {
-        postContent = content
+    open fun setContent(content: String?): HttpRequest {
+        postContent = content ?: ""
         return this
     }
 
@@ -238,7 +237,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 设置直接提交得post 并且是json
      */
-    open fun setContentJson(content: String): HttpRequest {
+    open fun setContentJson(content: String?): HttpRequest {
         //添加公共参数
         var content = content
         if (OkHttpUtils.get().isCommonParams) {
@@ -251,7 +250,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
                 e.printStackTrace()
             }
         }
-        postContent = content
+        postContent = content ?: ""
         isJson = true
         setMethod("POST")
         return this
