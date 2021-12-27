@@ -94,11 +94,16 @@ abstract class AbsHttpResponse(
         val o = getKeyToObject(*key) ?: return null
         if (type.toString().contains("java.lang.Boolean")) return o.toString().toBoolean() as T?
         return when (type) {
-            String::class.java -> GsonHelper.getGsonNotNull().toJson(o)
+            String::class.java -> when (o) {
+                is Map<*,*>, is List<*> -> GsonHelper.getGsonNotNull()
+                    .toJson(o)
+                else -> o.toString()
+            }
             Int::class.java -> o.toString().toIntOrNull()
             Long::class.java -> o.toString().toLongOrNull()
             Float::class.java -> o.toString().toFloatOrNull()
             Double::class.java -> o.toString().toDoubleOrNull()
+            is Map<*,*>, is List<*> -> o
             else -> {
                 //转换成json
                 val str: String = GsonHelper.getGsonNotNull().toJson(o)
