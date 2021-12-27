@@ -34,11 +34,13 @@ interface IHttpResponse {
      * @param response 网络请求是 Response，缓存是 null
      */
     fun <T> parseData(gson: Gson, json: String, type: Type, response: Response?): T {
-        return (gson.fromJson(json, type) as T).also {
-            this.json = json
-            if (response != null) {
-                this.httpCode = response.code
-                this.response = response
+        return (gson.fromJson(json, type) as T).apply {
+            if (this is IHttpResponse) {
+                this.json = json
+                if (response != null) {
+                    this.httpCode = response.code
+                    this.response = response
+                }
             }
         }
     }
