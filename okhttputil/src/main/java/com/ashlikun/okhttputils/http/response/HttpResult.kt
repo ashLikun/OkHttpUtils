@@ -27,11 +27,10 @@ open class HttpResult<T> : HttpResponse() {
     override fun <M> parseData(gson: Gson, json: String, type: Type, response: Response?): M {
         //如果修改值，只能调用apply,因为这个方法调用后会指向调用的返回值
         return (super.parseData(gson, json, type, response) as M).apply {
-            if (this is HttpResult<*>) {
-                //防止data是null
-                if (this.isSucceed) {
-                    data = (data ?: ClassUtils.getListOrArrayOrObject(type)) as Nothing?
-                }
+            this as HttpResult<T>
+            //防止data是null
+            if (this.isSucceed) {
+                data = (data ?: ClassUtils.getListOrArrayOrObject(type)) as Nothing?
             }
         }
     }

@@ -35,12 +35,11 @@ interface IHttpResponse {
      */
     fun <T> parseData(gson: Gson, json: String, type: Type, response: Response?): T {
         return (gson.fromJson(json, type) as T).apply {
-            if (this is IHttpResponse) {
-                this.json = json
-                if (response != null) {
-                    this.httpCode = response.code
-                    this.response = response
-                }
+            this as IHttpResponse
+            this.json = json
+            if (response != null) {
+                this.httpCode = response.code
+                this.response = response
             }
         }
     }
