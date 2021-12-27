@@ -2,9 +2,11 @@ package com.ashlikun.okhttputils.http.response
 
 import com.ashlikun.gson.GsonHelper
 import com.google.gson.JsonParseException
+import com.google.gson.annotations.Expose
 import okhttp3.Response
 import org.json.JSONException
 import java.lang.reflect.Type
+import kotlin.reflect.KClass
 
 /**
  * @author　　: 李坤
@@ -43,14 +45,14 @@ abstract class AbsHttpResponse(
      * 获取根部json对象
      * 说明后续这个结果都是json对象
      */
-    val jsonMap: MutableMap<String, Any?>? by lazy {
-        try {
-            GsonHelper.getGsonNotNull()
+    @Transient
+    var jsonMap: MutableMap<String, Any?>? = null
+        get() {
+            if (field != null || json.isNullOrEmpty()) return field
+            field = GsonHelper.getGsonNotNull()
                 .fromJson(json, MutableMap::class.java) as MutableMap<String, Any?>
-        } catch (e: Exception) {
-            null
+            return field
         }
-    }
 
 
     fun getKeyToObject(vararg key: String): Any? {
@@ -85,51 +87,61 @@ abstract class AbsHttpResponse(
      * 根据key获取对象,多个key代表多个等级,不能获取数组
      */
     @Throws(JsonParseException::class, JSONException::class)
-    fun <T> getValue(type: Type, vararg key: String): T? {
+    fun <T : Any> getValue(type: Type, vararg key: String): T? {
         if (key.isEmpty()) {
             return null
         }
         val o = getKeyToObject(*key) ?: return null
-        //转换成json
-        val str: String = GsonHelper.getGsonNotNull().toJson(o)
-        return GsonHelper.getGsonNotNull().fromJson(str, type)
+        if (type.toString().contains("java.lang.Boolean")) return o.toString().toBoolean() as T?
+        return when (type) {
+            String::class.java -> GsonHelper.getGsonNotNull().toJson(o)
+            Int::class.java -> o.toString().toIntOrNull()
+            Long::class.java -> o.toString().toLongOrNull()
+            Float::class.java -> o.toString().toFloatOrNull()
+            Double::class.java -> o.toString().toDoubleOrNull()
+            else -> {
+                //转换成json
+                val str: String = GsonHelper.getGsonNotNull().toJson(o)
+                GsonHelper.getGsonNotNull().fromJson(str, type)
+            }
+        } as T?
     }
 
     /**
-     * 基本类型的获取
-     * 方法功能：根据key获取对象,多个key代表多个等级,只能获取基础数据类型
+     * 获取指定类型数据
+     * 根据key获取对象,多个key代表多个等级
      */
-    fun <T> getValueBase(vararg key: String): T? {
-        return if (key.isEmpty()) null else getKeyToObject(*key) as T?
+    inline fun <reified T> getValue(vararg key: String): T? {
+        return getValue(T::class.java, *key)
     }
 
 
     fun getIntValue(vararg key: String) = getIntValue(0, *key)
     fun getIntValue(defaultValue: Int, vararg key: String) =
-        getValueBase<Any>(*key)?.toString()?.toIntOrNull() ?: defaultValue
+        getValue<Int>(*key) ?: defaultValue
 
 
     fun getLongValue(vararg key: String) = getLongValue(0, *key)
     fun getLongValue(defaultValue: Long, vararg key: String) =
-        getValueBase<Any>(*key)?.toString()?.toLongOrNull() ?: defaultValue
+        getValue<Long>(*key) ?: defaultValue
 
 
     fun getStringValue(vararg key: String) = getStringValueDef("", *key)
-    fun getStringValueDef(defaultValue: String, vararg key: String) =
-        getValueBase<Any>(*key)?.toString() ?: defaultValue
+    fun getStringValueDef(defaultValue: String, vararg key: String): String =
+        getValue<String>(*key) ?: defaultValue
 
 
     fun getBooleanValue(vararg key: String) = getBooleanValue(false, *key)
     fun getBooleanValue(defaultValue: Boolean, vararg key: String) =
-        getValueBase<Any>(*key)?.toString()?.toBoolean() ?: defaultValue
+        getValue<Boolean>(*key) ?: defaultValue
 
 
     fun getFloatValue(vararg key: String) = getFloatValue(0f, *key)
     fun getFloatValue(defaultValue: Float, vararg key: String) =
-        getValueBase<Any>(*key)?.toString()?.toFloatOrNull() ?: defaultValue
+        getValue<Float>(*key) ?: defaultValue
 
 
     fun getDoubleValue(vararg key: String) = getDoubleValue(0.0, *key)
     fun getDoubleValue(defaultValue: Double, vararg key: String) =
-        getValueBase<Any>(*key)?.toString()?.toDoubleOrNull() ?: defaultValue
+        getValue<Double>(*key) ?: defaultValue
 }
