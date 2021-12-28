@@ -30,7 +30,7 @@ open class HttpResult<T> : HttpResponse() {
             this as HttpResult<T>
             //防止data是null
             if (this.isSucceed) {
-                data = (data ?: ClassUtils.getListOrArrayOrObject(type)) as Nothing?
+                this.data = (this.data ?: ClassUtils.getListOrArrayOrObject(type)) as T?
             }
         }
     }

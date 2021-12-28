@@ -16,6 +16,6 @@ import java.lang.reflect.Type
  */
 class HomeHttpResult<T> : HttpResponse() {
     override fun <T> parseData(gson: Gson, json: String, type: Type, response: Response?): T {
-        return GsonBuilder().create().fromJson(json, type)
+        return super.parseData(GsonBuilder().create(), json, type, response)
     }
 }
