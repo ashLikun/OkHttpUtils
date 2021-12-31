@@ -110,3 +110,16 @@ dependencies {
         # OkHttp platform used only on JVM and when Conscrypt dependency is available.
         -dontwarn okhttp3.internal.platform.ConscryptPlatform
 
+        #kotlin
+        -keep class kotlin.** { *; }
+        -keep class kotlin.Metadata { *; }
+        -dontwarn kotlin.**
+        -keepclassmembers class **$WhenMappings {
+            <fields>;
+        }
+        -keepclassmembers class kotlin.Metadata {
+            public <methods>;
+        }
+        -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+            static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
+        }

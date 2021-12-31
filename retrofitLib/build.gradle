@@ -1,10 +1,8 @@
-apply plugin: 'com.android.library'
-// 使用Kotlin插件
-apply plugin: 'kotlin-android'
-apply plugin: 'com.github.dcendents.android-maven'
-// GitHub账户名
-group = 'com.github.ashLikun'
-
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'maven-publish'
+}
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion

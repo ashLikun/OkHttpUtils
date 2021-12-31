@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onSuccess(responseBody: GoodListData) {
                         Log.e("onSuccess", responseBody.getValue<Boolean>("list").toString())
-                        Log.e("onSuccess", responseBody.getValue<String>("list"))
+//                        Log.e("onSuccess", responseBody.getValue<String>("list"))
                         Log.e("onSuccess", responseBody.getStringValueDef("123", "list", "title"))
                     }
 
