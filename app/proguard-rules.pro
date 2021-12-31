@@ -1,36 +1,14 @@
--dontobfuscate
 
 -keepattributes RuntimeVisibleAnnotations
--keepattributes RuntimeInvisibleAnnotations
--keepattributes LocalVariableTypeTable
--keepattributes EnclosingMethod
--keepattributes Synthetic
--keepattributes RuntimeInvisibleParameterAnnotations
--keepattributes AnnotationDefault
--keepattributes RuntimeVisibleParameterAnnotations
 -keep class kotlin.Metadata { *; }
--keep interface kotlin.Metadata { *; }
--keepclassmembers @kotlin.Metadata class * {
-    <methods>;
-}
--keepclassmembers @kotlin.Metadata interface * {
-    <methods>;
-}
 
--keepclassmembers class **.WhenMappings {
-    <fields>;
-}
--keepclassmembers interface * extends java.io.Serializable { *; }
--dontwarn   com.**
--keepclasseswithmembernames class com.** {
-     <methods>;
-}
 -dontwarn com.**
 -dontnote com.**
 -dontwarn com.**
 -keep interface * extends java.io.Serializable { *; }
 -keep class com.** { *; }
 -keep interface com.** { *; }
+-keep class  kotlin.** { *; }
 
 
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and

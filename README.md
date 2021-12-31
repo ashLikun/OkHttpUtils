@@ -1,6 +1,6 @@
 [![Release](https://jitpack.io/v/ashLikun/OkHttpUtils.svg)](https://jitpack.io/#ashLikun/OkHttpUtils)
 
-
+## 注意：tools.build:gradle 7.0  kotlin/Metadata 被去除，导致混淆后反射无法获取接口方法参数名称，retrofit就不能调用代理，注意，等7.1+就可以了
 # **OkhttpUtils**
 基于okhttp的封装
 ## 使用方法
