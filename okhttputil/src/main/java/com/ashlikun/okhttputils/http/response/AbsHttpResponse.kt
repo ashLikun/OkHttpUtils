@@ -1,13 +1,9 @@
 package com.ashlikun.okhttputils.http.response
 
 import com.ashlikun.gson.GsonHelper
-import com.google.gson.JsonParseException
-import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
 import okhttp3.Response
-import org.json.JSONException
 import java.lang.reflect.Type
-import kotlin.reflect.KClass
 
 /**
  * @author　　: 李坤
@@ -104,16 +100,22 @@ abstract class AbsHttpResponse(
                 Long::class.java -> o.toString().toLongOrNull()
                 Float::class.java -> o.toString().toFloatOrNull()
                 Double::class.java -> o.toString().toDoubleOrNull()
-                is Map<*, *> -> o
-                is List<*> -> {
-                    //转换成json
-                    val str: String = GsonHelper.getGsonNotNull().toJson(o)
-                    GsonHelper.getGsonNotNull().fromJson(str, object : TypeToken<T>() {}.type)
-                }
                 else -> {
-                    //转换成json
-                    val str: String = GsonHelper.getGsonNotNull().toJson(o)
-                    GsonHelper.getGsonNotNull().fromJson(str, type)
+                    when {
+                        type is Class<*> && Map::class.java.isAssignableFrom(type) -> o
+                        type is Class<*> && List::class.java.isAssignableFrom(type) -> {
+                            //转换成json
+                            val str: String = GsonHelper.getGsonNotNull().toJson(o)
+                            GsonHelper.getGsonNotNull()
+                                .fromJson(str, object : TypeToken<T>() {}.type)
+                        }
+                        else -> {
+                            //转换成json
+                            val str: String = GsonHelper.getGsonNotNull().toJson(o)
+                            GsonHelper.getGsonNotNull().fromJson(str, type)
+                        }
+                    }
+
                 }
             } as T?
         } catch (e: Exception) {
