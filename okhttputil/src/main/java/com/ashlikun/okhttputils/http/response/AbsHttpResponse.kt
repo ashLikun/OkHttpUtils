@@ -86,30 +86,34 @@ abstract class AbsHttpResponse(
     /**
      * 根据key获取对象,多个key代表多个等级,不能获取数组
      */
-    @Throws(JsonParseException::class, JSONException::class)
     fun <T : Any> getValue(type: Type, vararg key: String): T? {
         if (key.isEmpty()) {
             return null
         }
-        val o = getKeyToObject(*key) ?: return null
-        if (type.toString().contains("java.lang.Boolean")) return o.toString().toBoolean() as T?
-        return when (type) {
-            String::class.java -> when (o) {
-                is Map<*,*>, is List<*> -> GsonHelper.getGsonNotNull()
-                    .toJson(o)
-                else -> o.toString()
-            }
-            Int::class.java -> o.toString().toIntOrNull()
-            Long::class.java -> o.toString().toLongOrNull()
-            Float::class.java -> o.toString().toFloatOrNull()
-            Double::class.java -> o.toString().toDoubleOrNull()
-            is Map<*,*>, is List<*> -> o
-            else -> {
-                //转换成json
-                val str: String = GsonHelper.getGsonNotNull().toJson(o)
-                GsonHelper.getGsonNotNull().fromJson(str, type)
-            }
-        } as T?
+        try {
+            val o = getKeyToObject(*key) ?: return null
+            if (type.toString().contains("java.lang.Boolean")) return o.toString().toBoolean() as T?
+            return when (type) {
+                String::class.java -> when (o) {
+                    is Map<*, *>, is List<*> -> GsonHelper.getGsonNotNull()
+                        .toJson(o)
+                    else -> o.toString()
+                }
+                Int::class.java -> o.toString().toIntOrNull()
+                Long::class.java -> o.toString().toLongOrNull()
+                Float::class.java -> o.toString().toFloatOrNull()
+                Double::class.java -> o.toString().toDoubleOrNull()
+                is Map<*, *> -> o
+                else -> {
+                    //转换成json
+                    val str: String = GsonHelper.getGsonNotNull().toJson(o)
+                    GsonHelper.getGsonNotNull().fromJson(str, type)
+                }
+            } as T?
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
     }
 
     /**
