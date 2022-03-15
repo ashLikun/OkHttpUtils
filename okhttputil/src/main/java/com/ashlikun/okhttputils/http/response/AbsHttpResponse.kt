@@ -3,6 +3,7 @@ package com.ashlikun.okhttputils.http.response
 import com.ashlikun.gson.GsonHelper
 import com.google.gson.JsonParseException
 import com.google.gson.annotations.Expose
+import com.google.gson.reflect.TypeToken
 import okhttp3.Response
 import org.json.JSONException
 import java.lang.reflect.Type
@@ -104,6 +105,11 @@ abstract class AbsHttpResponse(
                 Float::class.java -> o.toString().toFloatOrNull()
                 Double::class.java -> o.toString().toDoubleOrNull()
                 is Map<*, *> -> o
+                is List<*> -> {
+                    //转换成json
+                    val str: String = GsonHelper.getGsonNotNull().toJson(o)
+                    GsonHelper.getGsonNotNull().fromJson(str, object : TypeToken<T>() {}.type)
+                }
                 else -> {
                     //转换成json
                     val str: String = GsonHelper.getGsonNotNull().toJson(o)
