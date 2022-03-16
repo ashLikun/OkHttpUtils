@@ -103,7 +103,7 @@ annotation class PathField(val key: String)
  * })
  *  @FieldDefault("key:value")
  */
-@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.CLASS)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class FieldDefault(vararg val value: String)

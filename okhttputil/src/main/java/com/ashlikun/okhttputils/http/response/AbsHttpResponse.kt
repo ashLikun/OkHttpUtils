@@ -105,9 +105,7 @@ abstract class AbsHttpResponse(
                         type is Class<*> && Map::class.java.isAssignableFrom(type) -> o
                         type is Class<*> && List::class.java.isAssignableFrom(type) -> {
                             //转换成json
-                            val str: String = GsonHelper.getGsonNotNull().toJson(o)
-                            GsonHelper.getGsonNotNull()
-                                .fromJson(str, object : TypeToken<T>() {}.type)
+                            throw RuntimeException("请使用 object : TypeToken<List<String>>() {}.type")
                         }
                         else -> {
                             //转换成json
