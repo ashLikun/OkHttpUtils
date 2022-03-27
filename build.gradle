@@ -6,12 +6,9 @@ buildscript {
     repositories {
         jcenter()
         google()
-        mavenCentral()
     }
     dependencies {
-//        classpath 'com.android.tools.build:gradle:7.1.0-beta05'
-        //7.0  kotlin/Metadata 被去除，导致混淆后反射无法获取接口方法参数名称，retrofit就不能代理，注意，等7.1+就可以了
-        classpath 'com.android.tools.build:gradle:4.2.0'
+        classpath 'com.android.tools.build:gradle:4.1.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -25,16 +22,15 @@ allprojects {
     }
 }
 
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
 ext {
     superVersion = "1.2.+"
-    compileSdkVersion = 30
-    buildToolsVersion = "30.0.2"
+    compileSdkVersion = 29
+    buildToolsVersion = "29.0.2"
     designVersion = "com.google.android.material:material:" + superVersion
-    v4Version = "androidx.legacy:legacy-support-v4:" + superVersion
-    v7AppCompat = "androidx.appcompat:appcompat:" + superVersion
     targetSdkVersion = 26
     minSdkVersion = 21
     versionCode = 1
