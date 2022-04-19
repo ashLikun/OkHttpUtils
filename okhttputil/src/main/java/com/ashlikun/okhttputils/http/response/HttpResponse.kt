@@ -13,10 +13,10 @@ open class HttpResponse(
     //原始数据
     json: String = ""
 ) : AbsHttpResponse(json) {
-    @SerializedName(value = CODE_KEY)
+    @SerializedName(value = CODE_KEY, alternate = [CODE_KEY2])
     override var code = ERROR
 
-    @SerializedName(MES_KEY)
+    @SerializedName(MES_KEY, alternate = [MES_KEY2])
     override var message: String = ""
 
     override fun setOnGsonErrorData(json: String) {
@@ -34,6 +34,8 @@ open class HttpResponse(
         var SUCCEED = 1 //正常请求
         var ERROR = 0 //请求出错
         const val CODE_KEY = "code"
+        const val CODE_KEY2 = "status"
         const val MES_KEY = "msg"
+        const val MES_KEY2 = "message"
     }
 }
