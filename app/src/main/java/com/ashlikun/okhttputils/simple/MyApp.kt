@@ -46,7 +46,7 @@ class MyApp : Application() {
             .cookieJar(CookieJarImpl(DBCookieStore()))
             .addInterceptor(MarvelSigningInterceptor())
             .build()
-        OkHttpUtils.init(mOkHttpClient)
+        OkHttpUtils.init(this, mOkHttpClient)
         OkHttpUtils.get().commonHeaders = head
         OkHttpUtils.get().commonParams = params
         DownloadManager.initPath(this.cacheDir.path)

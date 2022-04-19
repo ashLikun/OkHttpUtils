@@ -14,7 +14,7 @@ import kotlin.reflect.jvm.javaType
  * 功能介绍：处理注解
  */
 class HandlerAnnotation(var kClass: KClass<*>,
-                        var method: KFunction<*>) {
+    var method: KFunction<*>) {
     var httpMethod = "POST"
 
     //解析json的类型区别

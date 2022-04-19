@@ -26,8 +26,7 @@ open class HttpException(
          * 处理异常
          */
         fun handleFailureHttpException(call: Call, e: IOException): HttpException {
-            val res: HttpException
-            res = if (e is ConnectException) {
+            val res: HttpException = if (e is ConnectException) {
                 HttpException(HttpErrorCode.HTTP_NO_CONNECT, HttpErrorCode.MSG_NO_CONNECT, e)
             } else if (e is SocketException) {
                 //java.net.SocketException: sendto failed: ECONNRESET (Connection reset by peer)
@@ -36,16 +35,12 @@ open class HttpException(
                 if ("Socket closed" == e.message) {
                     HttpException(HttpErrorCode.HTTP_CANCELED, HttpErrorCode.MSG_CANCELED, e)
                 } else {
-                    HttpException(
-                        HttpErrorCode.HTTP_SOCKET_ERROR,
-                        HttpErrorCode.MSG_SOCKET_ERROR,
-                        e
-                    )
+                    HttpException(HttpErrorCode.HTTP_SOCKET_ERROR, HttpErrorCode.MSG_SOCKET_ERROR, e)
                 }
             } else if (e is SocketTimeoutException) {
                 HttpException(HttpErrorCode.HTTP_TIME_OUT, HttpErrorCode.MSG_TIME_OUT, e)
             } else if (e is UnknownHostException) {
-                HttpException(HttpErrorCode.HTTP_UNKNOWN_HOST, HttpErrorCode.MSG_UNKNOWN_HOST, e)
+                HttpException(HttpErrorCode.HTTP_UNKNOWN_HOST, HttpErrorCode.MSG_NO_CONNECT, e)
             } else {
                 e.printStackTrace()
                 HttpException(HttpErrorCode.HTTP_UNKNOWN, HttpErrorCode.MSG_UNKNOWN, e)
@@ -65,7 +60,7 @@ open class HttpException(
             } else if (code == HttpURLConnection.HTTP_FORBIDDEN) { //403
                 HttpException(code, HttpErrorCode.MSG_FORBIDDEN)
             } else if (code == HttpURLConnection.HTTP_NOT_FOUND) { //404
-                HttpException(code, HttpErrorCode.MSG_NOT_FOUND)
+                HttpException(code, HttpErrorCode.MSG_NOT_FIND)
             } else if (code == HttpURLConnection.HTTP_BAD_METHOD) { //405
                 HttpException(code, HttpErrorCode.MSG_BAD_METHOD)
             } else if (code == HttpURLConnection.HTTP_MULT_CHOICE || code == HttpURLConnection.HTTP_MOVED_PERM || code == HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_SEE_OTHER

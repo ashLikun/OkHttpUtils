@@ -1,0 +1,15 @@
+<resources>
+    <string name="okhttp_message_no_conect">请检查网络设置</string>
+    <string name="okhttp_message_time_out">连接超时</string>
+    <string name="okhttp_message_unknown">未知错误</string>
+    <string name="okhttp_message_unknown_network">未知网络错误</string>
+    <string name="okhttp_message_data_error">数据解析错误</string>
+    <string name="okhttp_message_data_error2">数据解析错误_NULL</string>
+    <string name="okhttp_message_socket_error">请求过于频繁,请稍后再试</string>
+    <string name="okhttp_message_canceled">请求被取消</string>
+    <string name="okhttp_message_internal_error">服务君累趴下啦</string>
+    <string name="okhttp_message_forbidden">禁止访问</string>
+    <string name="okhttp_message_no_find">资源不存在</string>
+    <string name="okhttp_message_redirrect">重定向错误</string>
+    <string name="okhttp_message_bad_method">请求方法错误</string>
+</resources>

@@ -65,7 +65,7 @@ annotation class Action(val value: String)
  * 1：在方法上  当前
  * 2：在接口上  全部
  */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS,AnnotationTarget.ANNOTATION_CLASS)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS, AnnotationTarget.ANNOTATION_CLASS)
 @Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Parse(val parse: String)
@@ -74,11 +74,11 @@ annotation class Parse(val parse: String)
 @Inherited
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Field(val key: String,
-                       val encoded: Boolean = false,
-        //是否是文件
-                       val isFile: Boolean = false,
-        //如果是多个文件是否用同一个key变成数组
-                       val isFileArray: Boolean = false)
+    val encoded: Boolean = false,
+    //是否是文件
+    val isFile: Boolean = false,
+    //如果是多个文件是否用同一个key变成数组
+    val isFileArray: Boolean = false)
 
 /**
  * 这个字段不用提交,用于回调的时候处理
@@ -101,7 +101,7 @@ annotation class PathField(val key: String)
  * "key1:value1"，
  * "key2:value2"
  * })
- *  @FieldDefault("key:value")
+ * * @FieldDefault("key:value")
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Inherited
@@ -110,11 +110,11 @@ annotation class FieldDefault(vararg val value: String)
 
 /**
  * 用户请求的固定参数
- * @Params({
+ * *@Params({
  * "key1:value1"，
  * "key2:value2"
  * })
- *  @Params("key:value")
+ *  *@Params("key:value")
  *  1:用在方法上，当前请求
  *  2:用在接口上，当前接口全部请求
  */
@@ -125,11 +125,11 @@ annotation class Params(vararg val value: String)
 
 /**
  * 用户请求的头
- * @Headers({
+ * * @Headers({
  * "key1:value1"，
  * "key2:value2"
  * })
- *  @Headers("key:value")
+ * * @Headers("key:value")
  *  1:用在方法上，当前请求
  *  2:用在接口上，当前接口全部请求
  */
@@ -140,8 +140,9 @@ annotation class Headers(vararg val value: String)
 
 /**
  * 用户请求的头,用于参数
+ * 如果是空，会取参数的名字
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Inherited
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Header(val value: String)
+annotation class Header(val value: String = "")

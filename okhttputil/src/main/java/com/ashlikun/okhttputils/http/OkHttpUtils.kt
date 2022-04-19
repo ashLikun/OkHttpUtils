@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.http
 
+import android.content.Context
 import com.ashlikun.gson.GsonHelper
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
@@ -135,6 +136,9 @@ class OkHttpUtils private constructor(
     }
 
     companion object {
+        var app: Context? = null
+            private set
+
         //默认的超时时间
         const val DEFAULT_MILLISECONDS = 60000L
         const val DEFAULT_MILLISECONDS_LONG = 200000L
@@ -144,7 +148,8 @@ class OkHttpUtils private constructor(
         /**
          * 初始化一个全局的OkHttpClient
          */
-        fun init(okHttpClient: OkHttpClient?) {
+        fun init(app: Context, okHttpClient: OkHttpClient?) {
+            this.app = app.applicationContext
             get().okHttpClient = okHttpClient ?: get().okHttpClient
         }
 
