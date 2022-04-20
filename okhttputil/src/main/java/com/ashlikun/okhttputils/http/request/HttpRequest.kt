@@ -358,10 +358,13 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         val header = Headers.Builder()
         //添加公共请求头
         OkHttpUtils.get().commonHeaders.forEach {
-            header.add(it.key, it.value)
+            //直接set
+            header[it.key] = it.value
         }
+        //如果在公共请求头有的要替换
         headers.forEach {
-            header.add(it.key, it.value)
+            //直接set
+            header[it.key] = it.value
         }
         request = builder
             .url(url.toString())

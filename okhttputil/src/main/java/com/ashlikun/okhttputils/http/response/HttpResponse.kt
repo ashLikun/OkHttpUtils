@@ -20,6 +20,7 @@ open class HttpResponse(
     override var message: String = ""
 
     override fun setOnGsonErrorData(json: String) {
+        super.setOnGsonErrorData(json)
         code = getIntValue(CODE_KEY)
         message = getStringValue(MES_KEY)
     }

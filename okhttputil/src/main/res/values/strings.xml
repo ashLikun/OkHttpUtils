@@ -1,4 +1,7 @@
 <resources>
+    <!--如果这个不为空，那么就会全部使用这个-->
+    <string name="okhttp_message_common"></string>
+
     <string name="okhttp_message_no_conect">请检查网络设置</string>
     <string name="okhttp_message_time_out">连接超时</string>
     <string name="okhttp_message_unknown">未知错误</string>
