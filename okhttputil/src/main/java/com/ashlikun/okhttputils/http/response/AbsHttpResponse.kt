@@ -15,10 +15,16 @@ import java.lang.reflect.Type
  * 功能介绍：IHttpResponse的基础实现类
  */
 abstract class AbsHttpResponse(
+    json: String = ""
+) : IHttpResponse {
     //原始数据
     @Transient
     override var json: String = ""
-) : IHttpResponse {
+        set(value) {
+            field == value
+            jsonHelper = JSONHelp(value)
+        }
+
     /**
      * 获取头部code
      */
@@ -36,7 +42,6 @@ abstract class AbsHttpResponse(
      */
     open fun setOnGsonErrorData(json: String) {
         this.json = json
-        jsonHelper = JSONHelp(json)
     }
 
     /**
@@ -46,6 +51,9 @@ abstract class AbsHttpResponse(
     @Transient
     var jsonHelper = JSONHelp(json)
 
+    init {
+        this.json = json
+    }
 
     fun getKeyToObject(vararg key: String) = jsonHelper.getKeyToObject(*key)
 
