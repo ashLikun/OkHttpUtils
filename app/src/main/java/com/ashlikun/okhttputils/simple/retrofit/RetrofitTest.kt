@@ -17,14 +17,16 @@ class RetrofitTest {
         @JvmStatic
         fun start() {
             Log.e("qqq aaa sss", "${System.currentTimeMillis()}")
+//            val aa = ApiOther.api.testx(1)
+//            Log.e("aaaaaaaa", "$aa")
             GlobalScope.launch {
-//                var aaa = ApiOther.api.testx(111)
-//                Log.e("aaaa", aaa?.json + "")
+                var aaa = ApiOther.api.testx(111)
+                Log.e("aaaa", aaa?.toString() + "")
 //                aaa = ApiOther.api.test( 11111, WeiJinModel())
 //                Log.e("bbb", aaa?.json + "")
 //                var aaa = ApiOther.api.test7(111, "asdasdsad")
-                var aaa = ApiOther.api.test(111, WeiJinModel())
-                Log.e("bbb", aaa?.json + "")
+                var aaa2 = ApiOther.api.test(111, WeiJinModel())
+                Log.e("bbb", aaa2?.json + "")
             }
 
         }

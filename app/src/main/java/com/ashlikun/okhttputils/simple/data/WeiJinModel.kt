@@ -10,7 +10,6 @@ import com.ashlikun.okhttputils.retrofit.FieldNo
  *
  * 功能介绍：
  */
-@FieldNo
 class WeiJinModel {
     /**
      * marketId : 61129

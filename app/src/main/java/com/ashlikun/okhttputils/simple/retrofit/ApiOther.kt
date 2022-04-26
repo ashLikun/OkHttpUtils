@@ -29,8 +29,8 @@ interface ApiOther : BaseApi {
 
     suspend fun testx(
         handle: Int
-    ): HttpResponse? {
-        return HttpResponse("{}")
+    ): String? {
+        return "11111111111"
     }
 
     @Get("https://api-sip.510gow.com/interface?action=recommend")
