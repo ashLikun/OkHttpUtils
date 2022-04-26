@@ -33,7 +33,7 @@ class MyInvocationHandler implements InvocationHandler {
             if (continuation instanceof Continuation) {
                 retrofit.proxyStart(method, args);
                 try {
-                    Object o = retrofit.loadServiceMethod(method).invoke(args, (Continuation) continuation);
+                    Object o = retrofit.loadServiceMethod(proxy, method).invoke(proxy, args, (Continuation) continuation);
                     return o;
                 } catch (Exception e) {
                     retrofit.proxyError(method, args, e);
@@ -41,6 +41,13 @@ class MyInvocationHandler implements InvocationHandler {
                 }
             }
         }
-        throw new IllegalArgumentException("必须是协程方法suspend");
+        //执行普通方法
+        try {
+            Object o = retrofit.loadServiceMethod(proxy, method).invokeNoSuspend(proxy, args);
+            return o;
+        } catch (Exception e) {
+            retrofit.proxyError(method, args, e);
+            throw e;
+        }
     }
 }

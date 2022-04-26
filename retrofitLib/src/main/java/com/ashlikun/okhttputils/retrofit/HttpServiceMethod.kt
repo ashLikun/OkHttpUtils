@@ -21,7 +21,7 @@ class HttpServiceMethod<ReturnT>(
         //解析Json的类型区别
         var parseType: String
 ) : ServiceMethod<ReturnT>() {
-    override suspend fun invoke(args: Array<Any?>?): ReturnT {
+    override suspend fun invoke(proxy: Any?,args: Array<Any?>?): ReturnT {
         if (Retrofit.get().createRequest == null || Retrofit.get().execute == null) {
             throw java.lang.IllegalArgumentException("必须初始化Retrofit.get().init")
         }
@@ -36,6 +36,10 @@ class HttpServiceMethod<ReturnT>(
             itt.apply(request, args)
         }
         return Retrofit.get().execute!!.invoke(request, this, args) as ReturnT
+    }
+
+    override fun invokeNoSuspend(proxy: Any?,args: Array<Any?>?): ReturnT {
+        throw IllegalArgumentException("必须是协程方法suspend")
     }
 
     companion object {

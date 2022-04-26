@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap
 typealias ServiceMethodInvoke<T> = suspend (request: HttpRequest, result: HttpServiceMethod<T>, params: Array<Any?>?) -> T
 
 data class RetrofitUrl(var url: String,
-                       var action: String,
-                       var path: String) {
+    var action: String,
+    var path: String) {
 
 }
 
@@ -49,7 +49,7 @@ class Retrofit private constructor() {
     var createUrl: ((url: String) -> String)? = null
 
     fun init(createRequest: (it: HttpServiceMethod<*>) -> HttpRequest,
-             execute: ServiceMethodInvoke<*>
+        execute: ServiceMethodInvoke<*>
     ) {
         this.createRequest = createRequest
         this.execute = execute
@@ -58,10 +58,10 @@ class Retrofit private constructor() {
     fun <T> create(service: Class<T>): T {
         validateServiceInterface(service)
         return Proxy.newProxyInstance(
-                service.classLoader, arrayOf<Class<*>>(service), MyInvocationHandler(this)) as T
+            service.classLoader, arrayOf<Class<*>>(service), MyInvocationHandler(this)) as T
     }
 
-    fun <T> loadServiceMethod(method: Method): ServiceMethod<T> {
+    fun <T> loadServiceMethod(proxy: Any?, method: Method): ServiceMethod<T> {
         var result: ServiceMethod<T>? = serviceMethodCache[method] as ServiceMethod<T>?
         //同步锁
         return result ?: synchronized(serviceMethodCache) {

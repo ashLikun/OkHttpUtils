@@ -27,7 +27,7 @@ interface ApiOther : BaseApi {
         }
     }
 
-    suspend fun testx(
+    fun testx(
         handle: Int
     ): String? {
         return "11111111111"

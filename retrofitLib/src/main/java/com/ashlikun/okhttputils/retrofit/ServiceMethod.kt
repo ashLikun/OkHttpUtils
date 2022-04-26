@@ -13,7 +13,8 @@ import kotlin.reflect.jvm.javaMethod
 
 
 abstract class ServiceMethod<T> {
-    abstract suspend fun invoke(args: Array<Any?>?): T
+    abstract suspend fun invoke(proxy: Any?, args: Array<Any?>?): T
+    abstract fun invokeNoSuspend(proxy: Any?, args: Array<Any?>?): T
 
 
     companion object {
@@ -25,7 +26,7 @@ abstract class ServiceMethod<T> {
             //使用Kotlin反射
             val kClass = method.declaringClass.kotlin
             val kMethod = kClass.memberFunctions.find { it.javaMethod == method }
-                    ?: throw NullPointerException("无法找到这个Java方法对应的Kotlin方法")
+                ?: throw NullPointerException("无法找到这个Java方法对应的Kotlin方法")
 
             return if (kMethod.isAbstract) {
                 //抽象方法
@@ -43,13 +44,13 @@ abstract class ServiceMethod<T> {
 
 
         fun methodError(
-                method: Method, cause: Throwable?, message: String, vararg args: Any?): RuntimeException {
+            method: Method, cause: Throwable?, message: String, vararg args: Any?): RuntimeException {
             var message = message
             message = String.format(message, *args)
             return IllegalArgumentException(
-                    """$message
+                """$message
     for method ${method.declaringClass.simpleName}.${method.name}""",
-                    cause)
+                cause)
         }
 
         open fun hasUnresolvableType(type: Type?): Boolean {
@@ -75,11 +76,11 @@ abstract class ServiceMethod<T> {
             }
             val className = type?.javaClass?.name ?: "null"
             throw IllegalArgumentException(
-                    "Expected a Class, ParameterizedType, or "
-                            + "GenericArrayType, but <"
-                            + type
-                            + "> is of type "
-                            + className)
+                "Expected a Class, ParameterizedType, or "
+                        + "GenericArrayType, but <"
+                        + type
+                        + "> is of type "
+                        + className)
         }
     }
 
