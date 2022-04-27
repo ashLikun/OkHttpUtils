@@ -16,7 +16,8 @@ class RetrofitTest {
     companion object {
         @JvmStatic
         fun start() {
-            Log.e("qqq aaa sss", "${System.currentTimeMillis()}")
+            val aa = 11111;
+            Log.e("qqq aaa sss", (aa is Number).toString())
 //            val aa = ApiOther.api.testx(1)
 //            Log.e("aaaaaaaa", "$aa")
             GlobalScope.launch {

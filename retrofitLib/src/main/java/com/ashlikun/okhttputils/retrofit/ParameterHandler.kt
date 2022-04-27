@@ -10,6 +10,7 @@ import java.io.File
  *
  * 功能介绍：对参数的描述
  * @param index  方法里面的第几个参数  -1:代表固定参数,这时候的key就是 "key1:value1"
+ * @param key 对应字段名，提交后台的Key
  */
 class ParameterHandler(
     var index: Int,
@@ -25,38 +26,38 @@ class ParameterHandler(
     //吧这个注解信息填入到HttpRequest里面
     internal fun apply(request: HttpRequest, args: Array<Any?>?) {
         val value = if (index == -1) valueDefault else args?.getOrNull(index)
-        if (isHeader) {
-            request.addHeader(key, value?.toString() ?: "")
-        } else if (isFile) {//如果是文件
-            if (value is List<*>) {
-                if (isFileArray) {
-                    value.forEachIndexed { nIndex, s ->
-                        if (s is String) {
-                            if (isFileArray) {
-                                request.addParamFilePath("${key}[${nIndex}]", s)
-                            } else {
-                                request.addParamFilePath(key, s)
-                            }
-                        } else if (s is File) {
-                            if (isFileArray) {
-                                request.addParam("${key}[${nIndex}]", s)
-                            } else {
-                                request.addParam(key, s)
+        when {
+            isHeader -> request.addHeader(key, value?.toString() ?: "")
+            //如果是文件
+            isFile || value is File -> {
+                if (value is List<*>) {
+                    if (isFileArray) {
+                        value.forEachIndexed { nIndex, s ->
+                            if (s is String) {
+                                if (isFileArray) {
+                                    request.addParamFilePath("${key}[${nIndex}]", s)
+                                } else {
+                                    request.addParamFilePath(key, s)
+                                }
+                            } else if (s is File) {
+                                if (isFileArray) {
+                                    request.addParam("${key}[${nIndex}]", s)
+                                } else {
+                                    request.addParam(key, s)
+                                }
                             }
                         }
                     }
-                }
-            } else {
-                if (value is String) {
-                    request.addParamFilePath(key, value)
-                } else if (value is File) {
-                    request.addParam(key, value)
+                } else {
+                    if (value is String) {
+                        request.addParamFilePath(key, value)
+                    } else if (value is File) {
+                        request.addParam(key, value)
+                    }
                 }
             }
-        } else {
-            //普通的键值对
-            request.addParam(key, value)
+            //普通的键值对,内部会各种处理
+            else -> request.addParam(key, value)
         }
-
     }
 }

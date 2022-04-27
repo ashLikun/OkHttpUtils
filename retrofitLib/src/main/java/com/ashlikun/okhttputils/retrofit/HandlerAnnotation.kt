@@ -191,11 +191,11 @@ class HandlerAnnotation(var kClass: KClass<*>,
     fun handleParams() {
         method.valueParameters.forEachIndexed { index, rit ->
             val annotations = rit.annotations
-            val parameterHandler = ParameterHandler(index, rit.name ?: "")
             val paramsType = rit.type.javaType
             //这个参数类型对应的类上面没有添加FieldNo注解的
             var isBreak = paramsType is Class<*> && paramsType.annotations.find { it is FieldNo } != null
             if (!isBreak) {
+                val parameterHandler = ParameterHandler(index, rit.name ?: "")
                 params.add(parameterHandler)
                 //当前字段的全部注解
                 handleParamsNebu(annotations, parameterHandler)

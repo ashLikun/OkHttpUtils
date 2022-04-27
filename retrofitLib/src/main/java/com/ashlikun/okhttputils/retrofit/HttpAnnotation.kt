@@ -70,6 +70,12 @@ annotation class Action(val value: String)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Parse(val parse: String)
 
+/**
+ * 提交的字段
+ * 1：基本数据类型，直接就是具体值
+ * 2：File 类型，就会强制使用File
+ * 3：Map和其他对象，就会使用json序列化成多个字段
+ */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Inherited
 @Retention(AnnotationRetention.RUNTIME)
