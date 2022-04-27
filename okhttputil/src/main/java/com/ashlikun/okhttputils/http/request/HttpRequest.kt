@@ -135,24 +135,35 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 添加对象参数
      */
     open fun addParamObject(key: String, valuse: Any?): HttpRequest {
+        fun other(key: String, valuse: Any) {
+            try {
+                val gson = GsonHelper.getGson()
+                val map = gson.fromJson(gson.toJson(valuse), Map::class.java)
+                addParams(map)
+            } catch (e: Exception) {
+                Log.e("OkhttpUtils ", "addParamObject error  key = ${key},valuse = ${valuse},${valuse.javaClass}")
+                e.printStackTrace()
+                //普通键值对
+                if (key.isNotEmpty()) params[key] = valuse
+            }
+        }
         if (valuse != null) {
             when {
                 //如果参数是Map类型，就直接释放
                 valuse is Map<*, *> -> addParams(valuse)
                 //普通键值对
                 (valuse is String || valuse is Number || valuse is Boolean || valuse is Boolean) -> if (key.isNotEmpty()) params[key] = valuse
+                //如果是文件
+                valuse is File -> if (key.isNotEmpty()) addParam(key, valuse)
+                //如果是列表
+                valuse is List<*> -> {
+                    if (valuse.getOrNull(0) is File) {
+                        addParam(key, valuse as List<File>)
+                    } else other(key, valuse)
+                }
                 //其他值序列化成json  Map
                 else -> {
-                    try {
-                        val gson = GsonHelper.getGson()
-                        val map = gson.fromJson(gson.toJson(valuse), Map::class.java)
-                        addParams(map)
-                    } catch (e: Exception) {
-                        Log.e("OkhttpUtils ", "addParamObject error  key = ${key},valuse = ${valuse},${valuse.javaClass}")
-                        e.printStackTrace()
-                        //普通键值对
-                        if (key.isNotEmpty()) params[key] = valuse
-                    }
+                    other(key, valuse)
                 }
             }
 
