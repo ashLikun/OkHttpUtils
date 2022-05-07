@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.retrofit
 
+import android.util.Log
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.superclasses
@@ -16,6 +17,9 @@ import kotlin.reflect.jvm.javaType
 class HandlerAnnotation(var kClass: KClass<*>,
     var method: KFunction<*>) {
     var httpMethod = "POST"
+
+    //是否格式化成json提交
+    var isJson: Boolean? = null
 
     //解析json的类型区别
     var parseType = ""
@@ -50,6 +54,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
                 when (it) {
                     is Url -> if (!it.method.isNullOrEmpty()) httpMethod = it.method
                     is Mehtod -> httpMethod = it.method
+                    is Json -> isJson = it.value
                     is Path -> path += it.value
                     is Parse -> parseType = it.parse
                     //固定头
@@ -91,6 +96,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
                         httpMethod = it.method
                     }
                     is Mehtod -> httpMethod = it.method
+                    is Json -> isJson = it.value
                     is Parse -> parseType = it.parse
                     is Get -> {
                         if (url.isNullOrEmpty()) {
@@ -217,6 +223,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
                             parameterHandler.key = it.key
                         }
                         parameterHandler.isFile = it.isFile
+                        parameterHandler.isBody = it.isBody
                         parameterHandler.isFileArray = it.isFileArray
                     }
                     //请求头

@@ -1,6 +1,8 @@
 package com.ashlikun.okhttputils.retrofit
 
+import android.util.Log
 import java.lang.reflect.Type
+import kotlin.math.log
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaType
@@ -13,15 +15,17 @@ import kotlin.reflect.jvm.javaType
  * 功能介绍：解析方法,构建请求,执行请求
  */
 class HttpServiceMethod<ReturnT>(
-        var url: String,
-        var method: String,
-        var resultType: Type,
-        var params: List<ParameterHandler>,
-        var urlParams: List<ParameterHandler>,
-        //解析Json的类型区别
-        var parseType: String
+    var url: String,
+    var method: String,
+    //null:默认
+    var isJsonRequest: Boolean?,
+    var resultType: Type,
+    var params: List<ParameterHandler>,
+    var urlParams: List<ParameterHandler>,
+    //解析Json的类型区别
+    var parseType: String
 ) : ServiceMethod<ReturnT>() {
-    override suspend fun invoke(proxy: Any?,args: Array<Any?>?): ReturnT {
+    override suspend fun invoke(proxy: Any?, args: Array<Any?>?): ReturnT {
         if (Retrofit.get().createRequest == null || Retrofit.get().execute == null) {
             throw java.lang.IllegalArgumentException("必须初始化Retrofit.get().init")
         }
@@ -30,7 +34,9 @@ class HttpServiceMethod<ReturnT>(
             url = url.replace("{${it.key}}", args?.getOrNull(it.index).toString())
         }
         //创建请求
-        val request = Retrofit.get().createRequest!!.invoke(this).setMethod(method)
+        val request = Retrofit.get().createRequest!!.invoke(this).setMethod(method).apply {
+            isJson = isJsonRequest
+        }
         //添加参数
         params.forEach { itt ->
             itt.apply(request, args)
@@ -38,13 +44,13 @@ class HttpServiceMethod<ReturnT>(
         return Retrofit.get().execute!!.invoke(request, this, args) as ReturnT
     }
 
-    override fun invokeNoSuspend(proxy: Any?,args: Array<Any?>?): ReturnT {
+    override fun invokeNoSuspend(proxy: Any?, args: Array<Any?>?): ReturnT {
         throw IllegalArgumentException("必须是协程方法suspend")
     }
 
     companion object {
         fun <ReturnT> parseAnnotations(
-                retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
+            retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
                 : HttpServiceMethod<ReturnT> {
 
 
@@ -66,24 +72,30 @@ class HttpServiceMethod<ReturnT>(
             val returnType = method.returnType.javaType
             if (hasUnresolvableType(returnType)) {
                 throw methodErrorK(
-                        kClass,
-                        method,
-                        null,
-                        "Method return type must not include a type variable or wildcard: %s",
-                        returnType)
+                    kClass,
+                    method,
+                    null,
+                    "Method return type must not include a type variable or wildcard: %s",
+                    returnType)
             }
-            return HttpServiceMethod(handlerAnnotation.url, handlerAnnotation.httpMethod, returnType, handlerAnnotation.params, handlerAnnotation.urlParams, handlerAnnotation.parseType)
+            return HttpServiceMethod(handlerAnnotation.url,
+                handlerAnnotation.httpMethod,
+                handlerAnnotation.isJson,
+                returnType,
+                handlerAnnotation.params,
+                handlerAnnotation.urlParams,
+                handlerAnnotation.parseType)
         }
 
 
         fun methodErrorK(kClass: KClass<*>,
-                         method: KFunction<*>, cause: Throwable?, message: String, vararg args: Any?): RuntimeException {
+            method: KFunction<*>, cause: Throwable?, message: String, vararg args: Any?): RuntimeException {
             var message = message
             message = String.format(message, *args)
             return IllegalArgumentException(
-                    """$message
+                """$message
     for method ${kClass.simpleName}.${method.name}""",
-                    cause)
+                cause)
         }
     }
 

@@ -51,8 +51,16 @@ class MyApp : Application() {
         OkHttpUtils.get().commonParams = params
         DownloadManager.initPath(this.cacheDir.path)
         Retrofit.get().init(
-            createRequest = { HttpRequest(it.url) },
+            createRequest = { MyHttpRequest(it.url) },
             execute = { request, result, params -> request.syncExecute<Any>(result.resultType) }
         )
     }
+}
+
+class MyHttpRequest(url: String) : HttpRequest(url) {
+    override fun onBuildRequestBodyHasCommonParams() {
+        super.onBuildRequestBodyHasCommonParams()
+        toJson()
+    }
+
 }

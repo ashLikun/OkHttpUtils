@@ -10,10 +10,7 @@ import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.http.request.ProgressRequestBody
 import com.ashlikun.okhttputils.http.response.HttpErrorCode
 import com.ashlikun.okhttputils.http.response.IHttpResponse
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonSyntaxException
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -527,4 +524,13 @@ object HttpUtils {
         m.appendTail(sb)
         return sb.toString()
     }
+
+    fun isJson(content: String) = jsonParser(content)?.run { true } ?: false
+
+    fun jsonParser(content: String) = runCatching {
+        JsonParser().parse(content)
+    }.getOrNull()
 }
+
+inline fun String.isJson() = HttpUtils.isJson(this)
+inline fun String.jsonParser() = HttpUtils.jsonParser(this)

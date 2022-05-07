@@ -80,6 +80,11 @@ class OkHttpUtils private constructor(
     val isCommonParams
         get() = commonParams.isNotEmpty()
 
+    /**
+     * 是否默认以json提交数据
+     */
+    val isJsonRequest: Boolean? = null
+
     init {
         if (client == null) {
             this.okHttpClient = OkHttpClient.Builder()

@@ -3,11 +3,8 @@ package com.ashlikun.okhttputils.http.request
 import android.net.Uri
 import android.util.Log
 import com.ashlikun.gson.GsonHelper
-import com.ashlikun.okhttputils.http.ExecuteCall
-import com.ashlikun.okhttputils.http.HttpException
+import com.ashlikun.okhttputils.http.*
 import com.ashlikun.okhttputils.http.HttpUtils.createUrlFromParams
-import com.ashlikun.okhttputils.http.OkHttpUtils
-import com.ashlikun.okhttputils.http.SuperHttp
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.google.gson.Gson
@@ -17,6 +14,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.lang.reflect.Type
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * @author　　: 李坤
@@ -55,7 +53,10 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     lateinit var request: Request
         protected set
 
-    open var isJson = false
+    /**
+     * 是否json形式提交
+     */
+    open var isJson: Boolean? = OkHttpUtils.get().isJsonRequest
 
     //标识这个请求，会传递到Request里面
     open var tag: Any? = null
@@ -108,12 +109,11 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      */
     open val paramsNotCommonParams: Map<String, Any>
         get() {
-            var value: Map<String, Any>
-            if (isJson) {
-                value = parseGson.fromJson(
-                    postContent,
-                    Map::class.java
-                ) as Map<String, Any>
+            var value: Map<String, Any> = emptyMap()
+            if (isJson == true) {
+                runCatching {
+                    value = parseGson.fromJson(postContent, Map::class.java) as Map<String, Any>
+                }
             } else {
                 value = params.toMap()
             }
@@ -133,13 +133,14 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
 
     /**
      * 添加对象参数
+     *  @param isValueJson  对象中的对象是否归根到根节点
      */
-    open fun addParamObject(key: String, valuse: Any?): HttpRequest {
-        fun other(key: String, valuse: Any) {
+    open fun addParamObject(key: String, valuse: Any?, isValueJson: Boolean = true): HttpRequest {
+        fun other(key: String, valuse: Any, isValueJson: Boolean = true) {
             try {
                 val gson = GsonHelper.getGson()
                 val map = gson.fromJson(gson.toJson(valuse), Map::class.java)
-                addParams(map)
+                addParams(map, isValueJson)
             } catch (e: Exception) {
                 Log.e("OkhttpUtils ", "addParamObject error  key = ${key},valuse = ${valuse},${valuse.javaClass}")
                 e.printStackTrace()
@@ -149,8 +150,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         }
         if (valuse != null) {
             when {
-                //如果参数是Map类型，就直接释放
-                valuse is Map<*, *> -> addParams(valuse)
+
                 //普通键值对
                 (valuse is String || valuse is Number || valuse is Boolean || valuse is Boolean) -> if (key.isNotEmpty()) params[key] = valuse
                 //如果是文件
@@ -159,11 +159,15 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
                 valuse is List<*> -> {
                     if (valuse.getOrNull(0) is File) {
                         addParam(key, valuse as List<File>)
-                    } else other(key, valuse)
+                    } else if (key.isNotEmpty()) params[key] = valuse
                 }
+                //如果跳过释放，就直接添加
+                !isValueJson -> if (key.isNotEmpty()) params[key] = valuse
+                //如果参数是Map类型，就直接释放
+                valuse is Map<*, *> -> addParams(valuse, false)
                 //其他值序列化成json  Map
                 else -> {
-                    other(key, valuse)
+                    other(key, valuse, false)
                 }
             }
 
@@ -173,9 +177,23 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
 
     /**
      * 添加参数
+     * @param isValueJson 对象中的对象是否归根到根节点
      */
-    open fun addParam(key: String, valuse: Any?): HttpRequest {
-        addParamObject(key, valuse)
+    open fun addParam(key: String, valuse: Any?, isValueJson: Boolean = true): HttpRequest {
+        addParamObject(key, valuse, isValueJson)
+        return this
+    }
+
+    /**
+     * 添加map参数
+     * @param isValueJson 对象中的对象是否归根到根节点
+     */
+    open fun addParams(map: Map<*, *>?, isValueJson: Boolean = true): HttpRequest {
+        map?.forEach {
+            if (it.key != null && it.value != null) {
+                addParam(it.key!!.toString(), it.value!!, isValueJson)
+            }
+        }
         return this
     }
 
@@ -201,17 +219,6 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         }
     }
 
-    /**
-     * 添加map参数
-     */
-    open fun addParams(map: Map<*, *>?): HttpRequest {
-        map?.forEach {
-            if (it.key != null && it.value != null) {
-                addParam(it.key!!.toString(), it.value!!)
-            }
-        }
-        return this
-    }
 
     /**
      * 添加文件参数
@@ -253,31 +260,21 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 设置直接提交得post
      * 不会添加公共参数
      */
-    open fun setContent(content: String?): HttpRequest {
-        postContent = content ?: ""
-        return this
-    }
-
-
-    /**
-     * 设置直接提交得post 并且是json
-     */
-    open fun setContentJson(content: String?): HttpRequest {
+    open fun setContent(content: String): HttpRequest {
         //添加公共参数
         var content = content
         if (OkHttpUtils.get().isCommonParams) {
-            try {
-                params =
-                    parseGson.fromJson(content, TreeMap::class.java) as TreeMap<String, Any>
+            runCatching {
+                params = parseGson.fromJson(content, TreeMap::class.java) as TreeMap<String, Any>
                 addCommonParams()
                 content = parseGson.toJson(params)
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
         }
-        postContent = content ?: ""
-        isJson = true
-        setMethod("POST")
+        postContent = content
+        isJson = postContent.isJson()
+        if (method == methods[0]) {
+            setMethod("POST")
+        }
         return this
     }
 
@@ -287,15 +284,31 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 2：如果存在文件就不能用content提交
      */
     open fun toJson(): HttpRequest {
+        if (isJson == false) {
+            return this
+        }
+        if (method == methods[0]) {
+            setMethod("POST")
+        }
         //添加公共参数
         addCommonParams()
         //转换成json
         if (params.isNotEmpty() && !isHavafiles) {
-            postContent = GsonHelper.getGson().toJson(params)
+            if (postContent.isNotEmpty()) {
+                runCatching {
+                    params = (params + (parseGson.fromJson(postContent, HashMap::class.java) as MutableMap<String, Any>)).toMutableMap()
+                }
+            }
+            //如果参数只有一个，并且是List，那么json就是数组
+            if (params.size == 1 && params.values.find { it != null } is List<*>) {
+                postContent = GsonHelper.getGson().toJson(params.values.find { it != null })
+            } else {
+                postContent = GsonHelper.getGson().toJson(params)
+            }
             params.clear()
-            isJson = true
-            setMethod("POST")
         }
+
+        isJson = postContent.isJson()
         return this
     }
 
@@ -415,6 +428,9 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         if (postContent.isEmpty()) {
             addCommonParams()
         }
+        if (isJson == true) {
+            toJson()
+        }
         onBuildRequestBodyHasCommonParams()
         if (method == "GET") {
             //get请求把参数放在url里面, 没有请求实体
@@ -422,7 +438,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
             body = null
         } else if (postContent.isNotEmpty()) {
             //只提交content
-            body = if (isJson) {
+            body = if (isJson == true) {
                 ContentRequestBody.createNew(
                     if (contentType == null) MEDIA_TYPE_JSON else contentType,
                     postContent
