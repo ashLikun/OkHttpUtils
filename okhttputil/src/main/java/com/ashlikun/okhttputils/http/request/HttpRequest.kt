@@ -56,7 +56,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 是否json形式提交
      */
-    open var isJson: Boolean? = OkHttpUtils.get().isJsonRequest
+    open var isJson: Boolean? = if (OkHttpUtils.get().isJsonRequest == true) true else null
 
     //标识这个请求，会传递到Request里面
     open var tag: Any? = null
@@ -428,9 +428,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         if (postContent.isEmpty()) {
             addCommonParams()
         }
-        if (isJson == true) {
-            toJson()
-        }
+        toJson()
         onBuildRequestBodyHasCommonParams()
         if (method == "GET") {
             //get请求把参数放在url里面, 没有请求实体
