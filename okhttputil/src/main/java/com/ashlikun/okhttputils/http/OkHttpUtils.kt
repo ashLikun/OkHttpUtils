@@ -69,6 +69,11 @@ class OkHttpUtils private constructor(
     var onDataParseError: OnDataParseError? = null
 
     /**
+     * 是否默认以json提交数据
+     */
+    var isJsonRequest: Boolean? = null
+
+    /**
      * 是否设置了公共头
      */
     val isCommonHeaders
@@ -80,10 +85,6 @@ class OkHttpUtils private constructor(
     val isCommonParams
         get() = commonParams.isNotEmpty()
 
-    /**
-     * 是否默认以json提交数据
-     */
-    val isJsonRequest: Boolean? = null
 
     init {
         if (client == null) {
