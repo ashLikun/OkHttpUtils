@@ -112,9 +112,7 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
             }
             val resultType: ResultType? = callback.convertResponse(response, gson)
             //缓存
-            if (cachePolicy?.cacheMode != null && cachePolicy?.cacheMode != CacheMode.NO_CACHE) {
-                cachePolicy?.save(response, CacheEntity.getHanderResult(resultType))
-            }
+            cachePolicy?.save(response, CacheEntity.getHanderResult(resultType))
             if (resultType == null) {
                 postFailure(
                     HttpException(HTTP_DATA_ERROR, MSG_DATA_ERROR)
