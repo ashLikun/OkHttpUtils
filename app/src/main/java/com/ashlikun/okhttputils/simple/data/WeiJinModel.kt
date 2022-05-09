@@ -39,4 +39,7 @@ class WeiJinModel {
     var investmentBaoName: String? = null
     var transferDate: String? = null
     var isHold = false
+    var adwwww: Adwwww = Adwwww()
 }
+
+data class Adwwww(val value: String = "")

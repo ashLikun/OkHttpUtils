@@ -38,7 +38,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     compileOnly 'com.squareup.okhttp3:okhttp:4.9.3'
     compileOnly 'com.google.code.gson:gson:2.8.5'
-    compileOnly 'com.github.ashLikun:MultiTypeGson:2.0.0'
+    compileOnly 'com.github.ashLikun:MultiTypeGson:2.1.0'
     compileOnly 'com.github.ashLikun:LiteOrm:2.0.2'
     //kotlin 协程
     compileOnly "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"

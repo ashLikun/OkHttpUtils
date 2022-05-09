@@ -13,7 +13,7 @@ import com.ashlikun.okhttputils.simple.HttpManage
 @Url(url = HttpManage.BASE_URL, method = "POST")
 @Path(HttpManage.BASE_PATH)
 @Action(HttpManage.ACTION)
-@Headers(value = ["commonHeader1:111", "commonHeader2:222"])
-@Params(value = ["commonParams1:111", "commonParams2:222"])
+//@Headers(value = ["commonHeader1:111", "commonHeader2:222"])
+//@Params(value = ["commonParams1:111", "commonParams2:222"])
 interface BaseApi {
 }

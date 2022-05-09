@@ -2,8 +2,7 @@ package com.ashlikun.okhttputils.simple.retrofit
 
 import android.util.Log
 import com.ashlikun.okhttputils.simple.data.WeiJinModel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * 作者　　: 李坤
@@ -20,15 +19,35 @@ class RetrofitTest {
             Log.e("qqq aaa sss", (aa is Number).toString())
 //            val aa = ApiOther.api.testx(1)
 //            Log.e("aaaaaaaa", "$aa")
-            GlobalScope.launch {
-                var aaa = ApiOther.api.testx(111)
-                Log.e("aaaa", aaa?.toString() + "")
-//                aaa = ApiOther.api.test( 11111, WeiJinModel())
-//                Log.e("bbb", aaa?.json + "")
-//                var aaa = ApiOther.api.test7(111, "asdasdsad")
-                var aaa2 = ApiOther.api.test(111, WeiJinModel())
-                Log.e("bbb", aaa2?.json + "")
+            GlobalScope.launch(CoroutineExceptionHandler { coroutineContext, throwable ->
+                throwable.printStackTrace()
+            }) {
+                GlobalScope.async {
+                    delay(2000)
+                    Log.e("ggggggggg", "2")
+                    delay(2000)
+                }
+                runCatching {
+                    var aaa2 = ApiOther.api.test(111, WeiJinModel())
+                    Log.e("bbb", aaa2?.json + "")
+                }.onFailure {
+                    Log.e("sssssss22222222ss", "")
+                }
             }
+//            GlobalScope.launch {
+//                var aaa = ApiOther.api.testx(111)
+//                Log.e("aaaa", aaa?.toString() + "")
+////                aaa = ApiOther.api.test( 11111, WeiJinModel())
+////                Log.e("bbb", aaa?.json + "")
+////                var aaa = ApiOther.api.test7(111, "asdasdsad")
+//                runCatching {
+//                    var aaa2 = ApiOther.api.test(111, WeiJinModel())
+//                    Log.e("bbb", aaa2?.json + "")
+//                }.onFailure {
+//                    Log.e("sssssssss", "")
+//                }
+//
+//            }
 
         }
     }

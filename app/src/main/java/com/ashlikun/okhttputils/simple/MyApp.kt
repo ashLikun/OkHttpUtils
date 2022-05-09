@@ -9,9 +9,12 @@ import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.retrofit.Retrofit
 import com.ashlikun.okhttputils.simple.interceptor.MarvelSigningInterceptor
 import com.ashlikun.orm.LiteOrmUtil
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
+import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resumeWithException
 
 /**
  * 作者　　: 李坤
@@ -51,8 +54,24 @@ class MyApp : Application() {
         OkHttpUtils.get().commonParams = params
         DownloadManager.initPath(this.cacheDir.path)
         Retrofit.get().init(
-            createRequest = { HttpRequest(it.url) },
+            createRequest = { MyHttpRequest(it.url) },
             execute = { request, result, params -> request.syncExecute<Any>(result.resultType) }
         )
     }
+}
+
+suspend fun <T> testSuspend(): T {
+    return withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            continuation.resumeWithException(throw RuntimeException("ddddddd"))
+        }
+    }
+}
+
+class MyHttpRequest(url: String) : HttpRequest(url) {
+    override fun onBuildRequestBodyHasCommonParams() {
+        super.onBuildRequestBodyHasCommonParams()
+        toJson()
+    }
+
 }

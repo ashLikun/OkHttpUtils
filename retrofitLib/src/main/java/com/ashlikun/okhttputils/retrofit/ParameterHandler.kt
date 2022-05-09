@@ -17,6 +17,8 @@ class ParameterHandler(
     var key: String,
     var valueDefault: String = "",
     var isFile: Boolean = false,
+    //是否作为一个data提交，当只有一个参数的时候生效
+    var isBody: Boolean = false,
     var isHeader: Boolean = false,
     //如果是多个文件是否用同一个key变成数组
     var isFileArray: Boolean = false
@@ -27,7 +29,8 @@ class ParameterHandler(
     internal fun apply(request: HttpRequest, args: Array<Any?>?) {
         val value = if (index == -1) valueDefault else args?.getOrNull(index)
         when {
-            isHeader -> request.addHeader(key, value?.toString() ?: "")
+            isHeader -> request.addHeader(key, value?.toString().orEmpty())
+            isBody -> request.setContent(value?.toString().orEmpty())
             //如果是文件
             isFile || value is File -> {
                 if (value is List<*>) {
