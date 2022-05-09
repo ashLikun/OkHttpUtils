@@ -386,11 +386,13 @@ object HttpUtils {
                 if (json.isEmpty()) throw JsonSyntaxException("json length = 0")
                 try {
                     var cls = if (type is Class<*>) type
-                    else (type as ParameterizedType).rawType as Class<*>
-                    if (IHttpResponse::class.java.isAssignableFrom(cls)) {
-                        res = (cls.newInstance() as IHttpResponse).parseData(
-                            gson, json, type, response
-                        )
+                    else (type as? ParameterizedType)?.rawType as? Class<*>
+                    if (cls != null) {
+                        if (IHttpResponse::class.java.isAssignableFrom(cls)) {
+                            res = (cls.newInstance() as IHttpResponse).parseData(
+                                gson, json, type, response
+                            )
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
