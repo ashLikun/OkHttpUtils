@@ -21,7 +21,7 @@ abstract class AbsHttpResponse(
     @Transient
     override var json: String = ""
         set(value) {
-            field == value
+            field = value
             jsonHelper = JSONHelp(value)
         }
 
