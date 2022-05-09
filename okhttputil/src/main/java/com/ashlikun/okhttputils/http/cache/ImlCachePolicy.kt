@@ -2,10 +2,15 @@ package com.ashlikun.okhttputils.http.cache
 
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.ashlikun.okhttputils.http.request.HttpRequest
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okio.*
+import okio.BufferedSource
+import okio.ForwardingSource
+import okio.buffer
+import okio.source
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.nio.charset.Charset
@@ -31,14 +36,11 @@ open class ImlCachePolicy(request: HttpRequest) : BaseCachePolicy(request) {
                     .body(CacheResponseBody(cacheEntity))
                     .build()
                 val result = callback.convertResponse(response, request.parseGson)
-                GlobalScope.async(CoroutineExceptionHandler { _, t ->
-
-                }) {
-                    if (call != null && call.isCanceled()) {
-                        return@async
+                withContext(Dispatchers.Main) {
+                    if (call?.isCanceled() == false) {
+                        callback.onCacheSuccess(cacheEntity, result)
                     }
-                    callback.onCacheSuccess(cacheEntity, result)
-                }.await()
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()

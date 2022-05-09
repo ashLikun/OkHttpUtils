@@ -127,18 +127,20 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
     private suspend fun postResponse(response: Response, resultType: ResultType) {
         if (checkCanceled(response)) return
         callback.onSuccessSubThread(resultType)
-        GlobalScope.async(Dispatchers.Main + CoroutineExceptionHandler { _, t ->
-            t.printStackTrace()
-            postFailure(HttpException(HTTP_UNKNOWN, MSG_UNKNOWN, t))
-        }) {
-            if (checkCanceled(response)) return@async
-            if (callback.onSuccessHandelCode(resultType)) {
+        coroutineScope {
+            async(Dispatchers.Main + CoroutineExceptionHandler { _, t ->
+                t.printStackTrace()
+                postFailure(HttpException(HTTP_UNKNOWN, MSG_UNKNOWN, t))
+            }) {
                 if (checkCanceled(response)) return@async
-                callback.onSuccess(resultType)
-            }
-            exc.isCompleted = true
-            callback.onCompleted()
-            response.close()
-        }.await()
+                if (callback.onSuccessHandelCode(resultType)) {
+                    if (checkCanceled(response)) return@async
+                    callback.onSuccess(resultType)
+                }
+                exc.isCompleted = true
+                callback.onCompleted()
+                response.close()
+            }.await()
+        }
     }
 }
