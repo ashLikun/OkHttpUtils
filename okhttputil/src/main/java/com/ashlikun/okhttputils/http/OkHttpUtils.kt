@@ -64,6 +64,11 @@ class OkHttpUtils private constructor(
     var cacheTime = CacheEntity.CACHE_NEVER_EXPIRE
 
     /**
+     * 全局缓存是否检测接口成功后才保存,前提是结果实现IHttpResponse
+     */
+    var cacheIsCheckSuccess = true
+
+    /**
      * 当数据解析错误
      */
     var onDataParseError: OnDataParseError? = null

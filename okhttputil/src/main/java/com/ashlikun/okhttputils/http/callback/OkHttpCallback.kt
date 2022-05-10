@@ -4,7 +4,6 @@ import com.ashlikun.okhttputils.http.ExecuteCall
 import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.OkHttpUtils
-import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.cache.CachePolicy
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_DATA_ERROR
@@ -38,6 +37,9 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
                 }
             }
         }
+
+    //缓存是否检测成功
+    var cacheIsCheckSuccess: Boolean = true
 
     init {
         callback.onStart()
@@ -112,7 +114,7 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
             }
             val resultType: ResultType? = callback.convertResponse(response, gson)
             //缓存
-            cachePolicy?.save(response, CacheEntity.getHanderResult(resultType))
+            cachePolicy?.save(response, resultType, cacheIsCheckSuccess)
             if (resultType == null) {
                 postFailure(
                     HttpException(HTTP_DATA_ERROR, MSG_DATA_ERROR)

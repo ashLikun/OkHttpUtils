@@ -67,6 +67,9 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     //缓存超时时间
     open var cacheTime: Long = OkHttpUtils.get().cacheTime
 
+    //缓存是否检测接口成功后才保存  前提是结果实现IHttpResponse
+    open var cacheIsCheckSuccess = OkHttpUtils.get().cacheIsCheckSuccess
+
     //缓存的key，默认内部自动获取url，但是如果参数里面有动态的参数，那么可能失效，如时间戳,所以开放自己设置
     open var cacheKey: String = ""
         get() {

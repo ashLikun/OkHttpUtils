@@ -17,7 +17,7 @@ interface CachePolicy {
     val cache: CacheEntity?
     var cacheTime: Long
     var cacheMode: CacheMode
-    fun save(response: Response, result: String)
+    fun save(response: Response, result: Any?, isCheckSuccess: Boolean)
 
     /**
      * 回调缓存数据

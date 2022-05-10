@@ -1,7 +1,9 @@
 package com.ashlikun.okhttputils.http.cache
 
+import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.ashlikun.okhttputils.http.request.HttpRequest
+import com.ashlikun.okhttputils.http.response.IHttpResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -47,7 +49,12 @@ open class ImlCachePolicy(request: HttpRequest) : BaseCachePolicy(request) {
         }
     }
 
-    override fun save(response: Response, result: String) {
+    override fun save(response: Response, resultType: Any?, isCheckSuccess: Boolean) {
+        if (resultType is IHttpResponse) {
+            //不成功的数据就不缓存,前提是结果实现IHttpResponse
+            if (isCheckSuccess && !resultType.isSucceed) return
+        }
+        val result = CacheEntity.getHanderResult(resultType)
         //保存缓存
         if (cacheMode !== CacheMode.NO_CACHE && result.isNotEmpty()) {
             CacheEntity.createCacheEntity(request, response, result).save()

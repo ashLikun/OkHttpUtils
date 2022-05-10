@@ -6,7 +6,6 @@ import com.ashlikun.okhttputils.http.HttpUtils.handerResult
 import com.ashlikun.okhttputils.http.HttpUtils.launch
 import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.SuperHttp
-import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.cache.CachePolicy
 import com.ashlikun.okhttputils.http.cache.ImlCachePolicy
@@ -40,7 +39,6 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
     private var connTimeOut = TIME_OUT.toLong()
     open var interceptors: MutableList<Interceptor>? = null
     open var networkInterceptors: MutableList<Interceptor>? = null
-
 
     /**
      * 缓存代理
@@ -114,6 +112,7 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
         }
         call.enqueue(OkHttpCallback(exc, callback).apply {
             gson = httpRequest.parseGson
+            cacheIsCheckSuccess = httpRequest.cacheIsCheckSuccess
             cachePolicy = this@RequestCall.cachePolicy
         })
         return exc
@@ -149,10 +148,7 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
                     val data: ResultType = handerResult(type, response, httpRequest.parseGson)
                         ?: throw HttpException(HTTP_DATA_ERROR, MSG_DATA_ERROR)
                     //保存缓存
-                    cachePolicy?.save(
-                        response,
-                        CacheEntity.getHanderResult(data)
-                    )
+                    cachePolicy?.save(response, data, httpRequest.cacheIsCheckSuccess)
                     data
                 } catch (e: Exception) {
                     response.close()

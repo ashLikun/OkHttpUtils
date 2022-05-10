@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.http.cache
 
+import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.http.response.IHttpResponse
 import com.ashlikun.orm.LiteOrmUtil
@@ -71,10 +72,10 @@ open class CacheEntity {
             if (resultType == null) {
                 return ""
             }
-            return if (resultType is IHttpResponse) {
-                (resultType as IHttpResponse).json
-            } else {
-                resultType.toString()
+            return when (resultType) {
+                is IHttpResponse -> (resultType as IHttpResponse).json
+                is String -> resultType.toString()
+                else -> OkHttpUtils.get().parseGson.toJson(resultType)
             }
         }
 
