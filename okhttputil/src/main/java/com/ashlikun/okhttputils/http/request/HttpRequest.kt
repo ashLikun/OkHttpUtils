@@ -297,17 +297,17 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         //添加公共参数
         addCommonParams()
         //转换成json
-        if (params.isNotEmpty() && !isHavafiles) {
+        if (!isHavafiles) {
             if (postContent.isNotEmpty()) {
                 runCatching {
                     params = (params + (parseGson.fromJson(postContent, HashMap::class.java) as MutableMap<String, Any>)).toMutableMap()
                 }
             }
             //如果参数只有一个，并且是List，那么json就是数组
-            if (params.size == 1 && params.values.find { it != null } is List<*>) {
-                postContent = GsonHelper.getGson().toJson(params.values.find { it != null })
+            postContent = if (params.size == 1 && params.values.find { it != null } is List<*>) {
+                GsonHelper.getGson().toJson(params.values.find { it != null })
             } else {
-                postContent = GsonHelper.getGson().toJson(params)
+                GsonHelper.getGson().toJson(params)
             }
             params.clear()
         }
