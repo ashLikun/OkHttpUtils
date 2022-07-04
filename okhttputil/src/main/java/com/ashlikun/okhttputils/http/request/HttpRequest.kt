@@ -56,7 +56,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 是否json形式提交
      */
-    open var isJson: Boolean? = if (OkHttpUtils.get().isJsonRequest == true) true else null
+    open var isJson: Boolean = OkHttpUtils.get().isJsonRequest
 
     //标识这个请求，会传递到Request里面
     open var tag: Any? = null

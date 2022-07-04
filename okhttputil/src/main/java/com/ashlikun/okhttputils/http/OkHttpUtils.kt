@@ -76,7 +76,7 @@ class OkHttpUtils private constructor(
     /**
      * 是否默认以json提交数据
      */
-    var isJsonRequest: Boolean? = null
+    var isJsonRequest: Boolean = false
 
     /**
      * 是否设置了公共头
