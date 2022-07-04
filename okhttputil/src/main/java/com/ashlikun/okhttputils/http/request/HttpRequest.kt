@@ -113,7 +113,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     open val paramsNotCommonParams: Map<String, Any>
         get() {
             var value: Map<String, Any> = emptyMap()
-            if (isJson == true) {
+            if (isJson) {
                 runCatching {
                     value = parseGson.fromJson(postContent, Map::class.java) as Map<String, Any>
                 }
@@ -287,7 +287,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 2：如果存在文件就不能用content提交
      */
     open fun toJson(): HttpRequest {
-        if (isJson == false) {
+        if (!isJson) {
             return this
         }
         //get delete 请求不能json
@@ -440,7 +440,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
             body = null
         } else if (postContent.isNotEmpty()) {
             //只提交content
-            body = if (isJson == true) {
+            body = if (isJson) {
                 ContentRequestBody.createNew(
                     if (contentType == null) MEDIA_TYPE_JSON else contentType,
                     postContent
