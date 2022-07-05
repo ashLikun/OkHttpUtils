@@ -530,7 +530,12 @@ object HttpUtils {
     fun isJson(content: String) = jsonParser(content)?.run { true } ?: false
 
     fun jsonParser(content: String) = runCatching {
-        JsonParser().parse(content)
+        val res = JsonParser().parse(content)
+        if (res is JsonNull || res is JsonPrimitive) {
+            null
+        } else {
+            res
+        }
     }.getOrNull()
 }
 

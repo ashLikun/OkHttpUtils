@@ -310,9 +310,11 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
                 GsonHelper.getGson().toJson(params)
             }
             params.clear()
+            isJson = postContent.isJson()
+        } else {
+            //有文件不能json
+            isJson = false
         }
-
-        isJson = postContent.isJson()
         return this
     }
 

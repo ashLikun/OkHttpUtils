@@ -34,20 +34,18 @@ class ParameterHandler(
             //如果是文件
             isFile || value is File -> {
                 if (value is List<*>) {
-                    if (isFileArray) {
-                        value.forEachIndexed { nIndex, s ->
-                            if (s is String) {
-                                if (isFileArray) {
-                                    request.addParamFilePath("${key}[${nIndex}]", s)
-                                } else {
-                                    request.addParamFilePath(key, s)
-                                }
-                            } else if (s is File) {
-                                if (isFileArray) {
-                                    request.addParam("${key}[${nIndex}]", s)
-                                } else {
-                                    request.addParam(key, s)
-                                }
+                    value.forEachIndexed { nIndex, s ->
+                        if (s is String) {
+                            if (isFileArray) {
+                                request.addParamFilePath("${key}[${nIndex}]", s)
+                            } else {
+                                request.addParamFilePath(key, s)
+                            }
+                        } else if (s is File) {
+                            if (isFileArray) {
+                                request.addParam("${key}[${nIndex}]", s)
+                            } else {
+                                request.addParam(key, s)
                             }
                         }
                     }
