@@ -16,23 +16,27 @@ object ClassUtils {
      * 获取HttpResult类型
      */
     fun getHttpResultClass(type: Type): Type? {
-        if (type is ParameterizedType) {
-            //已经是的
-            if (type.rawType == HttpResult::class.java) {
-                return type
+        when (type) {
+            is ParameterizedType -> {
+                //已经是的
+                if (type.rawType == HttpResult::class.java) {
+                    return type
+                }
+                return getHttpResultClass(type.rawType)
             }
-            return getHttpResultClass(type.rawType)
-        } else if (type is Class<*>) {
-            return if (type == HttpResult::class.java) {
-                type as Class<HttpResult<*>>
-            } else if (type.genericSuperclass != null && type.genericSuperclass != Any::class.java) {
-                //genericSuperclass 获取带泛型类型
-                getHttpResultClass(type.genericSuperclass!!)
-            } else {
-                null
+            is Class<*> -> {
+                return if (type == HttpResult::class.java) {
+                    type as Class<HttpResult<*>>
+                } else if (type.genericSuperclass != null && type.genericSuperclass != Any::class.java) {
+                    //genericSuperclass 获取带泛型类型
+                    getHttpResultClass(type.genericSuperclass!!)
+                } else {
+                    null
+                }
             }
-        } else {
-            return null
+            else -> {
+                return null
+            }
         }
     }
 
