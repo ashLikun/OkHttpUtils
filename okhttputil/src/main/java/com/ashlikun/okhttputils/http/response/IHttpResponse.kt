@@ -29,6 +29,11 @@ interface IHttpResponse {
     val isSucceed: Boolean
 
     /**
+     * 当前类的类型
+     */
+    var currentType: Type
+
+    /**
      * 解析数据的时候，也是初始化的时候
      * 会先实例化一个空的本对象然后调用这个方法
      * @param response 网络请求是 Response，缓存是 null

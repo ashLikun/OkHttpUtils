@@ -3,9 +3,12 @@ package com.ashlikun.okhttputils.simple.retrofit
 import androidx.annotation.Keep
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.http.response.HttpResponse
+import com.ashlikun.okhttputils.http.response.HttpResult
 import com.ashlikun.okhttputils.retrofit.*
 import com.ashlikun.okhttputils.simple.ParseMulti
 import com.ashlikun.okhttputils.simple.data.Adwwww
+import com.ashlikun.okhttputils.simple.data.HttpPageResultX
+import com.ashlikun.okhttputils.simple.data.UserData
 import com.ashlikun.okhttputils.simple.data.WeiJinModel
 
 
@@ -39,7 +42,7 @@ interface ApiOther : BaseApi {
     suspend fun test(
         news_id: Int,
         ddd: WeiJinModel
-    ): HttpResponse
+    ): HttpResult<List<UserData>>
 
     @Json()
     @Post("https://api-sip.510gow.com/interface?action=recommend")

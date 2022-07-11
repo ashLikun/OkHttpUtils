@@ -1,9 +1,11 @@
 package com.ashlikun.okhttputils.http.response
 
+import android.util.Log
 import com.ashlikun.okhttputils.http.ClassUtils
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import okhttp3.Response
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 /**
@@ -14,26 +16,27 @@ import java.lang.reflect.Type
  * 功能介绍：http返回的基本数据， 用泛型解耦，可以适用于大部分接口
  */
 open class HttpResult<T> : HttpResponse() {
-    //用来模仿Data
+    /**
+     * 用来模仿Data
+     * 可能为null，如果不要null，使用dataX
+     */
     @SerializedName("data")
     open var data: T? = null
 
     /**
-     * 去除空,只有在success的时候才会强制赋值
+     * 新建的数据缓存,是给 HttpResult的data赋值
+     */
+    open val newData: T by lazy {
+        ClassUtils.getListOrArrayOrObject(ClassUtils.getHttpResultClass(currentType)) as T
+    }
+
+
+    /**
+     * 空判断，如果是null，就会初始化一个
      */
     open val dataX: T
-        get() = data!!
+        get() = (data ?: newData)
 
-    override fun <M> parseData(gson: Gson, json: String, type: Type, response: Response?): M {
-        //如果修改值，只能调用apply,因为这个方法调用后会指向调用的返回值
-        return (super.parseData(gson, json, type, response) as M).apply {
-            this as HttpResult<T>
-            //防止data是null
-            if (this.isSucceed) {
-                this.data = (this.data ?: ClassUtils.getListOrArrayOrObject(type)) as T?
-            }
-        }
-    }
 
     override fun toString(): String {
         return "HttpResult{" +

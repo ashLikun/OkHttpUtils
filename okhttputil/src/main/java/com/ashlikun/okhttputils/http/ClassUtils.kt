@@ -1,5 +1,6 @@
 package com.ashlikun.okhttputils.http
 
+import com.ashlikun.okhttputils.http.response.HttpResult
 import java.lang.reflect.*
 import java.lang.reflect.Array
 
@@ -11,6 +12,30 @@ import java.lang.reflect.Array
  * 功能介绍：反射和获取泛型类型的工具
  */
 object ClassUtils {
+    /**
+     * 获取HttpResult类型
+     */
+    fun getHttpResultClass(type: Type): Type? {
+        if (type is ParameterizedType) {
+            //已经是的
+            if (type.rawType == HttpResult::class.java) {
+                return type
+            }
+            return getHttpResultClass(type.rawType)
+        } else if (type is Class<*>) {
+            return if (type == HttpResult::class.java) {
+                type as Class<HttpResult<*>>
+            } else if (type.genericSuperclass != null && type.genericSuperclass != Any::class.java) {
+                //genericSuperclass 获取带泛型类型
+                getHttpResultClass(type.genericSuperclass!!)
+            } else {
+                null
+            }
+        } else {
+            return null
+        }
+    }
+
     /**
      * 获取当前泛型内部data->list或者数组  或者 对象
      * 实例化data，方便使用
@@ -32,7 +57,8 @@ object ClassUtils {
                 isTypeToListOrArray(type1) -> getRawType(type1)
                 //返回对象
                 type1 is Class<*> -> type1
-                //找父类
+                type1 is ParameterizedType -> type1.rawType as? Class<*>
+                //找泛型的泛型父类
                 else -> classToListOrArrayOrObject(type1)
             }
         } else if (superClass is Class<*>) {
@@ -47,7 +73,7 @@ object ClassUtils {
      */
     private fun isTypeToListOrArray(type: Type?): Boolean {
         return when (type) {
-            is Class<*> -> type == List::class.java || type == Array::class.java
+            is Class<*> -> List::class.java.isAssignableFrom(type) || Array::class.java.isAssignableFrom(type)
             is ParameterizedType -> {
                 if (type.rawType is Class<*>) {
                     if (List::class.java.isAssignableFrom((type.rawType as Class<*>))) {

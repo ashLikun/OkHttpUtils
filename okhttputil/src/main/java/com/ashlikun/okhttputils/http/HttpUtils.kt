@@ -410,6 +410,7 @@ object HttpUtils {
                 res.json = json
                 res.httpCode = response.code
                 res.response = response
+                res.currentType = type
             }
             if (res == null) {
                 throw IOException("${HttpErrorCode.MSG_DATA_ERROR2}  \n json = $json")
@@ -449,8 +450,9 @@ object HttpUtils {
                 throw IOException("${HttpErrorCode.MSG_DATA_ERROR2} \n  原异常：$e  \n json = $json")
             }
             if (res is IHttpResponse) {
-                (res as IHttpResponse).json = json
-                (res as IHttpResponse).httpCode = response.code
+                res.json = json
+                res.httpCode = response.code
+                res.currentType = type
             }
             if (res == null) {
                 throw IOException("${HttpErrorCode.MSG_DATA_ERROR2}  \n json = $json")

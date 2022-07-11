@@ -24,6 +24,7 @@ abstract class AbsHttpResponse(
             field = value
             jsonHelper = JSONHelp(value)
         }
+    override lateinit var currentType: Type
 
     /**
      * 获取头部code
