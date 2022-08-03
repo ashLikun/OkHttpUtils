@@ -18,15 +18,21 @@ object ClassUtils {
     fun getHttpResultClass(type: Type): Type? {
         when (type) {
             is ParameterizedType -> {
+                val rawType = type.rawType
                 //已经是的
-                if (type.rawType == HttpResult::class.java) {
+                if (rawType is Class<*> && HttpResult::class.java.isAssignableFrom(rawType)) {
+                    return type
+                }
+                if (rawType == HttpResult::class.java) {
                     return type
                 }
                 return getHttpResultClass(type.rawType)
             }
             is Class<*> -> {
-                return if (type == HttpResult::class.java) {
-                    type as Class<HttpResult<*>>
+                return if (HttpResult::class.java.isAssignableFrom(type)) {
+                    type
+                } else if (type == HttpResult::class.java) {
+                    type
                 } else if (type.genericSuperclass != null && type.genericSuperclass != Any::class.java) {
                     //genericSuperclass 获取带泛型类型
                     getHttpResultClass(type.genericSuperclass!!)
