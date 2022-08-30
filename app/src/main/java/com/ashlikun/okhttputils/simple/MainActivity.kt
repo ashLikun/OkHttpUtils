@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.ashlikun.gson.GsonHelper
+import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
@@ -106,6 +107,11 @@ class MainActivity : AppCompatActivity() {
                             "onCacheSuccess",
                             GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result
                         )
+                    }
+
+                    override fun onError(e: HttpException) {
+                        super.onError(e)
+                        Log.e("aaa", e.toString())
                     }
                 })
         }

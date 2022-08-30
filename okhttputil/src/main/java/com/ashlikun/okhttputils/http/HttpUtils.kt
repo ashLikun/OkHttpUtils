@@ -1,5 +1,9 @@
 package com.ashlikun.okhttputils.http
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Looper
 import android.text.TextUtils
@@ -539,6 +543,14 @@ object HttpUtils {
             res
         }
     }.getOrNull()
+
+    @SuppressLint("MissingPermission")
+    fun isNetworkAvailable(): Boolean {
+        val connectivity = OkHttpUtils.app?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+        return runCatching {
+            connectivity?.activeNetworkInfo?.state == NetworkInfo.State.CONNECTED
+        }.getOrNull() ?: false
+    }
 }
 
 inline fun String.isJson() = HttpUtils.isJson(this)

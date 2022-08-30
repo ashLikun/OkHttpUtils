@@ -26,6 +26,9 @@ open class HttpException(
          * 处理异常
          */
         fun handleFailureHttpException(call: Call, e: IOException): HttpException {
+            if (!HttpUtils.isNetworkAvailable()) {
+                return HttpException(HttpErrorCode.HTTP_NO_CONNECT, HttpErrorCode.MSG_NO_CONNECT, e)
+            }
             val res: HttpException = if (e is ConnectException) {
                 HttpException(HttpErrorCode.HTTP_NO_CONNECT, HttpErrorCode.MSG_NO_CONNECT, e)
             } else if (e is SocketException) {
