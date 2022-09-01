@@ -15,7 +15,7 @@ import kotlin.reflect.jvm.javaType
  * 功能介绍：处理注解
  */
 class HandlerAnnotation(var kClass: KClass<*>,
-    var method: KFunction<*>) {
+                        var method: KFunction<*>) {
     var httpMethod = "POST"
 
     //是否格式化成json提交
@@ -225,6 +225,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
                         parameterHandler.isFile = it.isFile
                         parameterHandler.isBody = it.isBody
                         parameterHandler.isFileArray = it.isFileArray
+                        parameterHandler.isObjToRoot = it.isObjToRoot
                     }
                     //请求头
                     is Header -> {

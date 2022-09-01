@@ -95,7 +95,9 @@ annotation class Field(val key: String = "",
     //是否作为一个data提交，当只有一个参数的时候生效,只支持String，其他对象会调用toString
     val isBody: Boolean = false,
     //如果是多个文件是否用同一个key变成数组
-    val isFileArray: Boolean = false)
+    val isFileArray: Boolean = false,
+    //对象是否变成释放变成根节点
+    val isObjToRoot: Boolean = true)
 
 /**
  * 这个字段不用提交,用于回调的时候处理

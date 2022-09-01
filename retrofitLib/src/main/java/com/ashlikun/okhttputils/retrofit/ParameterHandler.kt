@@ -21,7 +21,9 @@ class ParameterHandler(
     var isBody: Boolean = false,
     var isHeader: Boolean = false,
     //如果是多个文件是否用同一个key变成数组
-    var isFileArray: Boolean = false
+    var isFileArray: Boolean = false,
+    //对象是否变成释放变成根节点
+    var isObjToRoot: Boolean = true
 ) {
 
 
@@ -58,7 +60,7 @@ class ParameterHandler(
                 }
             }
             //普通的键值对,内部会各种处理
-            else -> request.addParam(key, value)
+            else -> request.addParam(key, value, isObjToRoot)
         }
     }
 }
