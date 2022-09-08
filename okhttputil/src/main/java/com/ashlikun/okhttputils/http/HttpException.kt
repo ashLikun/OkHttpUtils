@@ -59,7 +59,7 @@ open class HttpException(
             return if (message != null && message.contains("timed out") || code == HttpURLConnection.HTTP_CLIENT_TIMEOUT || code == HttpURLConnection.HTTP_GATEWAY_TIMEOUT) {
                 HttpException(HttpErrorCode.HTTP_TIME_OUT, HttpErrorCode.MSG_TIME_OUT)
             } else if (code == HttpURLConnection.HTTP_INTERNAL_ERROR || code == 0) { //500
-                HttpException(code, HttpErrorCode.MSG_INTERNAL_ERROR)
+                HttpException(code, HttpErrorCode.MSG_500)
             } else if (code == HttpURLConnection.HTTP_FORBIDDEN) { //403
                 HttpException(code, HttpErrorCode.MSG_FORBIDDEN)
             } else if (code == HttpURLConnection.HTTP_NOT_FOUND) { //404

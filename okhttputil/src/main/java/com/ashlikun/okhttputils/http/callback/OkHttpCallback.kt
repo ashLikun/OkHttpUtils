@@ -6,10 +6,9 @@ import com.ashlikun.okhttputils.http.HttpUtils
 import com.ashlikun.okhttputils.http.OkHttpUtils
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.cache.CachePolicy
+import com.ashlikun.okhttputils.http.response.HttpErrorCode
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_DATA_ERROR
-import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_UNKNOWN
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_DATA_ERROR
-import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_UNKNOWN
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.Call
@@ -100,6 +99,7 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
     override fun onResponse(call: Call, response: Response) {
         GlobalScope.launch(CoroutineExceptionHandler { _, t ->
             t.printStackTrace()
+            OkHttpUtils.get().onHttpError?.invoke(t)
             postFailure(HttpException(HTTP_DATA_ERROR, MSG_DATA_ERROR, t))
             response.close()
         }) {
@@ -128,11 +128,17 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
 
     private suspend fun postResponse(response: Response, resultType: ResultType) {
         if (checkCanceled(response)) return
-        callback.onSuccessSubThread(resultType)
+        runCatching {
+            callback.onSuccessSubThread(resultType)
+        }.onFailure {
+            OkHttpUtils.get().onHttpError?.invoke(it)
+        }
         coroutineScope {
             async(Dispatchers.Main + CoroutineExceptionHandler { _, t ->
                 t.printStackTrace()
-                postFailure(HttpException(HTTP_UNKNOWN, MSG_UNKNOWN, t))
+                OkHttpUtils.get().onHttpError?.invoke(t)
+                postFailure(HttpException(HttpErrorCode.HTTP_CALL_ERROR, HttpErrorCode.MSG_CALL_ERROR, t))
+                response.close()
             }) {
                 if (checkCanceled(response)) return@async
                 if (callback.onSuccessHandelCode(resultType)) {

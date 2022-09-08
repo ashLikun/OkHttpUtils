@@ -28,7 +28,11 @@ import java.util.concurrent.TimeUnit
  * @param response  Response
  * @param json      解析的json数据
  */
-typealias  OnDataParseError = (code: Int, exception: Exception, response: Response, json: String) -> Unit
+typealias  OnDataParseError = (code: Int, throwable: Throwable, response: Response, json: String) -> Unit
+/**
+ * 结果返回外部处理的时候错
+ */
+typealias  OnHttpError = (throwable: Throwable) -> Unit
 
 class OkHttpUtils private constructor(
     client: OkHttpClient?
@@ -72,6 +76,11 @@ class OkHttpUtils private constructor(
      * 当数据解析错误
      */
     var onDataParseError: OnDataParseError? = null
+
+    /**
+     * 结果返回外部处理的时候错
+     */
+    var onHttpError: OnHttpError? = null
 
     /**
      * 是否默认以json提交数据
@@ -186,28 +195,6 @@ class OkHttpUtils private constructor(
             return RequestCall(requestParam)
         }
 
-        /**
-         * 设置解析错误 回调
-         */
-        fun setOnDataParseError(onDataParseError: OnDataParseError) {
-            get().onDataParseError = onDataParseError
-        }
-
-        fun getOnDataParseError(): OnDataParseError? {
-            return get().onDataParseError
-        }
-
-        /**
-         * 发送解析错误
-         */
-        fun sendOnDataParseError(
-            code: Int,
-            exception: Exception,
-            response: Response,
-            json: String
-        ) {
-            get().onDataParseError?.invoke(code, exception, response, json)
-        }
     }
 
 }

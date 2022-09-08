@@ -404,7 +404,7 @@ object HttpUtils {
             } catch (e: Exception) {
                 //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
                 launch {
-                    OkHttpUtils.sendOnDataParseError(
+                    OkHttpUtils.get().onDataParseError?.invoke(
                         HttpErrorCode.HTTP_DATA_ERROR, e, response, json
                     )
                 }

@@ -15,6 +15,7 @@ object HttpErrorCode {
     const val HTTP_NO_CONNECT = 100102 //网络未连接
     const val HTTP_TIME_OUT = 100101 //网络超时
     const val HTTP_UNKNOWN = 100100 //未知错误
+    const val HTTP_CALL_ERROR = 100103 //处理结果错误
     const val HTTP_UNKNOWN_HOST = 10098 //域名错误
     const val HTTP_DATA_ERROR: Int = 10097 //数据解析错误
     const val HTTP_SOCKET_ERROR = 10096 //请求过于频繁,请稍后再试
@@ -32,6 +33,10 @@ object HttpErrorCode {
     //未知错误
     val MSG_UNKNOWN
         get() = getMessage(R.string.okhttp_message_unknown)
+
+    //处理结果错误
+    val MSG_CALL_ERROR
+        get() = getMessage(R.string.okhttp_message_call_error)
 
     //未知网络错误
     val MSG_UNKNOWN_NETWORK
@@ -54,7 +59,7 @@ object HttpErrorCode {
         get() = getMessage(R.string.okhttp_message_canceled)
 
     //服务君累趴下啦
-    val MSG_INTERNAL_ERROR
+    val MSG_500
         get() = getMessage(R.string.okhttp_message_internal_error)
 
     //禁止访问

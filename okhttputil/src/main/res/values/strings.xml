@@ -5,6 +5,7 @@
     <string name="okhttp_message_no_conect">请检查网络设置</string>
     <string name="okhttp_message_time_out">连接超时</string>
     <string name="okhttp_message_unknown">未知错误</string>
+    <string name="okhttp_message_call_error">处理结果错误</string>
     <string name="okhttp_message_unknown_network">未知网络错误</string>
     <string name="okhttp_message_data_error">数据解析错误</string>
     <string name="okhttp_message_data_error2">数据解析错误_NULL</string>
