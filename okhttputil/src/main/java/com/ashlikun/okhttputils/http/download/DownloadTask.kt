@@ -37,7 +37,7 @@ open class DownloadTask(
 
     // 文件保存路径
     open var saveDirPath: String = DownloadManager.defaultFilePath
-        set(value) = if (!value.endsWith("/")) field = "$value/" else field = value
+        set(value) = if (!value.endsWith(File.separator)) field = "$value${File.separator}" else field = value
 
     //文件保存的名称,如果正在下载就会被替换掉
     open var fileName: String = ""
@@ -185,9 +185,9 @@ open class DownloadTask(
                 downLoadFile = RandomAccessFile(filePath, FILE_MODE)
             } else {
                 //设置文件名
-                if (fileName.isEmpty()) {
-                    fileName = getNetFileName(null, url)
-                }
+//                if (fileName.isEmpty()) {
+//                    fileName = getNetFileName(null, url)
+//                }
                 downLoadFile = RandomAccessFile(filePath, FILE_MODE)
             }
             //调节已完成的长度与文件一致
