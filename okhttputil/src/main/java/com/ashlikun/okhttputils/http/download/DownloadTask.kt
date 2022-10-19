@@ -36,10 +36,11 @@ open class DownloadTask(
     open lateinit var client: OkHttpClient
 
     // 文件保存路径
-    open var saveDirPath: String = DownloadManager.defaultFilePath
+    open var saveDirPath: String =
+        if (!DownloadManager.defaultFilePath.endsWith(File.separator)) "${DownloadManager.defaultFilePath}${File.separator}" else DownloadManager.defaultFilePath
         set(value) = if (!value.endsWith(File.separator)) field = "$value${File.separator}" else field = value
 
-    //文件保存的名称,如果正在下载就会被替换掉
+    //文件保存的名称,如果正在下载就会被替换掉,第一次下载如果不设置，那么就会取Http的fileName，如果没有那么就会取url
     open var fileName: String = ""
 
     //下载状态

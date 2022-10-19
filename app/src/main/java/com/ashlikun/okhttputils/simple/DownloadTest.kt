@@ -14,7 +14,7 @@ import java.io.File
  */
 var task: DownloadTask = DownloadTask("resmp;csr=1bbd",
 //    url = "http://s.shouji.qihucdn.com/200407/28e9b1ac86444ec466f56ff0df9aa7b9/com.qihoo360.mobilesafe_267.apk?en=curpage%3D%26exp%3D1587610389%26from%3Dopenbox_detail_index%26m2%3D%26ts%3D1587005589%26tok%3D8ac5571c83e9bb8497076a3435f3c90d%26f%3Dz.apk",
-    url = "http://s.shouji.qihucdn.com/211215/71fcfc885874016c5bbf183c76d08ab7/com.ss.android.ugc.aweme_180901.apk?en=curpage%3D%26exp%3D1640354101%26from%3DAppList_qcms1%26m2%3D%26ts%3D1639749301%26tok%3D9e27d6e102c5921ffa7ef7a03ed91048%26v%3D%26f%3Dz.apk",
+    url = "https://www.pgyer.com/apiv2/app/install?_api_key=b6291f8ab5dab403b1cbb2344bed368f&appKey=d600ce66c1ae2a77073faf94167fb3b3",
     object : DownloadTaskListener {
         override fun onDownloading(
             downloadTask: DownloadTask,
