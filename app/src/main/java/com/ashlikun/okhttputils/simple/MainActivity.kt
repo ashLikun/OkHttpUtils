@@ -34,6 +34,11 @@ class MainActivity : AppCompatActivity() {
         }
         binding.buttonStartDown.setOnClickListener {
             DownloadManager.get().addDownloadTask(task)
+            DownloadManager.get().addDownloadTask(task2)
+            DownloadManager.get().addDownloadTask(task3)
+            DownloadManager.get().addDownloadTask(task4)
+            DownloadManager.get().addDownloadTask(task5)
+            DownloadManager.get().addDownloadTask(task6)
         }
         binding.buttonCancelPaus.setOnClickListener {
             DownloadManager.get().pause(task.id)
@@ -42,9 +47,7 @@ class MainActivity : AppCompatActivity() {
             DownloadManager.get().cancel(task.id)
         }
         binding.buttonImage.setOnClickListener {
-            OkHttpUtils.get(meinv)
-                .buildCall()
-                .execute(object : BitmapCallback() {
+            OkHttpUtils.get(meinv).buildCall().execute(object : BitmapCallback() {
                     override fun onSuccess(responseBody: Bitmap) {
                         super.onSuccess(responseBody)
                         binding.image.setImageBitmap(responseBody)
@@ -52,48 +55,35 @@ class MainActivity : AppCompatActivity() {
                 })
         }
         binding.buttonCookies.setOnClickListener {
-            OkHttpUtils.get("https://wanandroid.com/article/list/1/json?cid=0")
-                .apply {
+            OkHttpUtils.get("https://wanandroid.com/article/list/1/json?cid=0").apply {
                     addHeader("heeeeee", "adddheeeeee")
                     addParam("action", "recommend")
                     addParam("wwwwwwww", "dddddddddddd")
                     cacheMode = CacheMode.FIRST_CACHE_THEN_REQUEST
                     cacheTime = 3600000
-                }
-                .buildCall()
-                .execute(object : AbsCallback<GoodListData>() {
+                }.buildCall().execute(object : AbsCallback<GoodListData>() {
                     override fun onSuccess(responseBody: GoodListData) {
                         Log.e("onSuccess", responseBody.getStringValueDef("123", "list", "title"))
                     }
 
                     override fun onCacheSuccess(entity: CacheEntity, responseBody: GoodListData) {
                         super.onCacheSuccess(entity, responseBody)
-                        Log.e(
-                            "onCacheSuccess",
-                            GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result
-                        )
+                        Log.e("onCacheSuccess", GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result)
                     }
                 })
         }
         binding.buttonDefault.setOnClickListener {
-            OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend")
-                .apply {
+            OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend").apply {
                     addHeader("heeeeee", "adddheeeeee")
                     addParam("action", "recommend")
                     addParam("wwwwwwww", "dddddddddddd")
                     cacheMode = CacheMode.FIRST_CACHE_THEN_REQUEST
                     cacheTime = 3600000
                     toJson()
-                }
-                .buildCall()
-                .execute(object : AbsCallback<GoodListData>() {
-                    override val progressCallBack: ProgressCallBack =
-                        { progress, total, done, isUpdate ->
-                            Log.e(
-                                "aaa",
-                                "progress = $progress   total = $total    done = $done   isUpdate = $isUpdate"
-                            )
-                        }
+                }.buildCall().execute(object : AbsCallback<GoodListData>() {
+                    override val progressCallBack: ProgressCallBack = { progress, total, done, isUpdate ->
+                        Log.e("aaa", "progress = $progress   total = $total    done = $done   isUpdate = $isUpdate")
+                    }
 
                     override fun onSuccess(responseBody: GoodListData) {
                         Log.e("onSuccess", responseBody.getValue<Boolean>("list").toString())
@@ -103,10 +93,7 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onCacheSuccess(entity: CacheEntity, responseBody: GoodListData) {
                         super.onCacheSuccess(entity, responseBody)
-                        Log.e(
-                            "onCacheSuccess",
-                            GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result
-                        )
+                        Log.e("onCacheSuccess", GsonHelper.getGson().toJson(responseBody) + "\n\n\n" + entity.result)
                     }
 
                     override fun onError(e: HttpException) {
