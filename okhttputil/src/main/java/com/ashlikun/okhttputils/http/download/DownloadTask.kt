@@ -184,29 +184,32 @@ open class DownloadTask(
                 //替换文件名
                 fileName = dbEntity!!.fileName
                 downLoadFile = RandomAccessFile(filePath, FILE_MODE)
+
+                //下面这些是断点下载的恢复
+                //调节已完成的长度与文件一致
+                val fileLength = downLoadFile.length()
+                if (fileLength < completedSize) completedSize = downLoadFile.length()
+                // 下载完成，更新数据库数据
+                if (fileLength != 0L && totalSize <= fileLength) {
+                    downloadStatus = DownloadStatus.DOWNLOAD_STATUS_COMPLETED
+                    completedSize = fileLength
+                    totalSize = completedSize
+                    dbEntity = DownloadEntity(
+                        id, totalSize, totalSize,
+                        url, saveDirPath, fileName, downloadStatus
+                    )
+                    dbEntity?.save()
+                    // 执行finally中的回调
+                    return
+                }
             } else {
                 //设置文件名
 //                if (fileName.isEmpty()) {
 //                    fileName = getNetFileName(null, url)
 //                }
-                downLoadFile = RandomAccessFile(filePath, FILE_MODE)
+//                downLoadFile = RandomAccessFile(filePath, FILE_MODE)
             }
-            //调节已完成的长度与文件一致
-            val fileLength = downLoadFile.length()
-            if (fileLength < completedSize) completedSize = downLoadFile.length()
-            // 下载完成，更新数据库数据
-            if (fileLength != 0L && totalSize <= fileLength) {
-                downloadStatus = DownloadStatus.DOWNLOAD_STATUS_COMPLETED
-                completedSize = fileLength
-                totalSize = completedSize
-                dbEntity = DownloadEntity(
-                    id, totalSize, totalSize,
-                    url, saveDirPath, fileName, downloadStatus
-                )
-                dbEntity?.save()
-                // 执行finally中的回调
-                return
-            }
+
 
             // 开始下载
             val request: Request = Request.Builder().url(url).header(
@@ -218,6 +221,10 @@ open class DownloadTask(
             //设置response文件名
             if (fileName.isEmpty()) {
                 fileName = getNetFileName(response, url)
+            }
+            //这个需要在文件名已经存在的时候使用
+            if (downLoadFile == null) {
+                downLoadFile = RandomAccessFile(filePath, FILE_MODE)
             }
             // 文件跳转到指定位置开始写入
             downLoadFile.seek(completedSize)
