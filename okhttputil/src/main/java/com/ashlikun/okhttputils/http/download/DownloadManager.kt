@@ -21,8 +21,10 @@ class DownloadManager private constructor(var client: OkHttpClient) {
      * 添加下载任务
      */
     fun addDownloadTask(downloadTask: DownloadTask, isStart: Boolean = true) {
+        downloadTask.client = client
         val oldTask = currentTaskList[downloadTask.id]
         if (oldTask != null) {
+            oldTask.client = client
             when {
                 //正在下载不处理
                 oldTask.isDownloading -> return
@@ -40,7 +42,6 @@ class DownloadManager private constructor(var client: OkHttpClient) {
             }
         }
         if (!downloadTask.isDownloading) {
-            downloadTask.client = client
             downloadTask.downloadStatus = DownloadStatus.DOWNLOAD_STATUS_INIT
             // 保存下载task列表
             currentTaskList[downloadTask.id] = downloadTask
