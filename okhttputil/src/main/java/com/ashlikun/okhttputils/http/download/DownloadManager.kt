@@ -21,10 +21,8 @@ class DownloadManager private constructor(var client: OkHttpClient) {
      * 添加下载任务
      */
     fun addDownloadTask(downloadTask: DownloadTask, isStart: Boolean = true) {
-        downloadTask.client = client
         val oldTask = currentTaskList[downloadTask.id]
         if (oldTask != null) {
-            oldTask.client = client
             when {
                 //正在下载不处理
                 oldTask.isDownloading -> return
@@ -40,17 +38,19 @@ class DownloadManager private constructor(var client: OkHttpClient) {
                     return
                 }
             }
-        }
-        if (!downloadTask.isDownloading) {
-            downloadTask.downloadStatus = DownloadStatus.DOWNLOAD_STATUS_INIT
-            // 保存下载task列表
-            currentTaskList[downloadTask.id] = downloadTask
-            if (isStart) {
-                launch {
-                    downloadTask.run()
+        } else {
+            if (!downloadTask.isDownloading) {
+                downloadTask.downloadStatus = DownloadStatus.DOWNLOAD_STATUS_INIT
+                // 保存下载task列表
+                currentTaskList[downloadTask.id] = downloadTask
+                if (isStart) {
+                    launch {
+                        downloadTask.run()
+                    }
                 }
             }
         }
+
     }
 
     /**
@@ -88,9 +88,21 @@ class DownloadManager private constructor(var client: OkHttpClient) {
      *
      * @param task 任务id
      */
-    fun updateDownloadTask(task: DownloadTask) {
+    internal fun updateDownloadTask(task: DownloadTask) {
         val currTask = getDownloadTask(task.id)
         if (currTask != null) {
+            when {
+                //完成直接移除
+                task.isCompleted -> {
+                    currentTaskList.remove(task.id)
+                    return
+                }
+                //取消也直接移除
+                task.isCancel -> {
+                    currentTaskList.remove(task.id)
+                    return
+                }
+            }
             currentTaskList[task.id] = task
         }
     }
@@ -106,7 +118,7 @@ class DownloadManager private constructor(var client: OkHttpClient) {
             // 从数据库中取出未完成的task
             val entity = DownloadEntity.queryById(id)
             if (entity != null) {
-                if (entity.downloadStatus != DownloadStatus.DOWNLOAD_STATUS_COMPLETED) {
+                if (entity.downloadStatus != DownloadStatus.DOWNLOAD_STATUS_COMPLETED && entity.downloadStatus != DownloadStatus.DOWNLOAD_STATUS_CANCEL) {
                     currTask = parseEntity2Task(entity)
                     // 放入task list中
                     currentTaskList[id] = currTask

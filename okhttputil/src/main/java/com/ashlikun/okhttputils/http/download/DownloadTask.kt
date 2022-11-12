@@ -33,7 +33,8 @@ open class DownloadTask(
         private const val FILE_MODE = "rwd"
     }
 
-    open lateinit var client: OkHttpClient
+    open var client: OkHttpClient = DownloadManager.get().client
+
 
     // 文件保存路径
     open var saveDirPath: String =
@@ -167,7 +168,7 @@ open class DownloadTask(
     /**
      * 真正的下载
      */
-    open fun run() {
+    internal open fun run() {
         //正在下载
         if (isDownloading) return
         isCancel = false
