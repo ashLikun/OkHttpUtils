@@ -58,6 +58,12 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      */
     open var isJson: Boolean = OkHttpUtils.get().isJsonRequest
 
+    /**
+     * Params 一条数据的时候是不是转化为json数组
+     * 前提是json请求
+     */
+    open var isOneParamsJsonArray: Boolean = OkHttpUtils.get().isOneParamsJsonArray
+
     //标识这个请求，会传递到Request里面
     open var tag: Any? = null
 
@@ -304,7 +310,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
                 }
             }
             //如果参数只有一个，并且是List，那么json就是数组
-            postContent = if (params.size == 1 && params.values.find { it != null } is List<*>) {
+            postContent = if (params.size == 1 && isOneParamsJsonArray && params.values.find { it != null } is List<*>) {
                 GsonHelper.getGson().toJson(params.values.find { it != null })
             } else {
                 GsonHelper.getGson().toJson(params)

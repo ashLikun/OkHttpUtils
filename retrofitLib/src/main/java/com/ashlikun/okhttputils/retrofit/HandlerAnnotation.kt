@@ -14,8 +14,10 @@ import kotlin.reflect.jvm.javaType
  *
  * 功能介绍：处理注解
  */
-class HandlerAnnotation(var kClass: KClass<*>,
-                        var method: KFunction<*>) {
+class HandlerAnnotation(
+    var kClass: KClass<*>,
+    var method: KFunction<*>
+) {
     var httpMethod = "POST"
 
     //是否格式化成json提交
@@ -29,6 +31,14 @@ class HandlerAnnotation(var kClass: KClass<*>,
     var params = mutableListOf<ParameterHandler>()
     var urlParams = mutableListOf<ParameterHandler>()
     var classAllAnnotations = getClassAllAnnotations(kClass)
+
+    /**
+     * Params 一条数据的时候是不是转化为json数组
+     * 前提是json请求
+     */
+    var isOneParamsJsonArray: Boolean? = null
+
+
     fun getClassAllAnnotations(kClass: KClass<*>): List<Annotation> {
         var ans = mutableListOf<Annotation>()
         //查找父类的
@@ -55,6 +65,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
                     is Url -> if (!it.method.isNullOrEmpty()) httpMethod = it.method
                     is Mehtod -> httpMethod = it.method
                     is Json -> isJson = it.value
+                    is JsonOneParamsToArray -> isOneParamsJsonArray = it.value
                     is Path -> path += it.value
                     is Parse -> parseType = it.parse
                     //固定头
@@ -97,6 +108,7 @@ class HandlerAnnotation(var kClass: KClass<*>,
                     }
                     is Mehtod -> httpMethod = it.method
                     is Json -> isJson = it.value
+                    is JsonOneParamsToArray -> isOneParamsJsonArray = it.value
                     is Parse -> parseType = it.parse
                     is Get -> {
                         if (url.isNullOrEmpty()) {

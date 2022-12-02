@@ -20,6 +20,11 @@ class HttpServiceMethod<ReturnT>(
     var method: String,
     //null:默认
     var isJsonRequest: Boolean?,
+    /**
+     * Params 一条数据的时候是不是转化为json数组
+     * 前提是json请求
+     */
+    var isOneParamsJsonArray: Boolean?,
     var resultType: Type,
     var params: List<ParameterHandler>,
     var urlParams: List<ParameterHandler>,
@@ -35,8 +40,9 @@ class HttpServiceMethod<ReturnT>(
             url = url.replace("{${it.key}}", args?.getOrNull(it.index).toString())
         }
         //创建请求
-        val request = Retrofit.get().createRequest!!.invoke(this).setMethod(method).apply {
-            isJson = isJsonRequest ?: OkHttpUtils.get().isJsonRequest
+        val request = Retrofit.get().createRequest!!.invoke(this).setMethod(method).also {
+            it.isJson = isJsonRequest ?: OkHttpUtils.get().isJsonRequest
+            it.isOneParamsJsonArray = isOneParamsJsonArray ?: OkHttpUtils.get().isOneParamsJsonArray
         }
         //添加参数
         params.forEach { itt ->
@@ -51,7 +57,8 @@ class HttpServiceMethod<ReturnT>(
 
     companion object {
         fun <ReturnT> parseAnnotations(
-            retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>)
+            retrofit: Retrofit, kClass: KClass<*>, method: KFunction<*>
+        )
                 : HttpServiceMethod<ReturnT> {
 
 
@@ -77,26 +84,33 @@ class HttpServiceMethod<ReturnT>(
                     method,
                     null,
                     "Method return type must not include a type variable or wildcard: %s",
-                    returnType)
+                    returnType
+                )
             }
-            return HttpServiceMethod(handlerAnnotation.url,
+            return HttpServiceMethod(
+                handlerAnnotation.url,
                 handlerAnnotation.httpMethod,
                 handlerAnnotation.isJson,
+                handlerAnnotation.isOneParamsJsonArray,
                 returnType,
                 handlerAnnotation.params,
                 handlerAnnotation.urlParams,
-                handlerAnnotation.parseType)
+                handlerAnnotation.parseType
+            )
         }
 
 
-        fun methodErrorK(kClass: KClass<*>,
-            method: KFunction<*>, cause: Throwable?, message: String, vararg args: Any?): RuntimeException {
+        fun methodErrorK(
+            kClass: KClass<*>,
+            method: KFunction<*>, cause: Throwable?, message: String, vararg args: Any?
+        ): RuntimeException {
             var message = message
             message = String.format(message, *args)
             return IllegalArgumentException(
                 """$message
     for method ${kClass.simpleName}.${method.name}""",
-                cause)
+                cause
+            )
         }
     }
 

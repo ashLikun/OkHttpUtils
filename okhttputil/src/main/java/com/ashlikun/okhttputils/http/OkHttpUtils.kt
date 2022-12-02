@@ -88,6 +88,12 @@ class OkHttpUtils private constructor(
     var isJsonRequest: Boolean = false
 
     /**
+     * Params 一条数据的时候是不是转化为json数组
+     * 前提是json请求
+     */
+    var isOneParamsJsonArray: Boolean = true
+
+    /**
      * 是否设置了公共头
      */
     val isCommonHeaders

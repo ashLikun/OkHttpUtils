@@ -48,6 +48,15 @@ annotation class Mehtod(val method: String = "POST")
 annotation class Json(val value: Boolean = true)
 
 /**
+ * Params 一条数据的时候是不是转化为json数组 前提是json请求
+ * 1：在方法上  当前
+ * 2：在接口上  全部
+ */
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class JsonOneParamsToArray(val value: Boolean = true)
+
+/**
  * 请求的path 可以有占位符 ：/user/{id}
  * @param replace 是否替换父类的
  * 如果接口上也有配置，那么默认会相加，如果replace=true那么就替换
@@ -88,7 +97,8 @@ annotation class Parse(val parse: String)
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Inherited
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Field(val key: String = "",
+annotation class Field(
+    val key: String = "",
     val encoded: Boolean = false,
     //是否是文件
     val isFile: Boolean = false,
@@ -97,7 +107,8 @@ annotation class Field(val key: String = "",
     //如果是多个文件是否用同一个key变成数组
     val isFileArray: Boolean = false,
     //对象是否变成释放变成根节点
-    val isObjToRoot: Boolean = true)
+    val isObjToRoot: Boolean = true
+)
 
 /**
  * 这个字段不用提交,用于回调的时候处理
