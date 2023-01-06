@@ -189,27 +189,27 @@ class OkHttpManage private constructor(
         /**
          * 创建一个新的 OkHttpManage
          */
-        @Synchronized
         fun create(key: String, okHttpClient: OkHttpClient?): OkHttpManage {
-            val manage = OkHttpManage(okHttpClient)
-            manageCache[key] = manage
-            return manage
+            return synchronized(manageCache) {
+                val manage = OkHttpManage(okHttpClient)
+                manageCache[key] = manage
+                manage
+            }
         }
 
-        @Synchronized
         fun getManage(key: String): OkHttpManage? {
-            return manageCache[key]
+            return synchronized(manageCache) { manageCache[key] }
         }
 
-        @Synchronized
         fun removeManage(key: String): OkHttpManage? {
-            return manageCache.remove(key)
+            return synchronized(manageCache) { manageCache.remove(key) }
         }
 
-        @Synchronized
         fun removeManage(okHttpManage: OkHttpManage) {
-            manageCache.filter { it.value == okHttpManage }.forEach {
-                manageCache.remove(it.key)
+            synchronized(manageCache) {
+                manageCache.filter { it.value == okHttpManage }.forEach {
+                    manageCache.remove(it.key)
+                }
             }
         }
 
@@ -241,8 +241,10 @@ class OkHttpManage private constructor(
         fun countRequest(vararg tag: Any): Int {
             var count = get().countRequest(tag)
             if (manageCache.isNotEmpty()) {
-                manageCache.forEach {
-                    count += it.value.countRequest(tag)
+                synchronized(manageCache) {
+                    manageCache.forEach {
+                        count += it.value.countRequest(tag)
+                    }
                 }
             }
             return count
@@ -254,8 +256,10 @@ class OkHttpManage private constructor(
         fun cancelTag(tag: Any) {
             get().cancelTag(tag)
             if (manageCache.isNotEmpty()) {
-                manageCache.forEach {
-                    it.value.countRequest(tag)
+                synchronized(manageCache) {
+                    manageCache.forEach {
+                        it.value.countRequest(tag)
+                    }
                 }
             }
         }
@@ -266,8 +270,10 @@ class OkHttpManage private constructor(
         fun cancelAll() {
             get().cancelAll()
             if (manageCache.isNotEmpty()) {
-                manageCache.forEach {
-                    it.value.cancelAll()
+                synchronized(manageCache) {
+                    manageCache.forEach {
+                        it.value.cancelAll()
+                    }
                 }
             }
         }
