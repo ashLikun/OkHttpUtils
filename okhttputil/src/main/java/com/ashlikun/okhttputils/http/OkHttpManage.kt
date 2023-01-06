@@ -34,7 +34,7 @@ typealias  OnDataParseError = (code: Int, throwable: Throwable, response: Respon
  */
 typealias  OnHttpError = (throwable: Throwable) -> Unit
 
-class OkHttpUtils private constructor(
+class OkHttpManage private constructor(
     client: OkHttpClient?
 ) {
     /**
@@ -72,15 +72,6 @@ class OkHttpUtils private constructor(
      */
     var cacheIsCheckSuccess = true
 
-    /**
-     * 当数据解析错误
-     */
-    var onDataParseError: OnDataParseError? = null
-
-    /**
-     * 结果返回外部处理的时候错
-     */
-    var onHttpError: OnHttpError? = null
 
     /**
      * 是否默认以json提交数据
@@ -168,15 +159,33 @@ class OkHttpUtils private constructor(
         //默认的超时时间
         const val DEFAULT_MILLISECONDS = 60000L
         const val DEFAULT_MILLISECONDS_LONG = 200000L
-        private val instance by lazy { OkHttpUtils(null) }
-        fun get(): OkHttpUtils = instance
 
         /**
-         * 初始化一个全局的OkHttpClient
+         * 当数据解析错误
+         */
+        var onDataParseError: OnDataParseError? = null
+
+        /**
+         * 结果返回外部处理的时候错
+         */
+        var onHttpError: OnHttpError? = null
+
+        private val instance by lazy { OkHttpManage(null) }
+        fun get(): OkHttpManage = instance
+
+        /**
+         * 初始化一个全局的 OkHttpManage
          */
         fun init(app: Context, okHttpClient: OkHttpClient?) {
             this.app = app.applicationContext
             get().okHttpClient = okHttpClient ?: get().okHttpClient
+        }
+
+        /**
+         * 创建一个新的 OkHttpManage
+         */
+        fun create(okHttpClient: OkHttpClient?): OkHttpManage {
+            return OkHttpManage(okHttpClient)
         }
 
         /**
@@ -198,7 +207,7 @@ class OkHttpUtils private constructor(
          * 设置参数
          */
         fun request(requestParam: HttpRequest): RequestCall {
-            return RequestCall(requestParam)
+            return requestParam.buildCall()
         }
 
     }

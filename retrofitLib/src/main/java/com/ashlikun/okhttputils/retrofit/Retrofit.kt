@@ -1,6 +1,8 @@
 package com.ashlikun.okhttputils.retrofit
 
+import com.ashlikun.okhttputils.http.OkHttpManage
 import com.ashlikun.okhttputils.http.request.HttpRequest
+import okhttp3.OkHttpClient
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
@@ -14,9 +16,11 @@ import java.util.concurrent.ConcurrentHashMap
  */
 typealias ServiceMethodInvoke<T> = suspend (request: HttpRequest, result: HttpServiceMethod<T>, params: Array<Any?>?) -> T
 
-data class RetrofitUrl(var url: String,
+data class RetrofitUrl(
+    var url: String,
     var action: String,
-    var path: String) {
+    var path: String
+) {
 
 }
 
@@ -48,26 +52,29 @@ class Retrofit private constructor() {
      */
     var createUrl: ((url: String) -> String)? = null
 
-    fun init(createRequest: (it: HttpServiceMethod<*>) -> HttpRequest,
+    fun init(
+        createRequest: (it: HttpServiceMethod<*>) -> HttpRequest,
         execute: ServiceMethodInvoke<*>
     ) {
         this.createRequest = createRequest
         this.execute = execute
     }
 
-    fun <T> create(service: Class<T>): T {
+    fun <T> create(service: Class<T>, okHttpManage: OkHttpManage? = null): T {
         validateServiceInterface(service)
         return Proxy.newProxyInstance(
-            service.classLoader, arrayOf<Class<*>>(service), MyInvocationHandler(this)) as T
+            service.classLoader, arrayOf<Class<*>>(service), MyInvocationHandler(this, okHttpManage)
+        ) as T
     }
 
-    fun <T> loadServiceMethod(proxy: Any?, method: Method): ServiceMethod<T> {
+    fun <T> loadServiceMethod(proxy: Any?, method: Method, okHttpManage: OkHttpManage?): ServiceMethod<T> {
         var result: ServiceMethod<T>? = serviceMethodCache[method] as ServiceMethod<T>?
         //同步锁
         return result ?: synchronized(serviceMethodCache) {
             result = serviceMethodCache[method] as ServiceMethod<T>?
             if (result == null) {
                 result = ServiceMethod.parse(this, method)
+                result!!.okHttpManage = okHttpManage
                 serviceMethodCache[method] = result!!
             }
             result!!

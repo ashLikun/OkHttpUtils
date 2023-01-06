@@ -7,7 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.ashlikun.gson.GsonHelper
 import com.ashlikun.okhttputils.http.HttpException
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.callback.AbsCallback
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             DownloadManager.get().cancel(task.id)
         }
         binding.buttonImage.setOnClickListener {
-            OkHttpUtils.get(meinv).buildCall().execute(object : BitmapCallback() {
+            OkHttpManage.get(meinv).buildCall().execute(object : BitmapCallback() {
                     override fun onSuccess(responseBody: Bitmap) {
                         super.onSuccess(responseBody)
                         binding.image.setImageBitmap(responseBody)
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 })
         }
         binding.buttonCookies.setOnClickListener {
-            OkHttpUtils.get("https://wanandroid.com/article/list/1/json?cid=0").apply {
+            OkHttpManage.get("https://wanandroid.com/article/list/1/json?cid=0").apply {
                     addHeader("heeeeee", "adddheeeeee")
                     addParam("action", "recommend")
                     addParam("wwwwwwww", "dddddddddddd")
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 })
         }
         binding.buttonDefault.setOnClickListener {
-            OkHttpUtils.post("https://api-sip.510gow.com/interface?action=recommend").apply {
+            OkHttpManage.post("https://api-sip.510gow.com/interface?action=recommend").apply {
                     addHeader("heeeeee", "adddheeeeee")
                     addParam("action", "recommend")
                     addParam("wwwwwwww", "dddddddddddd")

@@ -1,7 +1,7 @@
 package com.ashlikun.okhttputils.simple
 
 import android.app.Application
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 import com.ashlikun.okhttputils.http.cookie.CookieJarImpl
 import com.ashlikun.okhttputils.http.cookie.store.DBCookieStore
 import com.ashlikun.okhttputils.http.download.DownloadManager
@@ -11,7 +11,6 @@ import com.ashlikun.okhttputils.simple.interceptor.MarvelSigningInterceptor
 import com.ashlikun.orm.LiteOrmUtil
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
-import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resumeWithException
@@ -49,9 +48,9 @@ class MyApp : Application() {
             .cookieJar(CookieJarImpl(DBCookieStore()))
             .addInterceptor(MarvelSigningInterceptor())
             .build()
-        OkHttpUtils.init(this, mOkHttpClient)
-        OkHttpUtils.get().commonHeaders = head
-        OkHttpUtils.get().commonParams = params
+        OkHttpManage.init(this, mOkHttpClient)
+        OkHttpManage.get().commonHeaders = head
+        OkHttpManage.get().commonParams = params
         DownloadManager.initPath(this.cacheDir.path)
         Retrofit.get().init(
             createRequest = { MyHttpRequest(it.url) },

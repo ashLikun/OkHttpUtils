@@ -1,9 +1,7 @@
 package com.ashlikun.okhttputils.retrofit
 
-import android.util.Log
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 import java.lang.reflect.Type
-import kotlin.math.log
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaType
@@ -41,8 +39,9 @@ class HttpServiceMethod<ReturnT>(
         }
         //创建请求
         val request = Retrofit.get().createRequest!!.invoke(this).setMethod(method).also {
-            it.isJson = isJsonRequest ?: OkHttpUtils.get().isJsonRequest
-            it.isOneParamsJsonArray = isOneParamsJsonArray ?: OkHttpUtils.get().isOneParamsJsonArray
+            it.okHttpManage = okHttpManage ?: it.okHttpManage
+            it.isJson = isJsonRequest ?: it.okHttpManage.isJsonRequest
+            it.isOneParamsJsonArray = isOneParamsJsonArray ?: it.okHttpManage.isOneParamsJsonArray
         }
         //添加参数
         params.forEach { itt ->

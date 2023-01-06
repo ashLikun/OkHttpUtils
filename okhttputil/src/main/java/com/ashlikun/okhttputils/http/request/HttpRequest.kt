@@ -26,6 +26,8 @@ import kotlin.collections.HashMap
  *          可以继承，从写方法
  */
 open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
+    open var okHttpManage: OkHttpManage = OkHttpManage.get()
+
     //请求地址
     open var url: Uri = Uri.parse(url)
 
@@ -48,7 +50,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     open var files = mutableListOf<FileInput>()
 
 
-    open var parseGson: Gson = OkHttpUtils.get().parseGson
+    open var parseGson: Gson = okHttpManage.parseGson
 
     lateinit var request: Request
         protected set
@@ -56,13 +58,13 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     /**
      * 是否json形式提交
      */
-    open var isJson: Boolean = OkHttpUtils.get().isJsonRequest
+    open var isJson: Boolean = okHttpManage.isJsonRequest
 
     /**
      * Params 一条数据的时候是不是转化为json数组
      * 前提是json请求
      */
-    open var isOneParamsJsonArray: Boolean = OkHttpUtils.get().isOneParamsJsonArray
+    open var isOneParamsJsonArray: Boolean = okHttpManage.isOneParamsJsonArray
 
     //标识这个请求，会传递到Request里面
     open var tag: Any? = null
@@ -71,10 +73,10 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     open var cacheMode: CacheMode? = null
 
     //缓存超时时间
-    open var cacheTime: Long = OkHttpUtils.get().cacheTime
+    open var cacheTime: Long = okHttpManage.cacheTime
 
     //缓存是否检测接口成功后才保存  前提是结果实现IHttpResponse
-    open var cacheIsCheckSuccess = OkHttpUtils.get().cacheIsCheckSuccess
+    open var cacheIsCheckSuccess = okHttpManage.cacheIsCheckSuccess
 
     //缓存的key，默认内部自动获取url，但是如果参数里面有动态的参数，那么可能失效，如时间戳,所以开放自己设置
     open var cacheKey: String = ""
@@ -94,13 +96,12 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     }
 
     open fun setMethod(method: String): HttpRequest {
-        for (i in methods.indices) {
-            if (methods[i] == method) {
-                this.method = method
-                return this
-            }
+        val method = method.uppercase()
+        if (methods.contains(method)) {
+            this.method = method
+            return this
         }
-        Log.e("setMethod", "请求方法错误$method")
+        Log.e("setMethod", "请求方法错误$method,已经设为默认GET请求")
         this.method = methods[0]
         return this
     }
@@ -127,8 +128,8 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
                 value = params.toMap()
             }
             //去除公共参数
-            if (OkHttpUtils.get().isCommonParams)
-                value = value.filter { !OkHttpUtils.get().commonParams.containsKey(it.key) }
+            if (okHttpManage.isCommonParams)
+                value = value.filter { !okHttpManage.commonParams.containsKey(it.key) }
             return value
         }
 
@@ -220,7 +221,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 添加 公共参数
      */
     open protected fun addCommonParams() {
-        OkHttpUtils.get().commonParams.forEach { t ->
+        okHttpManage.commonParams.forEach { t ->
             //如果已经有了就不添加，公共参数优先级低
             if (!params.containsKey(t.key)) {
                 addParam(t.key, t.value)
@@ -272,7 +273,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
     open fun setContent(content: String): HttpRequest {
         //添加公共参数
         var content = content
-        if (OkHttpUtils.get().isCommonParams) {
+        if (okHttpManage.isCommonParams) {
             runCatching {
                 params = parseGson.fromJson(content, TreeMap::class.java) as TreeMap<String, Any>
                 addCommonParams()
@@ -329,7 +330,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
      * 这里返回的对象才可以执行请求
      */
     open fun buildCall(): RequestCall {
-        return RequestCall(this)
+        return RequestCall(this, okHttpManage)
     }
 
     /**
@@ -407,7 +408,7 @@ open class HttpRequest(url: String) : Comparator<String>, SuperHttp {
         val requestBody = buildRequestBody(callback)
         val header = Headers.Builder()
         //添加公共请求头
-        OkHttpUtils.get().commonHeaders.forEach {
+        okHttpManage.commonHeaders.forEach {
             //直接set
             header[it.key] = it.value
         }

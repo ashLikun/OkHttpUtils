@@ -3,7 +3,7 @@ package com.ashlikun.okhttputils.http.callback
 import com.ashlikun.okhttputils.http.ExecuteCall
 import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.HttpUtils
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.cache.CachePolicy
 import com.ashlikun.okhttputils.http.response.HttpErrorCode
@@ -23,9 +23,8 @@ import java.io.IOException
  * 功能介绍：okhttp的直接回调
  */
 
-open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callback<ResultType>) :
+open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callback<ResultType>, var gson: Gson) :
     okhttp3.Callback {
-    var gson: Gson = OkHttpUtils.get().parseGson
     var cachePolicy: CachePolicy? = null
         set(value) {
             field = value
@@ -42,10 +41,6 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
 
     init {
         callback.onStart()
-    }
-
-    fun setParseGson(gson: Gson) {
-        this.gson = gson
     }
 
     fun checkCanceled(response: Response? = null): Boolean {
@@ -99,7 +94,7 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
     override fun onResponse(call: Call, response: Response) {
         GlobalScope.launch(CoroutineExceptionHandler { _, t ->
             t.printStackTrace()
-            OkHttpUtils.get().onHttpError?.invoke(t)
+            OkHttpManage.onHttpError?.invoke(t)
             postFailure(HttpException(HTTP_DATA_ERROR, MSG_DATA_ERROR, t))
             response.close()
         }) {
@@ -131,12 +126,12 @@ open class OkHttpCallback<ResultType>(var exc: ExecuteCall, var callback: Callba
         runCatching {
             callback.onSuccessSubThread(resultType)
         }.onFailure {
-            OkHttpUtils.get().onHttpError?.invoke(it)
+            OkHttpManage.onHttpError?.invoke(it)
         }
         coroutineScope {
             async(Dispatchers.Main + CoroutineExceptionHandler { _, t ->
                 t.printStackTrace()
-                OkHttpUtils.get().onHttpError?.invoke(t)
+                OkHttpManage.onHttpError?.invoke(t)
                 postFailure(HttpException(HttpErrorCode.HTTP_CALL_ERROR, HttpErrorCode.MSG_CALL_ERROR, t))
                 response.close()
             }) {

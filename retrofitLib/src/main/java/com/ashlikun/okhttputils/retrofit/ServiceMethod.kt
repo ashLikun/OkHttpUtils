@@ -7,12 +7,15 @@ package com.ashlikun.okhttputils.retrofit
  *
  * 功能介绍：
  */
+import com.ashlikun.okhttputils.http.OkHttpManage
+import okhttp3.OkHttpClient
 import java.lang.reflect.*
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.javaMethod
 
 
 abstract class ServiceMethod<T> {
+    var okHttpManage: OkHttpManage? = null
     abstract suspend fun invoke(proxy: Any?, args: Array<Any?>?): T
     abstract fun invokeNoSuspend(proxy: Any?, args: Array<Any?>?): T
 

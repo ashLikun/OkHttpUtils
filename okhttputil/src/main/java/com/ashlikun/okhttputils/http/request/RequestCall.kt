@@ -4,7 +4,7 @@ import com.ashlikun.okhttputils.http.ExecuteCall
 import com.ashlikun.okhttputils.http.HttpException
 import com.ashlikun.okhttputils.http.HttpUtils.handerResult
 import com.ashlikun.okhttputils.http.HttpUtils.launch
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 import com.ashlikun.okhttputils.http.SuperHttp
 import com.ashlikun.okhttputils.http.cache.CacheMode
 import com.ashlikun.okhttputils.http.cache.CachePolicy
@@ -15,6 +15,7 @@ import com.ashlikun.okhttputils.http.response.HttpErrorCode.HTTP_DATA_ERROR
 import com.ashlikun.okhttputils.http.response.HttpErrorCode.MSG_DATA_ERROR
 import okhttp3.Call
 import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 import java.lang.reflect.ParameterizedType
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit
  *
  * 功能介绍：根据请求参数封装Okhttp的Request和Call，对外提供更多的接口：cancel(),3个超时时间
  */
-open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
+open class RequestCall(var httpRequest: HttpRequest, var okHttpManage: OkHttpManage) : SuperHttp {
     private val TIME_OUT = -1
     lateinit var request: Request
         private set
@@ -62,10 +63,10 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
         request = httpRequest.bulidRequest(callback)
         //如果超时时间大于0,就重新构建OkHttpClient
         if (isNewBuilder) {
-            readTimeOut = if (readTimeOut > 0) readTimeOut else OkHttpUtils.DEFAULT_MILLISECONDS
-            writeTimeOut = if (writeTimeOut > 0) writeTimeOut else OkHttpUtils.DEFAULT_MILLISECONDS
-            connTimeOut = if (connTimeOut > 0) connTimeOut else OkHttpUtils.DEFAULT_MILLISECONDS
-            val clone = OkHttpUtils.get().okHttpClient.newBuilder()
+            readTimeOut = if (readTimeOut > 0) readTimeOut else OkHttpManage.DEFAULT_MILLISECONDS
+            writeTimeOut = if (writeTimeOut > 0) writeTimeOut else OkHttpManage.DEFAULT_MILLISECONDS
+            connTimeOut = if (connTimeOut > 0) connTimeOut else OkHttpManage.DEFAULT_MILLISECONDS
+            val clone = okHttpManage.okHttpClient.newBuilder()
             if (readTimeOut != TIME_OUT.toLong()) {
                 clone.readTimeout(readTimeOut, TimeUnit.MILLISECONDS)
             }
@@ -83,7 +84,7 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
             }
             call = clone.build().newCall(request)
         } else {
-            call = OkHttpUtils.get().okHttpClient.newCall(request)
+            call = okHttpManage.okHttpClient.newCall(request)
         }
 
         if (httpRequest.cacheMode != null) {
@@ -110,8 +111,7 @@ open class RequestCall(var httpRequest: HttpRequest) : SuperHttp {
                 return exc
             }
         }
-        call.enqueue(OkHttpCallback(exc, callback).apply {
-            gson = httpRequest.parseGson
+        call.enqueue(OkHttpCallback(exc, callback,httpRequest.parseGson).apply {
             cacheIsCheckSuccess = httpRequest.cacheIsCheckSuccess
             cachePolicy = this@RequestCall.cachePolicy
         })

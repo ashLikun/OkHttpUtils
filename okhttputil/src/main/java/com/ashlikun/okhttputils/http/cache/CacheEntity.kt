@@ -1,6 +1,6 @@
 package com.ashlikun.okhttputils.http.cache
 
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 import com.ashlikun.okhttputils.http.request.HttpRequest
 import com.ashlikun.okhttputils.http.response.IHttpResponse
 import com.ashlikun.orm.LiteOrmUtil
@@ -68,14 +68,14 @@ open class CacheEntity {
          * @param <ResultType>
          * @return
         </ResultType> */
-        fun <ResultType> getHanderResult(resultType: ResultType?): String {
+        fun <ResultType> getHanderResult(resultType: ResultType?, okHttpManage: OkHttpManage): String {
             if (resultType == null) {
                 return ""
             }
             return when (resultType) {
                 is IHttpResponse -> (resultType as IHttpResponse).json
                 is String -> resultType.toString()
-                else -> OkHttpUtils.get().parseGson.toJson(resultType)
+                else -> okHttpManage.parseGson.toJson(resultType)
             }
         }
 

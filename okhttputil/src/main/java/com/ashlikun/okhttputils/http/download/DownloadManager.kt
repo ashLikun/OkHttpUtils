@@ -1,7 +1,7 @@
 package com.ashlikun.okhttputils.http.download
 
 import com.ashlikun.okhttputils.http.HttpUtils.launch
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
@@ -169,14 +169,14 @@ class DownloadManager private constructor(var client: OkHttpClient) {
 
         private val instance by lazy {
             if (defaultFilePath.isNullOrEmpty()) Exception("请调用initPath方法设置文件默认路径")
-            val client = OkHttpUtils.get().okHttpClient
+            val client = OkHttpManage.get().okHttpClient
                 .newBuilder()
                 .readTimeout(
-                    OkHttpUtils.DEFAULT_MILLISECONDS * 30,
+                    OkHttpManage.DEFAULT_MILLISECONDS * 30,
                     TimeUnit.MILLISECONDS
                 )
-                .writeTimeout(OkHttpUtils.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .connectTimeout(OkHttpUtils.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
+                .writeTimeout(OkHttpManage.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
+                .connectTimeout(OkHttpManage.DEFAULT_MILLISECONDS, TimeUnit.MILLISECONDS)
             client.interceptors().clear()
             client.networkInterceptors().clear()
             DownloadManager(client.build())

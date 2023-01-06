@@ -6,7 +6,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Looper
-import android.text.TextUtils
 import com.ashlikun.okhttputils.http.cache.CacheEntity
 import com.ashlikun.okhttputils.http.callback.Callback
 import com.ashlikun.okhttputils.http.request.ContentRequestBody
@@ -404,7 +403,7 @@ object HttpUtils {
             } catch (e: Exception) {
                 //数据解析异常，统一回调错误,运行到新的线程不占用当前线程
                 launch {
-                    OkHttpUtils.get().onDataParseError?.invoke(
+                    OkHttpManage.onDataParseError?.invoke(
                         HttpErrorCode.HTTP_DATA_ERROR, e, response, json
                     )
                 }
@@ -546,7 +545,7 @@ object HttpUtils {
 
     @SuppressLint("MissingPermission")
     fun isNetworkAvailable(): Boolean {
-        val connectivity = OkHttpUtils.app?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+        val connectivity = OkHttpManage.app?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
         return runCatching {
             connectivity?.activeNetworkInfo?.state == NetworkInfo.State.CONNECTED
         }.getOrNull() ?: false

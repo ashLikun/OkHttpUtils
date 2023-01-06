@@ -1,7 +1,7 @@
 package com.ashlikun.okhttputils.http.response
 
 import com.ashlikun.okhttputils.R
-import com.ashlikun.okhttputils.http.OkHttpUtils
+import com.ashlikun.okhttputils.http.OkHttpManage
 
 /**
  * @author　　: 李坤
@@ -20,7 +20,7 @@ object HttpErrorCode {
     const val HTTP_DATA_ERROR: Int = 10097 //数据解析错误
     const val HTTP_SOCKET_ERROR = 10096 //请求过于频繁,请稍后再试
     const val HTTP_CANCELED = 10095 //请求被取消
-    fun getMessage(resId: Int) = OkHttpUtils.app!!.getString(R.string.okhttp_message_common).ifEmpty { OkHttpUtils.app!!.getString(resId) }
+    fun getMessage(resId: Int) = OkHttpManage.app!!.getString(R.string.okhttp_message_common).ifEmpty { OkHttpManage.app!!.getString(resId) }
 
     //网络未连接
     val MSG_NO_CONNECT

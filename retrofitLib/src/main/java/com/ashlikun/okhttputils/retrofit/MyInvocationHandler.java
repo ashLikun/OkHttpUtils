@@ -1,5 +1,7 @@
 package com.ashlikun.okhttputils.retrofit;
 
+import com.ashlikun.okhttputils.http.OkHttpManage;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -14,10 +16,12 @@ import kotlin.coroutines.Continuation;
  */
 class MyInvocationHandler implements InvocationHandler {
     Retrofit retrofit;
+    OkHttpManage okHttpManage;
     private final Object[] emptyArgs = new Object[0];
 
-    public MyInvocationHandler(Retrofit retrofit) {
+    public MyInvocationHandler(Retrofit retrofit, OkHttpManage okHttpManage) {
         this.retrofit = retrofit;
+        this.okHttpManage = okHttpManage;
     }
 
 
@@ -33,7 +37,7 @@ class MyInvocationHandler implements InvocationHandler {
             if (continuation instanceof Continuation) {
                 retrofit.proxyStart(method, args);
                 try {
-                    Object o = retrofit.loadServiceMethod(proxy, method).invoke(proxy, args, (Continuation) continuation);
+                    Object o = retrofit.loadServiceMethod(proxy, method, okHttpManage).invoke(proxy, args, (Continuation) continuation);
                     return o;
                 } catch (Exception e) {
                     retrofit.proxyError(method, args, e);
@@ -43,7 +47,7 @@ class MyInvocationHandler implements InvocationHandler {
         }
         //执行普通方法
         try {
-            Object o = retrofit.loadServiceMethod(proxy, method).invokeNoSuspend(proxy, args);
+            Object o = retrofit.loadServiceMethod(proxy, method, okHttpManage).invokeNoSuspend(proxy, args);
             return o;
         } catch (Exception e) {
             retrofit.proxyError(method, args, e);
