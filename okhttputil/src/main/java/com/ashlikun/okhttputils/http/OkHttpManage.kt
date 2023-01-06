@@ -174,6 +174,11 @@ class OkHttpManage private constructor(
         fun get(): OkHttpManage = instance
 
         /**
+         * 缓存其他的OkHttpManage
+         */
+        private val manageCache = mutableMapOf<String, OkHttpManage>()
+
+        /**
          * 初始化一个全局的 OkHttpManage
          */
         fun init(app: Context, okHttpClient: OkHttpClient?) {
@@ -184,8 +189,28 @@ class OkHttpManage private constructor(
         /**
          * 创建一个新的 OkHttpManage
          */
-        fun create(okHttpClient: OkHttpClient?): OkHttpManage {
-            return OkHttpManage(okHttpClient)
+        @Synchronized
+        fun create(key: String, okHttpClient: OkHttpClient?): OkHttpManage {
+            val manage = OkHttpManage(okHttpClient)
+            manageCache[key] = manage
+            return manage
+        }
+
+        @Synchronized
+        fun getManage(key: String): OkHttpManage? {
+            return manageCache[key]
+        }
+
+        @Synchronized
+        fun removeManage(key: String): OkHttpManage? {
+            return manageCache.remove(key)
+        }
+
+        @Synchronized
+        fun removeManage(okHttpManage: OkHttpManage) {
+            manageCache.filter { it.value == okHttpManage }.forEach {
+                manageCache.remove(it.key)
+            }
         }
 
         /**
@@ -210,6 +235,42 @@ class OkHttpManage private constructor(
             return requestParam.buildCall()
         }
 
+        /**
+         * 根据Tag获取请求个数
+         */
+        fun countRequest(vararg tag: Any): Int {
+            var count = get().countRequest(tag)
+            if (manageCache.isNotEmpty()) {
+                manageCache.forEach {
+                    count += it.value.countRequest(tag)
+                }
+            }
+            return count
+        }
+
+        /**
+         * 根据Tag取消请求
+         */
+        fun cancelTag(tag: Any) {
+            get().cancelTag(tag)
+            if (manageCache.isNotEmpty()) {
+                manageCache.forEach {
+                    it.value.countRequest(tag)
+                }
+            }
+        }
+
+        /**
+         * 根据Tag取消请求
+         */
+        fun cancelAll() {
+            get().cancelAll()
+            if (manageCache.isNotEmpty()) {
+                manageCache.forEach {
+                    it.value.cancelAll()
+                }
+            }
+        }
     }
 
 }

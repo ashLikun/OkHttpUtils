@@ -62,8 +62,8 @@ class HandlerAnnotation(
         annotations.forEach {
             if (!AnnotationUtils.isInJavaLangAnnotationPackage(it)) {
                 when (it) {
-                    is Url -> if (!it.method.isNullOrEmpty()) httpMethod = it.method
-                    is Mehtod -> httpMethod = it.method
+                    is Url -> if (!it.method.isNullOrEmpty()) httpMethod = it.method.uppercase()
+                    is Mehtod -> httpMethod = it.method.uppercase()
                     is Json -> isJson = it.value
                     is JsonOneParamsToArray -> isOneParamsJsonArray = it.value
                     is Path -> path += it.value
@@ -106,7 +106,7 @@ class HandlerAnnotation(
                         url = it.url
                         httpMethod = it.method
                     }
-                    is Mehtod -> httpMethod = it.method
+                    is Mehtod -> httpMethod = it.method.uppercase()
                     is Json -> isJson = it.value
                     is JsonOneParamsToArray -> isOneParamsJsonArray = it.value
                     is Parse -> parseType = it.parse
