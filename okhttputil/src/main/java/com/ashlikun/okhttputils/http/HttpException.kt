@@ -17,9 +17,11 @@ open class HttpException(
     val code: Int,
     override val message: String,
     //原始错误
-    var throwable: Throwable? = null
+    val throwable: Throwable? = null
 ) : Exception(message) {
-
+    override fun toString(): String {
+        return "[code = " + code + "  ]" + super.toString()
+    }
 
     companion object {
         /**
