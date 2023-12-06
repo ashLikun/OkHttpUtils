@@ -1,6 +1,5 @@
 package com.ashlikun.okhttputils.retrofit
 
-import com.ashlikun.okhttputils.http.OkHttpManage
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

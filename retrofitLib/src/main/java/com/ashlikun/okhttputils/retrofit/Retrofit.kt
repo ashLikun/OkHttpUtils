@@ -2,7 +2,8 @@ package com.ashlikun.okhttputils.retrofit
 
 import com.ashlikun.okhttputils.http.OkHttpManage
 import com.ashlikun.okhttputils.http.request.HttpRequest
-import okhttp3.OkHttpClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
@@ -80,6 +81,14 @@ class Retrofit private constructor() {
             result!!
         }
 
+    }
+
+    suspend fun <T> loadServiceMethodSuspend(proxy: Any?, method: Method, okHttpManage: OkHttpManage?, args: Array<Any?>?): T {
+        return withContext(Dispatchers.IO) {
+            //子线程优化反射
+            val serviceMethod: ServiceMethod<T> = loadServiceMethod(proxy, method, okHttpManage)
+            serviceMethod.invoke(proxy, args)
+        }
     }
 
     /**

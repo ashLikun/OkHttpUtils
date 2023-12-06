@@ -37,7 +37,7 @@ class MyInvocationHandler implements InvocationHandler {
             if (continuation instanceof Continuation) {
                 retrofit.proxyStart(method, args);
                 try {
-                    Object o = retrofit.loadServiceMethod(proxy, method, okHttpManage).invoke(proxy, args, (Continuation) continuation);
+                    Object o = retrofit.loadServiceMethodSuspend(proxy, method, okHttpManage, args, (Continuation) continuation);
                     return o;
                 } catch (Exception e) {
                     retrofit.proxyError(method, args, e);

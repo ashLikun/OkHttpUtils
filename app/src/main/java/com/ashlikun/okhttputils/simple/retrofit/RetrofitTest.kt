@@ -28,9 +28,11 @@ class RetrofitTest {
                     delay(2000)
                 }
                 runCatching {
-                    var aaa2 = ApiOther.api.test(111, WeiJinModel())
-                    Log.e("bbb", aaa2?.dataX?.toString())
-                    Log.e("bbb2", aaa2?.newData?.toString())
+                   withContext(Dispatchers.Main){
+                       var aaa2 = ApiOther.api.test(111, WeiJinModel())
+                       Log.e("bbb", aaa2?.dataX?.toString())
+                       Log.e("bbb2", aaa2?.newData?.toString())
+                   }
                 }.onFailure {
                     it.printStackTrace()
                     Log.e("sssssss22222222ss", "")
